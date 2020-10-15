@@ -11,7 +11,7 @@ use crate::triangle3d::*;
 use crate::point3d::*;
 use crate::segment3d::*;
 use crate::polygon3d::*;
-use crate::loop3d::*;
+
 
 pub struct Triangulation3D {
     triangles:Vec<Triangle3D>,
@@ -969,6 +969,7 @@ pub fn is_convex(a:Point3D, b:Point3D, c:Point3D, d:Point3D) -> bool {
 #[cfg(test)]
 mod testing{
     use super::*;
+    use crate::loop3d::*;
 
     #[test]
     fn test_is_convex(){        

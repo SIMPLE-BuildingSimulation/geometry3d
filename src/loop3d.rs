@@ -17,7 +17,7 @@ impl Vertex {
     }
 }
 
-
+#[derive(Debug, Clone)]
 pub struct Loop3D{
     vertices : Vec<Vertex>,
     normal:Vector3D,    

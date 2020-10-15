@@ -261,9 +261,9 @@ impl Polygon3D{
                         if outer_normal.is_same_direction(inner_normal){
                             // If both in the same direction, then we need to 
                             // add the interior in reverse.
-                            vertex_to_add = (inner_vertex_id as i32 - j as i32) as usize % n_inner_loop_vertices;;
+                            vertex_to_add = (inner_vertex_id as i32 - j as i32) as usize % n_inner_loop_vertices;
                         }else{
-                            vertex_to_add = (inner_vertex_id as i32 + j as i32) as usize % n_inner_loop_vertices;;
+                            vertex_to_add = (inner_vertex_id as i32 + j as i32) as usize % n_inner_loop_vertices;
                         }
 
                         let (inner_vertex, is_valid) = self.inner[min_inner_loop_id].vertex(vertex_to_add).unwrap();
