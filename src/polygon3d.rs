@@ -10,10 +10,10 @@ pub struct Polygon3D{
 }
 
 impl Polygon3D{
-    pub fn new(outer: Loop3D )->Result<Polygon3D,&'static str>{
+    pub fn new(outer: Loop3D )->Result<Polygon3D,String>{
 
         if !outer.is_closed() {
-            return Err("Trying to create a Polygon3D from a loop that is not closed");
+            return Err(format!("Trying to create a Polygon3D from a loop that is not closed"));
         }
         
         let area = outer.area();
@@ -29,6 +29,10 @@ impl Polygon3D{
 
     pub fn outer(&self)->&Loop3D{
         &self.outer
+    }
+
+    pub fn clone_outer(&self)->Loop3D{
+        self.outer.clone()
     }
 
     pub fn n_inner_loops(&self) -> usize {

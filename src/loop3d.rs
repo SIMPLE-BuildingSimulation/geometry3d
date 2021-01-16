@@ -1,3 +1,5 @@
+
+
 use crate::point3d::*;
 use crate::vector3d::*;
 use crate::segment3d::*;
@@ -17,7 +19,7 @@ impl Vertex {
     }
 }
 
-#[derive(Debug, Clone)]
+
 pub struct Loop3D{
     vertices : Vec<Vertex>,
     normal:Vector3D,    
@@ -25,6 +27,8 @@ pub struct Loop3D{
     area:f64,
     n_valid_vertices:usize,
 }
+
+
 
 impl Loop3D {
     pub fn new()->Loop3D{
@@ -36,6 +40,19 @@ impl Loop3D {
             n_valid_vertices:0,
         }
     }
+
+    pub fn clone(&self)->Loop3D{
+        Loop3D{
+            normal:self.normal,
+            closed: self.closed,
+            area: self.area,
+            n_valid_vertices: self.n_valid_vertices,
+            vertices: self.vertices.clone(),
+        }
+    }
+
+
+
 
     pub fn push(&mut self,p:Point3D)->Result<usize,&'static str>{
 
@@ -384,6 +401,7 @@ impl Loop3D {
         self.closed
     }
 }
+
 
 
 

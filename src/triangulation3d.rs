@@ -89,6 +89,7 @@ impl Triangulation3D {
         self.n_valid_triangles
     }
 
+    #[allow(dead_code)]
     fn borrow_triangle(&mut self,i:usize )->Result<&mut Triangle3D,String>{
         
         if i < self.triangles.len() {
@@ -103,6 +104,7 @@ impl Triangulation3D {
         Err(msg)
     }
 
+    #[allow(dead_code)]
     fn invalidate(&mut self, i:usize)->Result<(),String>{
         let n = self.triangles.len();
         if i < n{
@@ -127,7 +129,7 @@ impl Triangulation3D {
         return None;
     }
 
-    
+    #[allow(dead_code)]
     fn mark_as_neighbours(&mut self, i1: usize, edge_1: usize, i2 : usize) -> Result<(),String> {        
         
         let start : Point3D;
@@ -212,6 +214,7 @@ impl Triangulation3D {
         }
     }
 
+    #[allow(dead_code)]
     fn get_opposite_vertex(&self, triangle: &Triangle3D, edge: Segment3D )->Result<Point3D,String> {
         
         let start = edge.start();
@@ -233,6 +236,7 @@ impl Triangulation3D {
         };
     }
 
+    #[allow(dead_code)]
     fn get_flipped_aspect_ratio(&self, index:usize,edge:usize)->Result<f64,String>{
 
         if edge > 2 {
@@ -298,6 +302,7 @@ impl Triangulation3D {
     
     }
 
+    #[allow(dead_code)]
     fn flip_diagonal(&mut self,index: usize, edge: usize)->Result<(),String>{
         // The transformation is as follows:
         //         C                C
@@ -465,6 +470,7 @@ impl Triangulation3D {
 
     }// end of flip_diagonal()
 
+    #[allow(dead_code)]
     fn split_edge(&mut self, base_index : usize, base_edge : usize, p : Point3D )-> Result<(),String> {
         // We are doing the following:
         //              C                    C
@@ -589,6 +595,7 @@ impl Triangulation3D {
 
     }
 
+    #[allow(dead_code)]
     fn split_triangle(&mut self, i:usize, p:Point3D)->Result<(),String>{
 
         // The transformation is as follows (puts P in the middle, 
@@ -732,6 +739,7 @@ impl Triangulation3D {
         Ok(())
     }
 
+    #[allow(dead_code)]
     fn restore_delaunay(&mut self, max_aspect_ratio: f64){
 
 
@@ -799,6 +807,7 @@ impl Triangulation3D {
     }// end of fn restore_delaunay
 
 
+    #[allow(dead_code)]
     fn add_point_to_triangle(&mut self, index: usize, point: Point3D, code: usize) -> Result<(),String>{
 
         if !self.triangles[index].is_valid(){
@@ -835,6 +844,7 @@ impl Triangulation3D {
         return Err("No Triangle3D in Triangulation3D contained the point that you wanted to add.".to_string());
     }
 
+    #[allow(dead_code)]
     fn refine(&mut self, max_area : f64, max_aspect_ratio : f64) -> Result<(),String>{
 
         let n_triangles = self.n_triangles();
