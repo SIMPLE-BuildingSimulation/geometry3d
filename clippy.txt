@@ -1,0 +1,21 @@
+    Checking geometry3d v0.1.0 (/Users/german/Documents/simple/geometry3d)
+warning: this sequence of operators looks suspiciously like a bug
+   --> src/triangle3d.rs:258:47
+    |
+258 |         let inv_denom = 1. / (dot00 * dot11 - dot01 * dot01);
+    |                                               ^^^^^^^^^^^^^ help: did you mean: `dot00 * dot01`
+    |
+    = note: `#[warn(clippy::suspicious_operation_groupings)]` on by default
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_operation_groupings
+
+warning: this sequence of operators looks suspiciously like a bug
+   --> src/triangle3d.rs:258:47
+    |
+258 |         let inv_denom = 1. / (dot00 * dot11 - dot01 * dot01);
+    |                                               ^^^^^^^^^^^^^ help: did you mean: `dot00 * dot01`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_operation_groupings
+
+warning: 2 warnings emitted
+
+    Finished dev [unoptimized + debuginfo] target(s) in 0.63s
