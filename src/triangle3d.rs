@@ -37,6 +37,38 @@ pub struct Triangle3D {
     index: usize,
 }
 
+#[derive(Clone,Copy,PartialEq,Eq)]
+pub enum PointInTriangle{
+    VertexA,
+    VertexB,
+    VertexC,
+    EdgeAB,
+    EdgeBC, 
+    EdgeAC,
+    Inside,
+    Outside
+}
+
+impl PointInTriangle {
+    pub fn is_vertex(&self)->bool{
+        match self{
+            Self::VertexA |
+            Self::VertexB |
+            Self::VertexC => true,
+            _ => false
+        }
+    }
+
+    pub fn is_edge(&self)->bool{
+        match self{
+            Self::EdgeAB |
+            Self::EdgeAC |
+            Self::EdgeBC => true,
+            _ => false
+        }
+    }
+}
+
 impl Triangle3D {
     pub fn new(
         vertex_a: Point3D,
@@ -248,7 +280,8 @@ impl Triangle3D {
         }
     }
 
-    pub fn test_point(&self, p: Point3D, code: &mut i8) -> bool {
+   
+    pub fn test_point(&self, p: Point3D) -> PointInTriangle {
         /*
         Source: http://blackpawn.com/texts/pointinpoly/
         */
@@ -279,25 +312,23 @@ impl Triangle3D {
         if u >= -f64::EPSILON && v >= -f64::EPSILON && w >= -f64::EPSILON {
             // Somewhere in the triangle
             if u <= f64::EPSILON && v <= f64::EPSILON {
-                *code = 0; // vertex a
+                PointInTriangle::VertexA
             } else if u <= f64::EPSILON && w <= f64::EPSILON {
-                *code = 1; // vertex b
+                PointInTriangle::VertexB
             } else if v <= f64::EPSILON && w <= f64::EPSILON {
-                *code = 2; // vertex c
+                PointInTriangle::VertexC
             } else if u <= f64::EPSILON {
-                *code = 3; // edge AB
+                PointInTriangle::EdgeAB
             } else if w <= f64::EPSILON {
-                *code = 4; // edge BC
+                PointInTriangle::EdgeBC
             } else if v <= f64::EPSILON {
-                *code = 5; // edge AC
+                PointInTriangle::EdgeAC
             } else {
-                *code = 6; // inside the triangle
-            }
-            return true;
+                PointInTriangle::Inside
+            }            
+        }else{            
+            PointInTriangle::Outside
         }
-        *code = -1;
-        // return
-        false
     }
 
     pub fn get_edge_index_by_points(&self, a: Point3D, b: Point3D) -> Option<usize> {
@@ -457,8 +488,6 @@ mod testing {
 
     #[test]
     fn test_test_point() {
-        let mut code: i8 = 1;
-        let mut in_triangle: bool;
 
         let a = Point3D::new(-1., 0., 0.);
         let b = Point3D::new(1., 0., 0.);
@@ -467,31 +496,21 @@ mod testing {
         let triangle = Triangle3D::new(a, b, c, 1).unwrap();
 
         // Vertex A.
-        in_triangle = triangle.test_point(a, &mut code);
-        assert!(in_triangle);
-        assert_eq!(code, 0);
+        assert!(PointInTriangle::VertexA == triangle.test_point(a));        
 
         // Vertex B.
-        in_triangle = triangle.test_point(b, &mut code);
-        assert!(in_triangle);
-        assert_eq!(code, 1);
+        assert!(PointInTriangle::VertexB == triangle.test_point(b));       
 
         // Vertex C.
-        in_triangle = triangle.test_point(c, &mut code);
-        assert!(in_triangle);
-        assert_eq!(code, 2);
-
+        assert!(PointInTriangle::VertexC == triangle.test_point(c));
+        
         // Segment AB.
         let origin = Point3D::new(0., 0., 0.);
-        in_triangle = triangle.test_point(origin, &mut code);
-        assert!(in_triangle);
-        assert_eq!(code, 3);
-
+        assert!(PointInTriangle::EdgeAB == triangle.test_point(origin));
+        
         // Point outside
         let point = Point3D::new(0., -1., 0.);
-        in_triangle = triangle.test_point(point, &mut code);
-        assert!(!in_triangle);
-        assert_eq!(code, -1);
+        assert!(PointInTriangle::Outside == triangle.test_point(point));        
     }
 
     #[test]

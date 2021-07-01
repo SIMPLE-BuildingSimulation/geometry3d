@@ -500,8 +500,8 @@ impl Triangulation3D {
     #[allow(dead_code)]
     fn split_edge(
         &mut self,
-        base_index: usize,
-        base_edge: usize,
+        triangle_index: usize,
+        edge_to_split: PointInTriangle,
         p: Point3D,
     ) -> Result<(), String> {
         // We are doing the following:
@@ -516,24 +516,25 @@ impl Triangulation3D {
         //             \/                   \|/
         //              opposite             opposite
 
-        if !self.triangles[base_index].is_valid() {
+        if !self.triangles[triangle_index].is_valid() {
             let msg = "Trying to split edge of an invalid Triangle3D".to_string();
             return Err(msg);
         }
-
-        if base_edge > 2 {
-            let msg =
-                "Trying to split edge of a Triangle3D... but edge is out of bounds".to_string();
-            return Err(msg);
-        }
+        
+        let edge_to_split = match edge_to_split {
+            PointInTriangle::EdgeAB =>0,
+            PointInTriangle::EdgeBC => 1,
+            PointInTriangle::EdgeAC=>2,
+            _ =>{unreachable!();} 
+        };
 
         // get points
-        let base_segment = self.triangles[base_index].segment(base_edge).unwrap();
+        let base_segment = self.triangles[triangle_index].segment(edge_to_split).unwrap();
         let vertex_a = base_segment.start();
         let vertex_b = base_segment.end();
 
         // Neighbour
-        let nei_i = self.triangles[base_index].neighbour(base_edge).unwrap();
+        let nei_i = self.triangles[triangle_index].neighbour(edge_to_split).unwrap();
 
         let mut process_hemisphere = |index: usize| -> (usize, usize) {
             let edge = self.triangles[index]
@@ -610,7 +611,7 @@ impl Triangulation3D {
         // PROCESS BASE TRIANGLE
         // ==============================
 
-        let (top_left_i, top_right_i) = process_hemisphere(base_index);
+        let (top_left_i, top_right_i) = process_hemisphere(triangle_index);
 
         // PROCESS NEIGHBOUR
         // =================
@@ -828,29 +829,28 @@ impl Triangulation3D {
         &mut self,
         index: usize,
         point: Point3D,
-        code: usize,
+        p_location: PointInTriangle,
     ) -> Result<(), String> {
         if !self.triangles[index].is_valid() {
             let msg = "Trying to add point into an obsolete triangle".to_string();
             return Err(msg);
         }
 
-        if code < 3 {
+        if p_location.is_vertex(){
             // Point is a vertex... ignore, but pretend we did something
             Ok(())
-        } else if code < 6 {
-            // Point in an edge
-            let edge: usize = code % 3;
-            self.split_edge(index, edge, point)
-        } else {
-            // Point inside the triangle (code == 6)
+        }else if p_location.is_edge(){
+            self.split_edge(index, p_location, point)
+        }else if p_location == PointInTriangle::Inside{
             self.split_triangle(index, point)
+        }else{
+            unreachable!();
         }
+                
     }
 
     fn add_point(&mut self, point: Point3D) -> Result<(), String> {
-        // Iterate through triangles to check
-        let mut code: i8 = -1;
+        // Iterate through triangles to check        
         let n = self.triangles.len();
         for i in 1..n {
             // skip triangle if it has been deleted
@@ -858,8 +858,10 @@ impl Triangulation3D {
                 continue;
             }
 
-            if self.triangles[i].test_point(point, &mut code) {
-                return self.add_point_to_triangle(i, point, code as usize);
+            
+            let p_location = self.triangles[i].test_point(point);
+            if p_location != PointInTriangle::Outside{
+                return self.add_point_to_triangle(i, point, p_location);
             }
         }
 
@@ -898,9 +900,15 @@ impl Triangulation3D {
                     }
                 }
 
+                let edge_to_split = match s_i{
+                    0 => PointInTriangle::EdgeAB,
+                    1 => PointInTriangle::EdgeBC,
+                    2 => PointInTriangle::EdgeAC,
+                    _ => {unreachable!();}
+                };
                 // add midpoint
                 let mid_s = s.midpoint();
-                self.split_edge(i, s_i, mid_s).unwrap();
+                self.split_edge(i, edge_to_split, mid_s).unwrap();
                 self.restore_delaunay(max_aspect_ratio);
             } else if area > max_area {
                 // if it is a skinny triangle, try to add the circumcenter
@@ -1411,7 +1419,7 @@ mod testing {
         assert_eq!(2, t.n_valid_triangles());
 
         // SPLIT
-        t.split_edge(0, 0, p).unwrap();
+        t.split_edge(0, PointInTriangle::EdgeAB, p).unwrap();
 
         assert_eq!(3, t.n_triangles());
         assert_eq!(3, t.n_valid_triangles());
@@ -1497,7 +1505,7 @@ mod testing {
         assert_eq!(4, t.n_valid_triangles());
 
         // SPLIT
-        t.split_edge(0, 0, p).unwrap();
+        t.split_edge(0, PointInTriangle::EdgeAB, p).unwrap();
 
         assert_eq!(6, t.n_triangles());
         assert_eq!(6, t.n_valid_triangles());
