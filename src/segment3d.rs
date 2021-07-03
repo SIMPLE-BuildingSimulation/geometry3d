@@ -117,7 +117,8 @@ impl Segment3D {
             return false;
         }
 
-        if (0. ..=1.).contains(&t_a) && (0. ..=1.).contains(&t_b) {
+        // if (0. ..=1.).contains(&t_a) && (0. ..=1.).contains(&t_b) {
+        if (f64::EPSILON ..1.).contains(&t_a) && (f64::EPSILON ..1.).contains(&t_b) {
             let pt_x = self.start.x + t_a * a.x();
             let pt_y = self.start.y + t_a * a.y();
             let pt_z = self.start.z + t_a * a.z();

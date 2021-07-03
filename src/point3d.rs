@@ -12,6 +12,10 @@ impl Point3D {
         Point3D { x, y, z }
     }
 
+    pub fn as_vector3d(&self)->Vector3D{
+        Vector3D::new(self.x,self.y,self.z)
+    }
+
     pub fn squared_distance(&self, point: Point3D) -> f64 {
         let dx = (self.x - point.x) * (self.x - point.x);
         let dy = (self.y - point.y) * (self.y - point.y);
@@ -22,11 +26,7 @@ impl Point3D {
     pub fn distance(&self, point: Point3D) -> f64 {
         let d2 = self.squared_distance(point);
         d2.sqrt()
-    }
-
-    pub fn vector3d(&self) -> Vector3D {
-        Vector3D::new(self.x, self.y, self.z)
-    }
+    }    
 
     pub fn compare(&self, p: Point3D) -> bool {
         let eps = 1E-10;
@@ -80,6 +80,26 @@ impl std::ops::Sub<&Vector3D> for &Point3D {
             x: self.x - other.x(),
             y: self.y - other.y(),
             z: self.z - other.z(),
+        }
+    }
+}
+
+impl std::ops::Mul<Vector3D> for Point3D {
+    type Output = f64;
+
+    fn mul(self, other: Vector3D) -> f64 {
+        {
+            self.x * other.x() + self.y * other.y() + self.z * other.z()
+        }
+    }
+}
+
+impl std::ops::Mul<Point3D> for Point3D {
+    type Output = f64;
+
+    fn mul(self, other: Point3D) -> f64 {
+        {
+            self.x * other.x + self.y * other.y + self.z * other.z
         }
     }
 }
@@ -146,6 +166,22 @@ mod testing {
         let b = Point3D::new(0.0, 0.0, 0.0);
         assert_eq!(25.0, a.squared_distance(b));
     }
+
+    #[test]
+    fn test_mul(){
+        let x = 23.;
+        let y = 59.;
+        let z = -0.23;
+
+        let pt = Point3D::new(x,y,z);
+        let other_pt = Point3D::new(z,x,y);
+        let other_vec = Vector3D::new(z,x,y);
+
+        assert_eq!(pt*other_pt, x*z+ y*x+ z*y);
+        assert_eq!(pt*other_vec, x*z+ y*x+ z*y);
+    }
+
+    
 
     #[test]
     fn test_distance() {
@@ -246,6 +282,8 @@ mod testing {
         assert_eq!(2.0 * z, fin.z);
     }
 
+    
+
     #[test]
     fn test_sub_point() {
         let x = 1.2;
@@ -274,13 +312,13 @@ mod testing {
     }
 
     #[test]
-    fn test_vector3d() {
+    fn test_as_vector3d() {
         let x = 123.1;
         let y = 543.1;
         let z = 9123.2;
 
         let p = Point3D::new(x, y, z);
-        let v = p.vector3d();
+        let v = p.as_vector3d();
 
         assert_eq!(x, v.x());
         assert_eq!(y, v.y());

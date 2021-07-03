@@ -42,16 +42,7 @@ impl Loop3D {
             n_valid_vertices: 0,
         }
     }
-
-    // pub fn clone(&self)->Loop3D{
-    //     Loop3D{
-    //         normal:self.normal,
-    //         closed: self.closed,
-    //         area: self.area,
-    //         n_valid_vertices: self.n_valid_vertices,
-    //         vertices: self.vertices.clone(),
-    //     }
-    // }
+    
 
     pub fn push(&mut self, point: Point3D) -> Result<usize, &'static str> {
         //check if it is closed
@@ -205,12 +196,9 @@ impl Loop3D {
             return Err("Trying to close a Loop3D with less than 3 valid vertices");
         }
 
-        // Close
-        // No need to set normal.
-        // It is done after third valid point
-        //self.set_normal();
+        // Close        
         self.closed = true;
-        let _a = self.set_area().unwrap();
+        self.set_area().unwrap();
         Ok(())
     }
 
@@ -363,12 +351,12 @@ impl Loop3D {
         // We need to go around from 0 to N vertices,
         // ... so, n+1 valid vertices.
         let mut i = 0; // inded in real vertices
-        let mut v = self.next_valid(&mut i).vector3d();
-        let mut v_p1 = self.next_valid(&mut i).vector3d();
+        let mut v = self.next_valid(&mut i).as_vector3d();
+        let mut v_p1 = self.next_valid(&mut i).as_vector3d();
         for _i in 2..n + 2 {
             rhs += v.cross(v_p1);
             v = v_p1;
-            v_p1 = self.next_valid(&mut i).vector3d();
+            v_p1 = self.next_valid(&mut i).as_vector3d();
         }
 
         let area = self.normal * rhs / 2.0;
@@ -400,6 +388,18 @@ mod testing {
     fn test_new() {
         let l = Loop3D::new();
         assert_eq!(l.vertices.len(), 0);
+
+        let l = Loop3D::default();
+        assert_eq!(l.vertices.len(), 0);
+
+        let v = Vertex{valid:false,position:Point3D::new(0.,1.,0.)};
+        let v_cp = v;
+        let v_clone = v.clone();
+        assert_eq!(v.position,v_cp.position);
+        assert_eq!(v.position,v_clone.position);
+        assert_eq!(v.valid,v_cp.valid);
+        assert_eq!(v.valid,v_clone.valid);
+
     }
 
     #[test]
@@ -622,8 +622,9 @@ mod testing {
         let bigl = 2. / (2 as f64).sqrt();
 
         the_loop.push(Point3D::new(-bigl, -bigl, 0.)).unwrap();
-        the_loop.push(Point3D::new(0.0, -bigl, 0.)).unwrap(); // collinear point
+        the_loop.push(Point3D::new(0.0, -bigl, 0.)).unwrap(); // collinear point, moving in X
         the_loop.push(Point3D::new(bigl, -bigl, 0.)).unwrap();
+        the_loop.push(Point3D::new(bigl, 0., 0.)).unwrap(); // collinear point, moving in Y
         the_loop.push(Point3D::new(bigl, bigl, 0.)).unwrap();
         the_loop.push(Point3D::new(-bigl, bigl, 0.)).unwrap();
         the_loop.push(Point3D::new(-bigl, -bigl, 0.)).unwrap();
@@ -649,8 +650,9 @@ mod testing {
         let bigl = 2. / (2 as f64).sqrt();
 
         the_loop.push(Point3D::new(-bigl, -bigl, 0.)).unwrap();
-        the_loop.push(Point3D::new(0.0, -bigl, 0.)).unwrap(); // collinear point
+        the_loop.push(Point3D::new(0.0, -bigl, 0.)).unwrap(); // collinear point, moving in X
         the_loop.push(Point3D::new(bigl, -bigl, 0.)).unwrap();
+        the_loop.push(Point3D::new(bigl, 0., 0.)).unwrap(); // collinear point, moving in Y
         the_loop.push(Point3D::new(bigl, bigl, 0.)).unwrap();
         the_loop.push(Point3D::new(-bigl, bigl, 0.)).unwrap();
         the_loop.push(Point3D::new(-bigl, -bigl, 0.)).unwrap();
@@ -675,8 +677,9 @@ mod testing {
         let bigl = 2. / (2 as f64).sqrt();
 
         the_loop.push(Point3D::new(-bigl, -bigl, 0.)).unwrap();
-        the_loop.push(Point3D::new(0., -bigl, 0.)).unwrap(); // collinear point
+        the_loop.push(Point3D::new(0., -bigl, 0.)).unwrap(); // collinear point, moving in X
         the_loop.push(Point3D::new(bigl, -bigl, 0.)).unwrap();
+        the_loop.push(Point3D::new(bigl, 0., 0.)).unwrap(); // collinear point, moving in Y
         the_loop.push(Point3D::new(bigl, bigl, 0.)).unwrap();
         the_loop.push(Point3D::new(-bigl, bigl, 0.)).unwrap();
         the_loop.push(Point3D::new(-bigl, -bigl, 0.)).unwrap();
@@ -707,8 +710,9 @@ mod testing {
         let bigl = 2. / (2 as f64).sqrt();
 
         the_loop.push(Point3D::new(-bigl, -bigl, 0.)).unwrap();
-        the_loop.push(Point3D::new(0., -bigl, 0.)).unwrap(); // collinear point
+        the_loop.push(Point3D::new(0., -bigl, 0.)).unwrap(); // collinear point, moving in X
         the_loop.push(Point3D::new(bigl, -bigl, 0.)).unwrap();
+        the_loop.push(Point3D::new(bigl, 0., 0.)).unwrap(); // collinear point, moving in Y
         the_loop.push(Point3D::new(bigl, bigl, 0.)).unwrap();
         the_loop.push(Point3D::new(-bigl, bigl, 0.)).unwrap();
         the_loop.push(Point3D::new(-bigl, -bigl, 0.)).unwrap();
@@ -729,6 +733,27 @@ mod testing {
             ))
             .unwrap();
         assert!(r);
+    }
+
+    #[test]
+    fn test_point_non_coplanar(){
+        let mut the_loop = Loop3D::new();
+        let l = 1. / (2 as f64).sqrt();
+                
+        the_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
+        the_loop.push(Point3D::new(-l, l, 0.)).unwrap();
+        the_loop.push(Point3D::new(l, l, 0.)).unwrap();
+        the_loop.push(Point3D::new(l, -l, 0.)).unwrap();
+        the_loop.close().unwrap();
+
+        let r = the_loop
+            .test_point(Point3D::new(
+                -1.5 / (2 as f64).sqrt(),
+                -1.5 / (2 as f64).sqrt(),
+                1.,
+            ))
+            .unwrap();
+        assert!(!r);
     }
 
     #[test]
@@ -856,4 +881,33 @@ mod testing {
         assert_eq!(i, 1);
         assert!(p.compare(Point3D::new(-2., -2., 0.)));
     }
+
+    #[test]
+    fn test_is_diagonal(){
+        assert!(false)
+    }
+
+    #[test]
+    fn test_invalidate_vertex(){
+        let mut l = Loop3D::new();
+        l.push(Point3D::new(-2., -2., 0.)).unwrap(); // 0 collinear
+        l.push(Point3D::new(2., -2., 0.)).unwrap(); // 1
+        l.push(Point3D::new(2., 2., 0.)).unwrap(); // 2
+        l.push(Point3D::new(-2., 2., 0.)).unwrap(); // 3 collinear point
+        l.push(Point3D::new(-2., 1., 0.)).unwrap(); // 4. collinear point... removed
+        l.push(Point3D::new(-2., 0., 0.)).unwrap(); // 5. collinear point... removed
+        l.push(Point3D::new(-2., -1., 0.)).unwrap(); // 6. collinear point... removed
+
+        assert!(l.vertices[2].valid);
+        l.invalidate_vertex(2).unwrap();
+        assert!(!l.vertices[2].valid);
+
+        assert!(l.invalidate_vertex(15).is_err());
+    }
+
+
+
+
+
 }
+

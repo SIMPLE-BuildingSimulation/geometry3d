@@ -32,7 +32,9 @@ impl Triangulation3D {
         }
     }
 
-    pub fn from_polygon(poly: Polygon3D) -> Result<Triangulation3D, String> {
+    /// Triangulates a [`Polygon3D`] without refining it, using the simple ear 
+    /// clipping algorithm
+    pub fn from_polygon(poly: &Polygon3D) -> Result<Triangulation3D, String> {
         let mut the_loop = poly.get_closed_loop();
         let mut t = Triangulation3D::new();
 

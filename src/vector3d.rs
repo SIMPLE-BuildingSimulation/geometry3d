@@ -1,4 +1,5 @@
 use std::fmt;
+use crate::point3d::Point3D;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vector3D {
@@ -162,6 +163,16 @@ impl std::ops::Mul<f64> for Vector3D {
     }
 }
 
+impl std::ops::Mul<Point3D> for Vector3D {
+    type Output = f64;
+
+    fn mul(self, other: Point3D) -> f64 {
+        {
+            self.x * other.x + self.y * other.y + self.z * other.z
+        }
+    }
+}
+
 impl std::ops::MulAssign<f64> for Vector3D {
     fn mul_assign(&mut self, s: f64) {
         self.x *= s;
@@ -249,6 +260,7 @@ mod testing {
         assert_eq!(y, pt.y());
         assert_eq!(z, pt.z());
     }
+    
 
     #[test]
     fn test_dot() {
@@ -259,6 +271,25 @@ mod testing {
         assert_eq!(y * x, 0.0);
         assert_eq!(x * x, 1.0);
         assert_eq!(y * y, 1.0);
+
+
+        let x = Vector3D::new(1.0, 3.0, -10.0);
+        let y = Vector3D::new(0.1, 2.0, 10.0);
+
+        assert_eq!(x * y, 1.*0.1+3.*2.-10.*10.);
+        assert_eq!(y * x, 1.*0.1+3.*2.-10.*10.);
+        assert_eq!(x * x, 1.+3.*3.+10.*10.);
+        assert_eq!(y * y, 0.1*0.1+2.0*2.0+10.*10.);
+
+        // Against a point
+        let x = Vector3D::new(1.0, 3.0, -10.0);
+        let y = Point3D::new(0.1, 2.0, 10.0);
+
+        assert_eq!(x * y, 1.*0.1+3.*2.-10.*10.);
+        assert_eq!(y * x, 1.*0.1+3.*2.-10.*10.);
+        assert_eq!(x * x, 1.+3.*3.+10.*10.);
+        assert_eq!(y * y, 0.1*0.1+2.0*2.0+10.*10.);
+
     }
 
     #[test]
@@ -423,6 +454,14 @@ mod testing {
 
     #[test]
     fn test_is_parallel() {
+
+        // Some Any of them is zero vector.
+        let v1 = Vector3D::new(123.1, 5.6, 99.12);
+        let v2 = Vector3D::new(0.,0.,0.);
+        assert!(!v1.is_parallel(v2));
+        assert!(!v2.is_parallel(v1));
+        assert!(!v2.is_parallel(v2));
+
         let v1 = Vector3D::new(123.1, 5.6, 99.12);
         let mut v2 = v1 * 3.14;
 
