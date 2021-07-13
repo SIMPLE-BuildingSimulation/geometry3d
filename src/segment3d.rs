@@ -115,7 +115,9 @@ impl Segment3D {
     /// # Examples
     ///
     /// ```
-    ///
+    /// use geometry3d::point3d::Point3D;
+    /// use geometry3d::segment3d::Segment3D;
+    /// 
     /// let vertical = Segment3D::new(Point3D::new(0., 0., -1.), Point3D::new(0., 0., 1.));
     /// let horizontal = Segment3D::new(Point3D::new(-1., 0., 0.), Point3D::new(1., 0., 0.));
     /// assert_eq!(horizontal.get_intersection_pt(&vertical), Some((0.5, 0.5)));

@@ -278,8 +278,7 @@ impl Loop3D {
         // Ray cast
         let d = (point - self.vertices[0]) * 1000000.; // Should be enough...?
         let ray = Segment3D::new(point, point + d);
-
-        let mut dummy = Point3D::new(0., 0., 0.);
+        
         let mut n_cross = 0;        
         let n = self.vertices.len();
         for i in 0..n {
@@ -331,8 +330,7 @@ impl Loop3D {
         }
 
         // We need to go around from 0 to N vertices,
-        // ... so, n+1 valid vertices.
-        let mut i = 0; // inded in real vertices
+        // ... so, n+1 valid vertices.        
         let mut v = self.vertices[0].as_vector3d();
         let mut v_p1 = self.vertices[1].as_vector3d();
         for i in 2..n + 2 {
@@ -349,12 +347,31 @@ impl Loop3D {
         Ok(self.area)
     }
 
-    pub fn area(&self) -> f64 {
-        self.area
+    /// Returns the area of the [`Loop3D`]
+    pub fn area(&self) -> Result<f64,String> {
+        if !self.is_closed(){
+            Err("Trying to get the area of an open Loop3D".to_string())
+        }else{
+            Ok(self.area)
+        }        
     }
 
+    /// Indicates whether the [`Loop3D`] has been closed already
     pub fn is_closed(&self) -> bool {
         self.closed
+    }
+
+    /// Checks whether the [`Loop3D`] contains a [`Segment3D`] `s` 
+    pub fn contains_segment(&self, s: &Segment3D)->bool{
+        let n = self.vertices.len();
+        for (i,v) in self.vertices.iter().enumerate(){
+            let next_v = self.vertices[(i+1)%n];
+            let segment = Segment3D::new(*v,next_v);
+            if segment.compare(s){
+                return true
+            }
+        }
+        false
     }
 }
 
@@ -366,6 +383,7 @@ impl Loop3D {
 mod testing {
     use super::*;
 
+    
     #[test]
     fn test_new() {
         let l = Loop3D::new();
@@ -685,9 +703,10 @@ mod testing {
         the_loop.push(Point3D::new(l, l, 0.)).unwrap();
         the_loop.push(Point3D::new(l, -l, 0.)).unwrap();
 
+        assert!(the_loop.area().is_err());
         the_loop.close().unwrap();
 
-        let a = the_loop.area();
+        let a = the_loop.area().unwrap();
         assert_eq!(4. * l * l, a);
     }
 
@@ -704,9 +723,11 @@ mod testing {
         the_loop.push(Point3D::new(0.0, 2.0 * l, 0.)).unwrap(); //5
         the_loop.push(Point3D::new(0., 0., 0.)).unwrap(); //0
 
+        assert!(the_loop.area().is_err());
+
         the_loop.close().unwrap();
 
-        let a = the_loop.area();
+        let a = the_loop.area().unwrap();
         assert_eq!(3.0, a);
         assert!(the_loop.normal().compare(Vector3D::new(0., 0., 1.)));
 
@@ -724,7 +745,7 @@ mod testing {
 
         the_loop.close().unwrap();
 
-        let a = the_loop.area();
+        let a = the_loop.area().unwrap();
         assert_eq!(3.0, a);
         assert!(the_loop.normal().compare(Vector3D::new(0., 0., -1.)));
     }
@@ -791,6 +812,55 @@ mod testing {
             Point3D::new(2., 2., 0.),
         )));
     }
+
+    #[test]
+    fn test_contains_segment(){
+        let mut l = Loop3D::new();
+        let p0 = Point3D::new(-2., -2., 0.);
+        let p1 = Point3D::new(2., -2., 0.);
+        let p2 = Point3D::new(2., 2., 0.);
+        let p3 = Point3D::new(-2., 2., 0.);
+        l.push(p0).unwrap(); // 0
+        l.push(p1).unwrap(); // 1
+        l.push(p2).unwrap(); // 2
+        l.push(p3).unwrap(); // 3
+
+        // Existing segments, in both directions
+        assert!(l.contains_segment(&Segment3D::new(p0,p1)));
+        assert!(l.contains_segment(&Segment3D::new(p1,p2)));
+        assert!(l.contains_segment(&Segment3D::new(p2,p3)));
+        assert!(l.contains_segment(&Segment3D::new(p3,p0)));
+        assert!(l.contains_segment(&Segment3D::new(p3,p2)));
+        assert!(l.contains_segment(&Segment3D::new(p2,p1)));
+        assert!(l.contains_segment(&Segment3D::new(p1,p0)));
+        assert!(l.contains_segment(&Segment3D::new(p0,p3)));
+
+        // Diagonals
+        assert!(!l.contains_segment(&Segment3D::new(p1,p3)));
+        assert!(!l.contains_segment(&Segment3D::new(p3,p1)));
+        assert!(!l.contains_segment(&Segment3D::new(p0,p2)));
+        assert!(!l.contains_segment(&Segment3D::new(p2,p0)));
+
+        // Segment inside
+        assert!(!l.contains_segment(&Segment3D::new(
+            Point3D::new(-0.5, -0.5, 0.),
+            Point3D::new( 0.5,  0.5, 0.),
+        )));
+
+        // Segment that crosses from in to out
+        assert!(!l.contains_segment(&Segment3D::new(
+            Point3D::new(-0.5, -0.5, 0.),
+            Point3D::new(10.5, 10.5, 0.),
+        )));
+
+        // Segment contained in another segment
+        assert!(!l.contains_segment(&Segment3D::new(
+            Point3D::new(-1., -2., 0.),
+            Point3D::new( 1., -2., 0.),
+        )));
+
+    }
+
 
     
 }

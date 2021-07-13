@@ -84,7 +84,7 @@ impl Triangulation3D {
                 // Add triangle
                 t.push(v0, v1, v2, count).unwrap();
 
-                //invalidate v1
+                //remove v1
                 the_loop.remove((i+1)%n);
 
                 // Set contrain
@@ -92,6 +92,7 @@ impl Triangulation3D {
 
                 count += 1;
             }
+            i+=1;
         } //end of loop{}
     }
 
@@ -843,6 +844,7 @@ impl Triangulation3D {
         } // End of while any_changes
     } // end of fn restore_delaunay
 
+    /// Adds a point on a specific [`Triangle3D`]
     fn add_point_to_triangle(
         &mut self,
         index: usize,
@@ -866,16 +868,18 @@ impl Triangulation3D {
         }
     }
 
+    /// Finds the location of a [`Point3D`] within the triangulation
+    /// and inserts it
     fn add_point(&mut self, point: Point3D) -> Result<(), String> {
         // Iterate through triangles to check
-        let n = self.triangles.len();
-        for i in 1..n {
+        
+        for (i,triangle) in self.triangles.iter().enumerate() {
             // skip triangle if it has been deleted
-            if !self.triangles[i].is_valid() {
+            if !triangle.is_valid() {
                 continue;
             }
 
-            let p_location = self.triangles[i].test_point(point);
+            let p_location = triangle.test_point(point);
             if p_location != PointInTriangle::Outside {
                 return self.add_point_to_triangle(i, point, p_location);
             }
@@ -1032,29 +1036,60 @@ mod testing {
         assert_eq!(t.triangles.len(), 0);
     }
 
-    #[test]
-    fn test_mesh_polygon() {
-        assert!(false)
-    }
-
-    #[test]
-    fn test_from_polygon() {
-        assert!(false)
-    }
-
-    #[test]
-    fn test_restore_delaunay() {
-        assert!(false)
-    }
+    
 
     #[test]
     fn test_add_point_to_triangle() {
-        assert!(false)
+        
+        let a = Point3D::new(-1., 0., 0.);
+        let b = Point3D::new(1., 0., 0.);
+        let c = Point3D::new(0., 1., 0.);
+        
+        
+        // Point inside (calls split_triangle())
+        let mut t = Triangulation3D::new();
+        let i = t.push(a, b, c, 0).unwrap();
+        t.add_point_to_triangle(i, Point3D::new(0.0, 0.1, 0.), PointInTriangle::Inside).unwrap();
+        assert_eq!(3,t.triangles.len());
+
+        // Point on AB edge (calls split_edge())
+        let mut t = Triangulation3D::new();
+        let i = t.push(a, b, c, 0).unwrap();
+        t.add_point_to_triangle(i, Point3D::new(0.0, 0.0, 0.), PointInTriangle::EdgeAB).unwrap();
+        assert_eq!(2,t.triangles.len());
+
+        // Point on Vertex (does nothing)
+        let mut t = Triangulation3D::new();
+        let i = t.push(a, b, c, 0).unwrap();
+        t.add_point_to_triangle(i, a, PointInTriangle::VertexA).unwrap();
+        assert_eq!(1,t.triangles.len());
+
     }
 
     #[test]
     fn test_add_point() {
-        assert!(false)
+        let a = Point3D::new(-1., 0., 0.);
+        let b = Point3D::new(1., 0., 0.);
+        let c = Point3D::new(0., 1., 0.);
+        
+        
+        // Point inside (calls split_triangle())
+        let mut t = Triangulation3D::new();
+        t.push(a, b, c, 0).unwrap();
+        t.add_point(Point3D::new(0.0, 0.1, 0.)).unwrap();
+        assert_eq!(3,t.triangles.len());
+
+        // Point on AB edge (calls split_edge())
+        let mut t = Triangulation3D::new();
+        t.push(a, b, c, 0).unwrap();
+        t.add_point(Point3D::new(0.0, 0.0, 0.)).unwrap();
+        assert_eq!(2,t.triangles.len());
+
+        // Point on Vertex (does nothing)
+        let mut t = Triangulation3D::new();
+        t.push(a, b, c, 0).unwrap();
+        t.add_point(a).unwrap();
+        assert_eq!(1,t.triangles.len());
     }
 
     #[test]
@@ -1666,23 +1701,23 @@ mod testing {
         p: &Polygon3D,
         max_area: f64,
         max_aspect_ratio: f64,
-    ) -> bool {
+    ) -> Result<(),String> {
         // Test area.
         let mut triangulation_area = 0.;
-        for i in 0..t.triangles.len() {
-            let triangle = &t.triangles[i];
 
-            // get area
-            let area = triangle.area();
-            triangulation_area += area;
+        // Checks triangles one by one
+        for (i,triangle) in t.triangles.iter().enumerate() {            
+
+            // get area            
+            triangulation_area += triangle.area();
 
             // Check proportions of triangle.
-            if area > max_area {
-                return false;
+            if triangle.area() >= max_area {
+                return Err(format!("Triangle {} in the triangulation has area ({}) >= max_area ({}) ",i, triangle.area(),max_area));                
             }
 
             if triangle.aspect_ratio() > max_aspect_ratio {
-                return false;
+                return Err(format!("Triangle {} in the triangulation has aspect_ratio ({}) >= max_aspect_ratio ({}) ",i, triangle.aspect_ratio(),max_aspect_ratio));                
             }
 
             // Check if any of the three vertices is
@@ -1694,59 +1729,45 @@ mod testing {
                 // Go through outer loop.
                 let outer = p.outer();
                 let n_out = outer.n_vertices();
-                let mut v_i = 0;
-                let mut count = 0;
-
-                while count <= n_out {
-                    let a = outer[v_i];
-                    v_i +=1;
-                    let mut this = v_i;
-                    let b = outer[this];
-                    this +=1;
+                for j in 0..n_out{
+                    let a = outer[j];
+                    let b = outer[(j+1)%n_out];
                     let outer_segment = Segment3D::new(a, b);
 
                     if outer_segment.contains(&edge).unwrap() {
                         if !triangle.is_constrained(e).unwrap() {
-                            return false;
+                            return Err(format!("Edge {} of Triangle {} in triangulation should be constrained",e,i));
                         }
                     }
-
-                    count += 1;
                 }
+                
 
                 // Go through inner loops.
                 for l_i in 0..p.n_inner_loops() {
                     let inner = p.inner(l_i).unwrap();
                     let n_in = inner.n_vertices();
-
-                    let mut v_i = 0;
-                    let mut count = 0;
-
-                    while count <= n_in {
-                        let a = inner[v_i];
-                        v_i +=1;
-                        let mut this = v_i;
-                        let b = inner[this];
-                        this +=1;
+                    
+                    for j in 0..n_in{
+                        let a = inner[j];
+                        let b = inner[(j+1)%n_in];
                         let inner_segment = Segment3D::new(a, b);
 
                         if inner_segment.contains(&edge).unwrap() {
                             if !triangle.is_constrained(e).unwrap() {
-                                return false;
+                                return Err(format!("Edge {} of Triangle3D {} in triangulation should be constrained",e,i));
                             }
                         }
-
-                        count += 1;
                     }
-                }
+                }// end of iterating inner loops
             }
         }
 
         // Must have the same area.
         if (triangulation_area - p.area()).abs() > 1E-9 {
-            return false;
+            return Err(format!("Areas of orginal polygon (A = {}) and triangulation (A = {}) do not match", triangulation_area,p.area()));
         }
-        return true;
+        // return
+        Ok(())
     }
 
     #[test]
@@ -1754,7 +1775,7 @@ mod testing {
         let a = Point3D::new(0., 0., 0.);
         let b = Point3D::new(1., 0., 0.);
         let c = Point3D::new(1., 1., 0.);
-        let d = Point3D::new(-1., 1., 0.);
+        
 
         let mut outer = Loop3D::new();
         outer.push(a).unwrap();
@@ -1768,17 +1789,50 @@ mod testing {
         t.push(a, b, c, 0).unwrap();
 
         // No contraints... should fail
-        assert!(!test_triangulation_results(&t, &poly, 1000., 1000.));
+        assert!(test_triangulation_results(&t, &poly, 1000., 1000.).is_err());
 
         // Add contraints and test again.
         t.triangles[0].constrain(0).unwrap();
         t.triangles[0].constrain(1).unwrap();
         t.triangles[0].constrain(2).unwrap();
-        assert!(test_triangulation_results(&t, &poly, 1000., 1000.));
+        assert!(test_triangulation_results(&t, &poly, 1000., 1000.).is_ok());
 
         // Add another triangle... should not work.
+        let d = Point3D::new(-1., 1., 0.);
         t.push(a, c, d, 0).unwrap();
 
-        assert!(!test_triangulation_results(&t, &poly, 1000., 1000.));
+        assert!(test_triangulation_results(&t, &poly, 1000., 1000.).is_err());
     }
+
+    #[test]
+    fn test_mesh_polygon() {
+        assert!(false)
+    }
+
+    #[test]
+    fn test_from_polygon() {
+        /* SIMPLE CASE ... three vertices */
+        let a = Point3D::new(0., 0., 0.);
+        let b = Point3D::new(1., 0., 0.);
+        let c = Point3D::new(1., 1., 0.);
+        
+
+        let mut outer = Loop3D::new();
+        outer.push(a).unwrap();
+        outer.push(b).unwrap();
+        outer.push(c).unwrap();
+        outer.close().unwrap();
+
+        let poly = Polygon3D::new(outer).unwrap();
+        let t = Triangulation3D::from_polygon(&poly).unwrap();
+        test_triangulation_results(&t, &poly, 1000., 1000.).unwrap();
+        
+
+    }
+
+    #[test]
+    fn test_restore_delaunay() {
+        assert!(false)
+    }
+
 } // end of test module
