@@ -2,32 +2,20 @@ use crate::point3d::Point3D;
 use crate::vector3d::Vector3D;
 
 pub struct Ray3D {
-    origin: Point3D,
-    direction: Vector3D,
+    pub origin: Point3D,
+    pub direction: Vector3D,
 }
 
-impl Ray3D{
-    
-    pub fn new(origin:Point3D, direction:Vector3D)->Self{
-        let mut direction = direction;
-        direction.normalize();
-        Self{
-            origin,
-            direction
-        }
-    }
-
+impl Ray3D {
     /// Returns the point that the [Ray3D] would be in after
     /// advancing `t`
-    pub fn advance(&self, t: f64)->Point3D{
+    pub fn project(&self, t: f64) -> Point3D {
         self.origin + self.direction * t
     }
 
-    pub fn direction(&self)->Vector3D{
-        self.direction
-    }
-
-    pub fn origin(&self)->Point3D{
-        self.origin
+    /// Translates the [Ray3D] `t` units of its length
+    /// into the future.
+    pub fn advance(&mut self, t: f64) {
+        self.origin = self.origin + self.direction * t
     }
 }

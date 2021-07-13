@@ -7,13 +7,19 @@ pub struct Point3D {
     pub z: f64,
 }
 
+impl std::fmt::Display for Point3D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Point3D({:.5},{:.5},{:.5})", self.x, self.y, self.z)
+    }
+}
+
 impl Point3D {
     pub fn new(x: f64, y: f64, z: f64) -> Point3D {
         Point3D { x, y, z }
     }
 
-    pub fn as_vector3d(&self)->Vector3D{
-        Vector3D::new(self.x,self.y,self.z)
+    pub fn as_vector3d(&self) -> Vector3D {
+        Vector3D::new(self.x, self.y, self.z)
     }
 
     pub fn squared_distance(&self, point: Point3D) -> f64 {
@@ -26,7 +32,7 @@ impl Point3D {
     pub fn distance(&self, point: Point3D) -> f64 {
         let d2 = self.squared_distance(point);
         d2.sqrt()
-    }    
+    }
 
     pub fn compare(&self, p: Point3D) -> bool {
         let eps = 1E-10;
@@ -63,6 +69,33 @@ impl std::ops::Add<Vector3D> for Point3D {
         }
     }
 }
+impl std::ops::Add for Point3D {
+    type Output = Point3D;
+
+    fn add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
+    }
+}
+
+impl std::ops::AddAssign for Point3D {
+    fn add_assign(&mut self, other: Self) {
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
+    }
+}
+
+impl std::ops::AddAssign<Vector3D> for Point3D {
+    fn add_assign(&mut self, other: Vector3D) {
+        self.x += other.x();
+        self.y += other.y();
+        self.z += other.z();
+    }
+}
 
 impl std::ops::Sub<Point3D> for Point3D {
     type Output = Vector3D;
@@ -88,9 +121,7 @@ impl std::ops::Mul<Vector3D> for Point3D {
     type Output = f64;
 
     fn mul(self, other: Vector3D) -> f64 {
-        {
-            self.x * other.x() + self.y * other.y() + self.z * other.z()
-        }
+        self.x * other.x() + self.y * other.y() + self.z * other.z()
     }
 }
 
@@ -98,9 +129,47 @@ impl std::ops::Mul<Point3D> for Point3D {
     type Output = f64;
 
     fn mul(self, other: Point3D) -> f64 {
-        {
-            self.x * other.x + self.y * other.y + self.z * other.z
+        self.x * other.x + self.y * other.y + self.z * other.z
+    }
+}
+
+impl std::ops::Mul<f64> for Point3D {
+    type Output = Self;
+
+    fn mul(self, other: f64) -> Self {
+        Self {
+            x: self.x * other,
+            y: self.y * other,
+            z: self.z * other,
         }
+    }
+}
+
+impl std::ops::MulAssign<f64> for Point3D {
+    fn mul_assign(&mut self, other: f64) {
+        self.x *= other;
+        self.y *= other;
+        self.z *= other;
+    }
+}
+
+impl std::ops::Div<f64> for Point3D {
+    type Output = Self;
+
+    fn div(self, other: f64) -> Self {
+        Self {
+            x: self.x / other,
+            y: self.y / other,
+            z: self.z / other,
+        }
+    }
+}
+
+impl std::ops::DivAssign<f64> for Point3D {
+    fn div_assign(&mut self, other: f64) {
+        self.x /= other;
+        self.y /= other;
+        self.z /= other;
     }
 }
 
@@ -168,20 +237,18 @@ mod testing {
     }
 
     #[test]
-    fn test_mul(){
+    fn test_mul() {
         let x = 23.;
         let y = 59.;
         let z = -0.23;
 
-        let pt = Point3D::new(x,y,z);
-        let other_pt = Point3D::new(z,x,y);
-        let other_vec = Vector3D::new(z,x,y);
+        let pt = Point3D::new(x, y, z);
+        let other_pt = Point3D::new(z, x, y);
+        let other_vec = Vector3D::new(z, x, y);
 
-        assert_eq!(pt*other_pt, x*z+ y*x+ z*y);
-        assert_eq!(pt*other_vec, x*z+ y*x+ z*y);
+        assert_eq!(pt * other_pt, x * z + y * x + z * y);
+        assert_eq!(pt * other_vec, x * z + y * x + z * y);
     }
-
-    
 
     #[test]
     fn test_distance() {
@@ -281,8 +348,6 @@ mod testing {
         assert_eq!(2.0 * y, fin.y);
         assert_eq!(2.0 * z, fin.z);
     }
-
-    
 
     #[test]
     fn test_sub_point() {

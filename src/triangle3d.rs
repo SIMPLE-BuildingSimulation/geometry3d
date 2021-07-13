@@ -1,7 +1,7 @@
-use crate::intersect_trait::Intersect;
+use crate::intersect_trait::{Intersect, SurfaceSide};
 use crate::point3d::*;
-use crate::segment3d::*;
 use crate::ray3d::Ray3D;
+use crate::segment3d::*;
 use crate::vector3d::Vector3D;
 
 pub struct Triangle3D {
@@ -31,6 +31,7 @@ pub struct Triangle3D {
     aspect_ratio: f64,
     circumcenter: Point3D,
     centroid: Point3D,
+    normal: Vector3D,
 
     valid: bool,
 
@@ -40,33 +41,25 @@ pub struct Triangle3D {
     index: usize,
 }
 
-#[derive(Clone,Copy,PartialEq,Eq)]
-pub enum PointInTriangle{
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum PointInTriangle {
     VertexA,
     VertexB,
     VertexC,
     EdgeAB,
-    EdgeBC, 
+    EdgeBC,
     EdgeAC,
     Inside,
-    Outside
+    Outside,
 }
 
 impl PointInTriangle {
-    pub fn is_vertex(&self)->bool{
-        matches!(self,
-            Self::VertexA |
-            Self::VertexB |
-            Self::VertexC
-        )
+    pub fn is_vertex(&self) -> bool {
+        matches!(self, Self::VertexA | Self::VertexB | Self::VertexC)
     }
 
-    pub fn is_edge(&self)->bool{
-        matches!(self,
-            Self::EdgeAB |
-            Self::EdgeAC |
-            Self::EdgeBC
-         )        
+    pub fn is_edge(&self) -> bool {
+        matches!(self, Self::EdgeAB | Self::EdgeAC | Self::EdgeBC)
     }
 }
 
@@ -112,6 +105,7 @@ impl Triangle3D {
             circumradius: -1.,
             circumcenter: Point3D::new(0., 0., 0.),
             centroid: Point3D::new(0., 0., 0.),
+            normal: Vector3D::new(0., 0., 0.),
 
             index: i,
             valid: true,
@@ -122,6 +116,7 @@ impl Triangle3D {
         t.set_aspect_ratio();
         t.set_circumcenter();
         t.set_centroid();
+        t.set_normal();
 
         Ok(t)
     }
@@ -163,6 +158,20 @@ impl Triangle3D {
                 edge
             )),
         }
+    }
+
+    /* Normal */
+
+    /// Calculates the normal of the Triangle
+    fn set_normal(&mut self) {
+        let b_a = self.v1 - self.v0;
+        let c_a = self.v2 - self.v1;
+        self.normal = b_a.cross(c_a);
+        self.normal.normalize();
+    }
+
+    pub fn normal(&self) -> Vector3D {
+        self.normal
     }
 
     /* Area */
@@ -269,16 +278,22 @@ impl Triangle3D {
         }
     }
 
-    pub fn a(&self)->Point3D{
-        self.v0
-    }
-    pub fn b(&self)->Point3D{
-        self.v1
-    }
-    pub fn c(&self)->Point3D{
+    /// Retrieves the first vertex of an A,B,C [`Triangle3D`]
+    pub fn a(&self) -> Point3D {
         self.v0
     }
 
+    /// Retrieves the second vertex of an A,B,C [`Triangle3D`]
+    pub fn b(&self) -> Point3D {
+        self.v1
+    }
+
+    /// Retrieves the third vertex of an A,B,C [`Triangle3D`]
+    pub fn c(&self) -> Point3D {
+        self.v0
+    }
+
+    /// Retrieves a segment of an A,B,C [`Triangle3D`]
     pub fn segment(&self, i: usize) -> Result<Segment3D, String> {
         match i {
             0 => Ok(self.s0),
@@ -291,41 +306,45 @@ impl Triangle3D {
         }
     }
 
-    pub fn ab(&self)->Segment3D{
+    /// Retrieves the first segment of an A,B,C [`Triangle3D`]
+    pub fn ab(&self) -> Segment3D {
         self.s0
     }
 
-    pub fn bc(&self)->Segment3D{
+    /// Retrieves the second segment of an A,B,C [`Triangle3D`]
+    pub fn bc(&self) -> Segment3D {
         self.s1
     }
-    pub fn ca(&self)->Segment3D{
+
+    /// Retrieves the third segment of an A,B,C [`Triangle3D`]
+    pub fn ca(&self) -> Segment3D {
         self.s2
     }
 
     /// Tests whether a point—which is assumed to be within the plane
     /// of the triangle—is inside the triangle.
-    /// 
+    ///
     /// # Explanation
     /// This is not something I made up. I found it [here](http://blackpawn.com/texts/pointinpoly/)
     /// and also in other places. (the explanation is here not as novelty)
     ///  
-    /// If a triangle in 3 dimentions as vertices $`\vec{A}`$, $`\vec{B}`$, and $`\vec{C}`$, then any 
+    /// If a triangle in 3 dimentions as vertices $`\vec{A}`$, $`\vec{B}`$, and $`\vec{C}`$, then any
     /// point in the plane of the triangle can be described by the following equation:
-    /// 
-    /// ```math 
+    ///
+    /// ```math
     /// \vec{P} = \vec{A} + \alpha \left(\vec{B}-\vec{A}\right)+\beta \left(\vec{C}-\vec{A}\right)
     /// ```
-    /// Or, after stating that $`\hat{e}_1=\left(\vec{B}-\vec{A}\right)`$ and $`\hat{e}_2 = \left(\vec{C}-\vec{A}\right)`$ 
+    /// Or, after stating that $`\hat{e}_1=\left(\vec{B}-\vec{A}\right)`$ and $`\hat{e}_2 = \left(\vec{C}-\vec{A}\right)`$
     /// and rearranging, we can express the same equation as:
     ///     
     /// ```math
     /// \vec{P} - \vec{A}=  \alpha \hat{e}_1+\beta \hat{e}_2
     /// ```
-    /// 
-    /// Since this is a 3D equation,  it is actually three equations and there are only two incognita 
-    /// ($`\alpha`$ and $`\beta`$). So, we can multiply it by $`\hat{e}_1`$ and $`\hat{e}_2`$ and produce 
+    ///
+    /// Since this is a 3D equation,  it is actually three equations and there are only two incognita
+    /// ($`\alpha`$ and $`\beta`$). So, we can multiply it by $`\hat{e}_1`$ and $`\hat{e}_2`$ and produce
     /// a system of equations that we can solve. After doing this, the equation above becomes:
-    /// 
+    ///
     /// ```math
     /// \hat{e}_1\left(\vec{P} - \vec{A}\right)=  \alpha \hat{e}_1\hat{e}_1+\beta \hat{e}_1\hat{e}_2
     /// ```
@@ -333,17 +352,16 @@ impl Triangle3D {
     /// ```math
     /// \hat{e}_2\left(\vec{P} - \vec{A}\right)=  \alpha \hat{e}_1\hat{e}_2+\beta \hat{e}_2\hat{e}_2
     /// ```
-    /// 
+    ///
     /// Which can be represented in matrix form as follows:
-    /// 
+    ///
     /// ```math
     /// \begin{Bmatrix}\hat{e}_1\left(\vec{P} - \vec{A}\right)\\\hat{e}_2\left(\vec{P} - \vec{A}\right)\end{Bmatrix}=\begin{pmatrix}\hat{e}_1\hat{e}_1&\hat{e}_1\hat{e}_2\\\hat{e}_1\hat{e}_2&\hat{e}_2\hat{e}_2\end{pmatrix}\begin{Bmatrix}\alpha\\\beta\end{Bmatrix}
     /// ```
-    /// 
-    /// What is left from here is to interpret the values of $`\alpha`$ and $`\beta`$ from the equations, 
+    ///
+    /// What is left from here is to interpret the values of $`\alpha`$ and $`\beta`$ from the equations,
     /// which allows us to position the point within the triangle.
     pub fn test_point(&self, p: Point3D) -> PointInTriangle {
-        
         // get vertices
         let vertex_a = self.v0;
         let vertex_b = self.v1;
@@ -363,9 +381,9 @@ impl Triangle3D {
         let left2 = e2 * p_minus_a;
 
         // Compute barycentric coordinates
-        let det =  e1e1*e2e2 - e1e2 * e1e2;        
-        let alpha = ( e2e2 * left1 - e1e2 * left2) / det;
-        let beta =  (-e1e2 * left1 + e1e1 * left2) / det;
+        let det = e1e1 * e2e2 - e1e2 * e1e2;
+        let alpha = (e2e2 * left1 - e1e2 * left2) / det;
+        let beta = (-e1e2 * left1 + e1e1 * left2) / det;
         let w = 1. - alpha - beta;
 
         // Check if point is in triangle
@@ -388,11 +406,11 @@ impl Triangle3D {
                 PointInTriangle::EdgeAB
             } else {
                 PointInTriangle::Inside
-            }            
-        }else{            
+            }
+        } else {
             PointInTriangle::Outside
         }
-    }    
+    }
 
     pub fn get_edge_index_by_points(&self, a: Point3D, b: Point3D) -> Option<usize> {
         if a.compare(self.s0.start()) && b.compare(self.s0.end())
@@ -483,38 +501,38 @@ impl Triangle3D {
     }
 }
 
-fn det_3x3(col0: &Vector3D,col1:&Vector3D,col2:&Vector3D)->f64{
-     col0.x()*(col1.y()*col2.z()-col2.y()*col1.z())
-    -col1.x()*(col0.y()*col2.z()-col2.y()*col0.z())
-    +col2.x()*(col0.y()*col1.z()-col1.y()*col0.z())
+fn det_3x3(col0: &Vector3D, col1: &Vector3D, col2: &Vector3D) -> f64 {
+    col0.x() * (col1.y() * col2.z() - col2.y() * col1.z())
+        - col1.x() * (col0.y() * col2.z() - col2.y() * col0.z())
+        + col2.x() * (col0.y() * col1.z() - col1.y() * col0.z())
 }
 
-impl Intersect for Triangle3D{
-    fn intersect(&self, ray: &Ray3D)->Option<f64>{
+impl Intersect for Triangle3D {
+    fn intersect(&self, ray: &Ray3D) -> Option<(f64, Vector3D, SurfaceSide)> {
         // Solve `Rorigin+t*Rdirection = A + alpha*(B-A) + beta*(C-A)`;
-        // Meaning: 
+        // Meaning:
         // alpha(A-B) + beta(A-C) + t*Rdirection = (A - Rorigin)
         // Solve this with Cramer's rule
-        
-        let a_ro = self.a() - ray.origin();
+
+        let a_ro = self.a() - ray.origin;
         let a_b = self.a() - self.b();
-        let a_c = self.a()-self.b();
-        let rd = ray.direction();
+        let a_c = self.a() - self.b();
+        let rd = ray.direction;
 
         let det_a = det_3x3(&a_b, &a_c, &rd);
 
-        let alpha = det_3x3(&a_ro, &a_c, &rd)/det_a;
-        let beta = det_3x3(&a_b, &a_ro, &rd)/det_a;            
-        let t = det_3x3(&a_b, &a_c, &a_ro)/det_a;  
+        let alpha = det_3x3(&a_ro, &a_c, &rd) / det_a;
+        let beta = det_3x3(&a_b, &a_ro, &rd) / det_a;
+        let t = det_3x3(&a_b, &a_c, &a_ro) / det_a;
 
-
-        // t must be positive, and alpha, beta and gamma must add to 1 and 
+        // t must be positive, and alpha, beta and gamma must add to 1 and
         // be positive
         if t < 0. || alpha + beta > 1. || alpha < 0. || beta < 0. {
             None
-        }else{
-            Some(t)
-        }        
+        } else {
+            let (side, normal) = SurfaceSide::get_side(self.normal, ray.direction);
+            Some((t, normal, side))
+        }
     }
 }
 
@@ -527,19 +545,31 @@ mod testing {
     use super::*;
 
     #[test]
-    fn test_det_3x3(){
-        assert_eq!(1.,det_3x3(
-            &Vector3D::new(1.,0.,0.),
-            &Vector3D::new(0.,1.,0.),
-            &Vector3D::new(0.,0.,1.)));
-        assert_eq!(8.,det_3x3(
-            &Vector3D::new(2.,0.,0.),
-            &Vector3D::new(0.,2.,0.),
-            &Vector3D::new(0.,0.,2.)));
-        assert_eq!(49.,det_3x3(
-            &Vector3D::new(2.,2.,1.),
-            &Vector3D::new(-3.,0.,4.),
-            &Vector3D::new(1.,-1.,5.)));        
+    fn test_det_3x3() {
+        assert_eq!(
+            1.,
+            det_3x3(
+                &Vector3D::new(1., 0., 0.),
+                &Vector3D::new(0., 1., 0.),
+                &Vector3D::new(0., 0., 1.)
+            )
+        );
+        assert_eq!(
+            8.,
+            det_3x3(
+                &Vector3D::new(2., 0., 0.),
+                &Vector3D::new(0., 2., 0.),
+                &Vector3D::new(0., 0., 2.)
+            )
+        );
+        assert_eq!(
+            49.,
+            det_3x3(
+                &Vector3D::new(2., 2., 1.),
+                &Vector3D::new(-3., 0., 4.),
+                &Vector3D::new(1., -1., 5.)
+            )
+        );
     }
 
     #[test]
@@ -602,7 +632,6 @@ mod testing {
 
     #[test]
     fn test_test_point() {
-
         let a = Point3D::new(0., 0., 0.);
         let b = Point3D::new(1., 0., 0.);
         let c = Point3D::new(0., 1., 0.);
@@ -610,14 +639,14 @@ mod testing {
         let triangle = Triangle3D::new(a, b, c, 1).unwrap();
 
         // Vertex A.
-        assert!(PointInTriangle::VertexA == triangle.test_point(a));        
+        assert!(PointInTriangle::VertexA == triangle.test_point(a));
 
         // Vertex B.
-        assert!(PointInTriangle::VertexB == triangle.test_point(b));       
+        assert!(PointInTriangle::VertexB == triangle.test_point(b));
 
         // Vertex C.
         assert!(PointInTriangle::VertexC == triangle.test_point(c));
-        
+
         // Segment AB.
         let p = Point3D::new(0.5, 0., 0.);
         assert!(PointInTriangle::EdgeAB == triangle.test_point(p));
@@ -629,14 +658,14 @@ mod testing {
         // Segment BC.
         let p = Point3D::new(0.5, 0.5, 0.);
         assert!(PointInTriangle::EdgeBC == triangle.test_point(p));
-        
+
         // Point outside
         let p = Point3D::new(0., -1., 0.);
-        assert!(PointInTriangle::Outside == triangle.test_point(p));        
+        assert!(PointInTriangle::Outside == triangle.test_point(p));
 
         // Point inside
         let p = Point3D::new(0.1, 0.1, 0.);
-        assert!(PointInTriangle::Inside == triangle.test_point(p));        
+        assert!(PointInTriangle::Inside == triangle.test_point(p));
     }
 
     #[test]

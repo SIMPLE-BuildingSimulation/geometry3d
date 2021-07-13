@@ -11,8 +11,17 @@ use crate::polygon3d::*;
 use crate::segment3d::*;
 use crate::triangle3d::*;
 
+/// A set of [`Triangle3D`] that, together, cover completely
+/// a [`Polygon3D`].
 pub struct Triangulation3D {
+    /// The triangles
     triangles: Vec<Triangle3D>,
+
+    /// The number of valid triangles.
+    ///
+    /// Check whether triangles are valid or not
+    /// before using them. Invalidating triangles help
+    /// accelerate the algorithms in this module.
     n_valid_triangles: usize,
 }
 
@@ -23,29 +32,42 @@ impl Default for Triangulation3D {
 }
 
 impl Triangulation3D {
+    /// Creates  a new empty [`Triangulation3D`]
     pub fn new() -> Triangulation3D {
-        let v: Vec<Triangle3D> = Vec::new();
-
         Triangulation3D {
             n_valid_triangles: 0,
-            triangles: v,
+            triangles: Vec::new(),
         }
     }
 
-    /// Triangulates a [`Polygon3D`] without refining it, using the simple ear 
-    /// clipping algorithm
+    /// Triangulates a [`Polygon3D`] using the simple ear
+    /// clipping algorithm and then progresively refines the mesh in order to get
+    /// a relatively healthy set of Delaunay triangles
+    pub fn mesh_polygon(
+        poly: &Polygon3D,
+        max_area: f64,
+        max_aspect_ratio: f64,
+    ) -> Result<Triangulation3D, String> {
+        let mut t = Self::from_polygon(poly)?;
+        t.refine(max_area, max_aspect_ratio)?;
+        Ok(t)
+    }
+
+    /// Triangulates a [`Polygon3D`] without refining it, using the simple ear
+    /// clipping algorithm.
     pub fn from_polygon(poly: &Polygon3D) -> Result<Triangulation3D, String> {
         let mut the_loop = poly.get_closed_loop();
         let mut t = Triangulation3D::new();
 
-        let mut count = 0;
-        let mut current_i = 0;
+        let mut count = 0; // keep note of the number of triangles
+        let mut i = 0;
         loop {
-            if the_loop.n_valid_vertices() == 3 {
+            let n = the_loop.n_vertices();
+            if n == 3 {
                 // Add last triangle
-                let v0 = the_loop.next_valid(&mut current_i);
-                let v1 = the_loop.next_valid(&mut current_i);
-                let v2 = the_loop.next_valid(&mut current_i);
+                let v0 = the_loop[0];
+                let v1 = the_loop[1];
+                let v2 = the_loop[2];
                 t.push(v0, v1, v2, count).unwrap();
 
                 // Set neighbours
@@ -53,22 +75,17 @@ impl Triangulation3D {
                 // return
                 return Ok(t);
             }
-
-            let mut v0_i = current_i;
-            let v0 = the_loop.next_valid(&mut v0_i);
-
-            let mut v1_i = v0_i;
-            let v1 = the_loop.next_valid(&mut v1_i);
-
-            let mut v2_i = v1_i;
-            let v2 = the_loop.next_valid(&mut v2_i);
+            
+            let v0 = the_loop[i%n];            
+            let v1 = the_loop[(i+1)%n];
+            let v2 = the_loop[(i+2)%n];
 
             if the_loop.is_diagonal(Segment3D::new(v0, v2)) {
                 // Add triangle
                 t.push(v0, v1, v2, count).unwrap();
 
                 //invalidate v1
-                the_loop.invalidate_vertex(v1_i).unwrap();
+                the_loop.remove((i+1)%n);
 
                 // Set contrain
                 //t.triangles[count].constrain(i: usize)
@@ -78,15 +95,17 @@ impl Triangulation3D {
         } //end of loop{}
     }
 
+    /// Returns the number of [`Triangle3D`] in the [`Triangulation3D`]
+    /// including invalid ones.
     pub fn n_triangles(&self) -> usize {
         self.triangles.len()
     }
 
+    /// Returns the number of valid [`Triangle3D`] in the [`Triangulation3D`]     
     pub fn n_valid_triangles(&self) -> usize {
         self.n_valid_triangles
     }
 
-    #[allow(dead_code)]
     fn borrow_triangle(&mut self, i: usize) -> Result<&mut Triangle3D, String> {
         if i < self.triangles.len() {
             let t = &mut self.triangles[i];
@@ -107,7 +126,6 @@ impl Triangulation3D {
         Err(msg)
     }
 
-    #[allow(dead_code)]
     fn invalidate(&mut self, i: usize) -> Result<(), String> {
         let n = self.triangles.len();
         if i < n {
@@ -134,7 +152,6 @@ impl Triangulation3D {
         None
     }
 
-    #[allow(dead_code)]
     fn mark_as_neighbours(&mut self, i1: usize, edge_1: usize, i2: usize) -> Result<(), String> {
         let start: Point3D;
         let end: Point3D;
@@ -220,7 +237,6 @@ impl Triangulation3D {
         }
     }
 
-    #[allow(dead_code)]
     fn get_opposite_vertex(
         &self,
         triangle: &Triangle3D,
@@ -247,7 +263,6 @@ impl Triangulation3D {
         }
     }
 
-    #[allow(dead_code)]
     fn get_flipped_aspect_ratio(&self, index: usize, edge: usize) -> Result<f64, String> {
         if edge > 2 {
             let msg = format!(
@@ -313,7 +328,6 @@ impl Triangulation3D {
         }
     }
 
-    #[allow(dead_code)]
     fn flip_diagonal(&mut self, index: usize, edge: usize) -> Result<(), String> {
         // The transformation is as follows:
         //         C                C
@@ -499,7 +513,6 @@ impl Triangulation3D {
         Ok(())
     } // end of flip_diagonal()
 
-    #[allow(dead_code)]
     fn split_edge(
         &mut self,
         triangle_index: usize,
@@ -522,21 +535,27 @@ impl Triangulation3D {
             let msg = "Trying to split edge of an invalid Triangle3D".to_string();
             return Err(msg);
         }
-        
+
         let edge_to_split = match edge_to_split {
-            PointInTriangle::EdgeAB =>0,
+            PointInTriangle::EdgeAB => 0,
             PointInTriangle::EdgeBC => 1,
-            PointInTriangle::EdgeAC=>2,
-            _ =>{unreachable!();} 
+            PointInTriangle::EdgeAC => 2,
+            _ => {
+                unreachable!();
+            }
         };
 
         // get points
-        let base_segment = self.triangles[triangle_index].segment(edge_to_split).unwrap();
+        let base_segment = self.triangles[triangle_index]
+            .segment(edge_to_split)
+            .unwrap();
         let vertex_a = base_segment.start();
         let vertex_b = base_segment.end();
 
         // Neighbour
-        let nei_i = self.triangles[triangle_index].neighbour(edge_to_split).unwrap();
+        let nei_i = self.triangles[triangle_index]
+            .neighbour(edge_to_split)
+            .unwrap();
 
         let mut process_hemisphere = |index: usize| -> (usize, usize) {
             let edge = self.triangles[index]
@@ -632,7 +651,6 @@ impl Triangulation3D {
         Ok(())
     }
 
-    #[allow(dead_code)]
     fn split_triangle(&mut self, i: usize, point: Point3D) -> Result<(), String> {
         // The transformation is as follows (puts P in the middle,
         // and splits the triangle into three triangles):
@@ -766,7 +784,6 @@ impl Triangulation3D {
         Ok(())
     }
 
-    #[allow(dead_code)]
     fn restore_delaunay(&mut self, max_aspect_ratio: f64) {
         // Flipping diagonals does not change the number of triangles.
         let n = self.triangles.len();
@@ -826,7 +843,6 @@ impl Triangulation3D {
         } // End of while any_changes
     } // end of fn restore_delaunay
 
-    #[allow(dead_code)]
     fn add_point_to_triangle(
         &mut self,
         index: usize,
@@ -838,21 +854,20 @@ impl Triangulation3D {
             return Err(msg);
         }
 
-        if p_location.is_vertex(){
+        if p_location.is_vertex() {
             // Point is a vertex... ignore, but pretend we did something
             Ok(())
-        }else if p_location.is_edge(){
+        } else if p_location.is_edge() {
             self.split_edge(index, p_location, point)
-        }else if p_location == PointInTriangle::Inside{
+        } else if p_location == PointInTriangle::Inside {
             self.split_triangle(index, point)
-        }else{
+        } else {
             unreachable!();
         }
-                
     }
 
     fn add_point(&mut self, point: Point3D) -> Result<(), String> {
-        // Iterate through triangles to check        
+        // Iterate through triangles to check
         let n = self.triangles.len();
         for i in 1..n {
             // skip triangle if it has been deleted
@@ -860,9 +875,8 @@ impl Triangulation3D {
                 continue;
             }
 
-            
             let p_location = self.triangles[i].test_point(point);
-            if p_location != PointInTriangle::Outside{
+            if p_location != PointInTriangle::Outside {
                 return self.add_point_to_triangle(i, point, p_location);
             }
         }
@@ -873,7 +887,6 @@ impl Triangulation3D {
         )
     }
 
-    #[allow(dead_code)]
     fn refine(&mut self, max_area: f64, max_aspect_ratio: f64) -> Result<(), String> {
         let n_triangles = self.n_triangles();
 
@@ -902,11 +915,13 @@ impl Triangulation3D {
                     }
                 }
 
-                let edge_to_split = match s_i{
+                let edge_to_split = match s_i {
                     0 => PointInTriangle::EdgeAB,
                     1 => PointInTriangle::EdgeBC,
                     2 => PointInTriangle::EdgeAC,
-                    _ => {unreachable!();}
+                    _ => {
+                        unreachable!();
+                    }
                 };
                 // add midpoint
                 let mid_s = s.midpoint();
@@ -998,6 +1013,56 @@ mod testing {
     use crate::loop3d::*;
 
     #[test]
+    fn test_new() {
+        let t = Triangulation3D::new();
+        assert_eq!(t.n_valid_triangles, 0);
+        assert_eq!(t.n_valid_triangles(), 0);
+
+        assert_eq!(t.n_triangles(), 0);
+        assert_eq!(t.triangles.len(), 0);
+    }
+
+    #[test]
+    fn test_default() {
+        let t = Triangulation3D::default();
+        assert_eq!(t.n_valid_triangles, 0);
+        assert_eq!(t.n_valid_triangles(), 0);
+
+        assert_eq!(t.n_triangles(), 0);
+        assert_eq!(t.triangles.len(), 0);
+    }
+
+    #[test]
+    fn test_mesh_polygon() {
+        assert!(false)
+    }
+
+    #[test]
+    fn test_from_polygon() {
+        assert!(false)
+    }
+
+    #[test]
+    fn test_restore_delaunay() {
+        assert!(false)
+    }
+
+    #[test]
+    fn test_add_point_to_triangle() {
+        assert!(false)
+    }
+
+    #[test]
+    fn test_add_point() {
+        assert!(false)
+    }
+
+    #[test]
+    fn test_refine() {
+        assert!(false)
+    }
+
+    #[test]
     fn test_is_convex() {
         let a = Point3D::new(-1., -1., 0.);
         let b = Point3D::new(1., -1., 0.);
@@ -1016,16 +1081,6 @@ mod testing {
 
         let b = Point3D::new(0., -0.1, 0.);
         assert!(is_convex(a, b, c, d));
-    }
-
-    #[test]
-    fn test_new() {
-        let t = Triangulation3D::new();
-        assert_eq!(t.n_valid_triangles, 0);
-        assert_eq!(t.n_valid_triangles(), 0);
-
-        assert_eq!(t.n_triangles(), 0);
-        assert_eq!(t.triangles.len(), 0);
     }
 
     #[test]
@@ -1638,14 +1693,16 @@ mod testing {
 
                 // Go through outer loop.
                 let outer = p.outer();
-                let n_out = outer.n_valid_vertices();
+                let n_out = outer.n_vertices();
                 let mut v_i = 0;
                 let mut count = 0;
 
                 while count <= n_out {
-                    let a = outer.next_valid(&mut v_i);
+                    let a = outer[v_i];
+                    v_i +=1;
                     let mut this = v_i;
-                    let b = outer.next_valid(&mut this);
+                    let b = outer[this];
+                    this +=1;
                     let outer_segment = Segment3D::new(a, b);
 
                     if outer_segment.contains(&edge).unwrap() {
@@ -1666,9 +1723,11 @@ mod testing {
                     let mut count = 0;
 
                     while count <= n_in {
-                        let a = inner.next_valid(&mut v_i);
+                        let a = inner[v_i];
+                        v_i +=1;
                         let mut this = v_i;
-                        let b = inner.next_valid(&mut this);
+                        let b = inner[this];
+                        this +=1;
                         let inner_segment = Segment3D::new(a, b);
 
                         if inner_segment.contains(&edge).unwrap() {

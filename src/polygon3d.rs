@@ -1,6 +1,9 @@
-use crate::loop3d::*;
-use crate::point3d::*;
-use crate::vector3d::*;
+use crate::intersect_trait::{Intersect, SurfaceSide};
+use crate::loop3d::Loop3D;
+use crate::plane3d::Plane3D;
+use crate::point3d::Point3D;
+use crate::ray3d::Ray3D;
+use crate::vector3d::Vector3D;
 
 pub struct Polygon3D {
     outer: Loop3D,
@@ -9,7 +12,32 @@ pub struct Polygon3D {
     normal: Vector3D,
 }
 
+impl Intersect for Polygon3D {
+    fn intersect(&self, ray: &Ray3D) -> Option<(f64, Vector3D, SurfaceSide)> {
+        
+        let p = self.outer[0];
+
+        let poly_plane = Plane3D::new(p, self.normal);
+        if let Some((t, normal, side)) = poly_plane.intersect(ray) {
+            let intersection = ray.project(t);
+            match self.test_point(intersection) {
+                Ok(is_in) => {
+                    if is_in {
+                        Some((t, normal, side))
+                    } else {
+                        None
+                    }
+                }
+                Err(e) => panic!("When intersecting Polygon3D: {}", e),
+            }
+        } else {
+            None
+        }
+    }
+}
+
 impl Polygon3D {
+    /// Creates a new [`Loop3D`] without any holes
     pub fn new(outer: Loop3D) -> Result<Polygon3D, String> {
         if !outer.is_closed() {
             return Err("Trying to create a Polygon3D from a loop that is not closed".to_string());
@@ -26,18 +54,34 @@ impl Polygon3D {
         })
     }
 
+    /// Calculates the average of the [`Point3D`] in the Outer [`Loop3D`]
+    pub fn outer_centroid(&self) -> Point3D {
+        let mut centroid = Point3D::new(0., 0., 0.);
+        let mut current_valid = 0;
+        
+        let outer = self.outer();
+        for v in outer.vertices() {
+            centroid += *v;
+        }
+        centroid / (outer.n_vertices() as f64)
+    }
+
+    /// Borrows the Outer [`Loop3D`]
     pub fn outer(&self) -> &Loop3D {
         &self.outer
     }
 
+    /// Clones the Outer [`Loop3D`]
     pub fn clone_outer(&self) -> Loop3D {
         self.outer.clone()
     }
 
+    /// Counts the inner [`Loop3D`]
     pub fn n_inner_loops(&self) -> usize {
         self.inner.len()
     }
 
+    /// Borrows an inner [`Loop3D`]
     pub fn inner(&self, i: usize) -> Result<&Loop3D, String> {
         if i < self.inner.len() {
             return Ok(&self.inner[i]);
@@ -46,15 +90,10 @@ impl Polygon3D {
         Err(msg)
     }
 
+    /// Checks whether a [`Point3D`] is inside the [`Polygon3D`]
     pub fn test_point(&self, p: Point3D) -> Result<bool, String> {
         // Must be within the outer loop
-        let result = self.outer.test_point(p);
-        let is_in = match result {
-            Ok(b) => b,
-            Err(e) => return Err(e),
-        };
-        // If it is not in the outer loop, then it is outside.
-        if !is_in {
+        if !self.outer.test_point(p)? {
             return Ok(false);
         }
 
@@ -78,6 +117,7 @@ impl Polygon3D {
         Ok(true)
     }
 
+    /// Makes a hole shaped as a [`Loop3D`] in the [`Polygon3D`].
     pub fn cut_hole(&mut self, hole: Loop3D) -> Result<(), String> {
         // Check that the normals are the same
 
@@ -87,21 +127,8 @@ impl Polygon3D {
         }
 
         // Check that all the points are inside the polygon.point3d
-        for i in 0..hole.n_vertices() {
-            let r = hole.vertex(i);
-            let p = match r {
-                Ok(point_valid) => {
-                    let (point, _valid) = point_valid;
-                    point
-                }
-                Err(e) => return Err(e.to_string()),
-            };
-            let r = self.test_point(p);
-            let is_in = match r {
-                Ok(x) => x,
-                Err(e) => return Err(e),
-            };
-            if !is_in {
+        for p in hole.vertices() {                                    
+            if !self.test_point(*p)? {
                 let msg = "At least one of the points in your hole are not inside the polygon"
                     .to_string();
                 return Err(msg);
@@ -112,27 +139,18 @@ impl Polygon3D {
         let n_inner = self.inner.len();
         for n_loop in 0..n_inner {
             let inner = &self.inner[n_loop];
-
-            let mut i: usize = 0;
-            while i < inner.n_valid_vertices() {
-                // get point from inner loop
-                let inner_p = inner.next_valid(&mut i);
-
-                // Check point in the hole we are making
-                let is_inside = match hole.test_point(inner_p) {
-                    Ok(b) => b,
-                    Err(e) => return Err(e),
-                };
-
-                if is_inside {
+            
+            for inner_p in inner.vertices(){
+                
+                // Check point in the hole we are making                
+                if hole.test_point(*inner_p)? {
                     let msg = "Apparently another hole in your Polygon3D would be inside the new hole you are making".to_string();
                     return Err(msg);
                 }
             }
         }
 
-        // All good now! Add it.
-        /*** */
+        // All good now! Add it.        
         let hole_area = hole.area();
 
         // reduce area
@@ -160,13 +178,8 @@ impl Polygon3D {
         let n_inner_loops = self.inner.len();
 
         //initialize the loop by cloning the current outer loop
-        let mut ret_loop = Loop3D::new();
-        let mut i: usize = 0;
-        while ret_loop.n_vertices() < self.outer.n_valid_vertices() {
-            let p = self.outer.next_valid(&mut i);
-            ret_loop.push(p).unwrap();
-        }
-
+        let mut ret_loop = self.outer.clone();
+        
         // We will use this for checking whether the inner
         // loop should be reversed or not.
         let outer_normal = self.outer.normal();
@@ -187,12 +200,8 @@ impl Polygon3D {
 
             let n_ext_vertices = ret_loop.n_vertices();
             for j in 0..n_ext_vertices {
-                let (ext_vertex, is_valid) = ret_loop.vertex(j).unwrap();
-
-                // skip invalid vertices.
-                if !is_valid {
-                    continue;
-                }
+                let ext_vertex = ret_loop[j];
+                
 
                 for k in 0..n_inner_loops {
                     // continue if already processed
@@ -203,11 +212,7 @@ impl Polygon3D {
                     let inner_loop = &self.inner[k];
                     let n_inner_vertices = inner_loop.n_vertices();
                     for l in 0..n_inner_vertices {
-                        let (inner_vertex, is_valid) = inner_loop.vertex(l).unwrap();
-
-                        if !is_valid {
-                            continue;
-                        }
+                        let inner_vertex = inner_loop[l];
 
                         // we work with squared distances... the result is
                         // the same but the calculation is faster.
@@ -231,11 +236,7 @@ impl Polygon3D {
 
             for i in 0..n_ext_vertices {
                 // Sequentially add all exterior vertices.
-                let (ext_vertex, is_valid) = ret_loop.vertex(i).unwrap();
-
-                if !is_valid {
-                    continue;
-                }
+                let ext_vertex = ret_loop[i];
 
                 // Add
                 aux.push(ext_vertex).unwrap();
@@ -260,11 +261,8 @@ impl Polygon3D {
                                 % n_inner_loop_vertices;
                         }
 
-                        let (inner_vertex, is_valid) =
-                            self.inner[min_inner_loop_id].vertex(vertex_to_add).unwrap();
-                        if !is_valid {
-                            continue;
-                        }
+                        let inner_vertex =
+                            self.inner[min_inner_loop_id][vertex_to_add];                        
 
                         let x = inner_vertex.x;
                         let y = inner_vertex.y;
@@ -295,6 +293,96 @@ impl Polygon3D {
 #[cfg(test)]
 mod testing {
     use super::*;
+
+    use crate::vector3d::Vector3D;
+
+    #[test]
+    fn test_polygon_intersect() {
+        // It should not work if we don't close it.
+        let mut the_loop = Loop3D::new();
+        let l = 20. as f64;
+        the_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
+        the_loop.push(Point3D::new(l, -l, 0.)).unwrap();
+        the_loop.push(Point3D::new(l, l, 0.)).unwrap();
+        the_loop.push(Point3D::new(-l, l, 0.)).unwrap();
+
+        the_loop.close().unwrap();
+
+        let polygon = Polygon3D::new(the_loop).unwrap();
+
+        let ray = Ray3D {
+            origin: Point3D::new(2.1, -3.1, 100.),
+            direction: Vector3D::new(0., 0., -1.),
+        };
+        if let Some((t, normal, side)) = polygon.intersect(&ray) {
+            assert_eq!(side, SurfaceSide::Front);
+            assert_eq!(normal, Vector3D::new(0., 0., 1.));
+            assert_eq!(t, 100.);
+        } else {
+            panic!("Did not intersect!")
+        }
+
+        let ray = Ray3D {
+            origin: Point3D::new(2.1, -3.1, -100.),
+            direction: Vector3D::new(0., 0., 1.),
+        };
+        if let Some((t, normal, side)) = polygon.intersect(&ray) {
+            assert_eq!(side, SurfaceSide::Back);
+            assert_eq!(normal, Vector3D::new(0., 0., -1.));
+            assert_eq!(t, 100.);
+        } else {
+            panic!("Did not intersect!")
+        }
+    }
+
+    #[test]
+    fn test_another_polygon_intersect() {
+        // It should not work if we don't close it.
+        let mut the_loop = Loop3D::new();
+        let l = 100. as f64;
+        the_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
+        the_loop.push(Point3D::new(l, -l, 0.)).unwrap();
+        the_loop.push(Point3D::new(l, l, 0.)).unwrap();
+        the_loop.push(Point3D::new(-l, l, 0.)).unwrap();
+
+        the_loop.close().unwrap();
+
+        let polygon = Polygon3D::new(the_loop).unwrap();
+
+        let origin = Point3D::new(0., 0., 3.);
+        let n_samples = 100;
+        for i in 0..n_samples {
+            let mut direction = Vector3D::new(0., (i as f64 * l) / n_samples as f64, -origin.z);
+            direction.normalize();
+            let ray = Ray3D { origin, direction };
+
+            if let Some((t, normal, side)) = polygon.intersect(&ray) {
+                assert_eq!(side, SurfaceSide::Front);
+                assert_eq!(normal, Vector3D::new(0., 0., 1.));
+                // assert_eq!(t, 100.);
+            } else {
+                panic!("Did not intersect i={} | direction: {} ", i, ray.direction)
+            }
+        }
+        for i in 103..104 {
+            //n_samples..2*n_samples {
+            let mut direction =
+                Vector3D::new(0., 0.01 + (i as f64 * l) / n_samples as f64, -origin.z);
+            direction.normalize();
+            let ray = Ray3D { origin, direction };
+
+            if let Some((t, normal, side)) = polygon.intersect(&ray) {
+                panic!(
+                    "Intersected! i={} Should not ... | inter_p: {}",
+                    i,
+                    ray.project(t)
+                );
+                assert_eq!(side, SurfaceSide::Front);
+                assert_eq!(normal, Vector3D::new(0., 0., 1.));
+                // assert_eq!(t, 100.);
+            }
+        }
+    }
 
     #[test]
     fn test_new() {
@@ -433,57 +521,46 @@ mod testing {
         let closed = p.get_closed_loop();
 
         assert_eq!(closed.n_vertices(), 10);
-        assert_eq!(closed.n_valid_vertices(), 10);
 
         // 0
-        let (p, is_valid) = closed.vertex(0).unwrap();
+        let p = closed[0];
         assert!(p.compare(Point3D::new(-2., -2., 0.)));
-        assert!(is_valid);
-
+        
         // 1
-        let (p, is_valid) = closed.vertex(1).unwrap();
+        let p = closed[1];
         assert!(p.compare(Point3D::new(-1., -1., 0.)));
-        assert!(is_valid);
-
+        
         // 2
-        let (p, is_valid) = closed.vertex(2).unwrap();
+        let p = closed[2];
         assert!(p.compare(Point3D::new(-1., 1., 0.)));
-        assert!(is_valid);
-
+        
         // 3
-        let (p, is_valid) = closed.vertex(3).unwrap();
+        let p = closed[3];
         assert!(p.compare(Point3D::new(1., 1., 0.)));
-        assert!(is_valid);
-
+        
         // 4
-        let (p, is_valid) = closed.vertex(4).unwrap();
+        let p = closed[4];
         assert!(p.compare(Point3D::new(1., -1., 0.)));
-        assert!(is_valid);
-
+        
         // 5
-        let (p, is_valid) = closed.vertex(5).unwrap();
+        let p = closed[5];
         assert!(p.compare(Point3D::new(-1., -1., 0.)));
-        assert!(is_valid);
-
+        
         // 6... Back to exterior
-        let (p, is_valid) = closed.vertex(6).unwrap();
+        let p = closed[6];
         assert!(p.compare(Point3D::new(-2., -2., 0.)));
-        assert!(is_valid);
-
+        
         // 7.
-        let (p, is_valid) = closed.vertex(7).unwrap();
+        let p = closed[7];
         assert!(p.compare(Point3D::new(6., -2., 0.)));
-        assert!(is_valid);
-
+        
         // 8
-        let (p, is_valid) = closed.vertex(8).unwrap();
+        let p = closed[8];
         assert!(p.compare(Point3D::new(6., 6., 0.)));
-        assert!(is_valid);
-
+        
         // 9
-        let (p, is_valid) = closed.vertex(9).unwrap();
-        assert!(p.compare(Point3D::new(-2., 6., 0.)));
-        assert!(is_valid);
+        let p = closed[9];
+        assert!(p.compare(Point3D::new(-2., 6., 0.)));        
     }
 
     #[test]
@@ -512,56 +589,46 @@ mod testing {
         let closed = p.get_closed_loop();
 
         assert_eq!(closed.n_vertices(), 10);
-        assert_eq!(closed.n_valid_vertices(), 10);
 
         // 0
-        let (p, is_valid) = closed.vertex(0).unwrap();
+        let p = closed[0];
         assert!(p.compare(Point3D::new(-2., -2., 0.)));
-        assert!(is_valid);
+        
 
         // 1
-        let (p, is_valid) = closed.vertex(1).unwrap();
-        assert!(p.compare(Point3D::new(-1., -1., 0.)));
-        assert!(is_valid);
+        let p = closed[1];
+        assert!(p.compare(Point3D::new(-1., -1., 0.)));        
 
-        // 2
-        let (p, is_valid) = closed.vertex(2).unwrap();
+        // 2        
+        let p = closed[2];
         assert!(p.compare(Point3D::new(-1., 1., 0.)));
-        assert!(is_valid);
-
+        
         // 3
-        let (p, is_valid) = closed.vertex(3).unwrap();
+        let p = closed[3];
         assert!(p.compare(Point3D::new(1., 1., 0.)));
-        assert!(is_valid);
-
+        
         // 4
-        let (p, is_valid) = closed.vertex(4).unwrap();
+        let p = closed[4];
         assert!(p.compare(Point3D::new(1., -1., 0.)));
-        assert!(is_valid);
-
+        
         // 5
-        let (p, is_valid) = closed.vertex(5).unwrap();
-        assert!(p.compare(Point3D::new(-1., -1., 0.)));
-        assert!(is_valid);
+        let p = closed[5];
+        assert!(p.compare(Point3D::new(-1., -1., 0.)));        
 
         // 6... Back to exterior
-        let (p, is_valid) = closed.vertex(6).unwrap();
+        let p = closed[6];
         assert!(p.compare(Point3D::new(-2., -2., 0.)));
-        assert!(is_valid);
-
+        
         // 7.
-        let (p, is_valid) = closed.vertex(7).unwrap();
+        let p = closed[7];
         assert!(p.compare(Point3D::new(6., -2., 0.)));
-        assert!(is_valid);
-
+        
         // 8
-        let (p, is_valid) = closed.vertex(8).unwrap();
+        let p = closed[8];
         assert!(p.compare(Point3D::new(6., 6., 0.)));
-        assert!(is_valid);
-
+        
         // 9
-        let (p, is_valid) = closed.vertex(9).unwrap();
-        assert!(p.compare(Point3D::new(-2., 6., 0.)));
-        assert!(is_valid);
+        let p = closed[9];
+        assert!(p.compare(Point3D::new(-2., 6., 0.)));        
     }
 }
