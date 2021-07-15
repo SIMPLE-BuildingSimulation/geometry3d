@@ -102,12 +102,11 @@ impl Loop3D {
     /// If the [`Point3D`] being
     /// pushed is collinear with the previous two, then instead of pushing a new
     /// [`Point3D`] it will update the last one (i.e., because the shape and area)
-    /// of the [`Polygon3D`] will still be the same. If you want to keep both
-    /// points, use the method `force_push`.
+    /// of the [`Loop3D`] will still be the same.
     /// 
-    /// Returns an error if the point being added would make the [`Polygon3D`] 
+    /// Returns an error if the point being added would make the [`Loop3D`] 
     /// intersect itself, or if the new [`Point3D`] is not coplanar with the 
-    /// [`Polygon3D`], or if the [`Polygon3D`] is closed.
+    /// [`Loop3D`], or if the [`Loop3D`] is closed.
     pub fn push(&mut self, point: Point3D) -> Result<(), String> {
         
         // Check the point
@@ -138,7 +137,7 @@ impl Loop3D {
         Ok(())
     }
 
-    /// Counts the vertices in the [`Polygon3D`]
+    /// Counts the vertices in the [`Loop3D`]
     pub fn n_vertices(&self) -> usize {
         self.vertices.len()
     }
@@ -179,6 +178,7 @@ impl Loop3D {
         if self.vertices.len() < 3 {
             return Err("Trying to close a Loop3D with less than 3 vertices".to_string());
         }
+                
 
         // Check the last vertex for collinearity
         let n = self.vertices.len();
@@ -190,6 +190,9 @@ impl Loop3D {
             // collinear. Remove the last vertex
             self.vertices.pop();
         }
+
+        // Check if closing would intercept 
+        self.valid_to_add(self.vertices[0])?;        
 
         // Check the first vertex for collinearity
         let n = self.vertices.len();
@@ -209,7 +212,7 @@ impl Loop3D {
     }
 
 
-    /// Sets the normal [`Vector3D`] for a [`Polygon3D`]
+    /// Sets the normal [`Vector3D`] for a [`Loop3D`]
     fn set_normal(&mut self) -> Result<(),String>{
 
         if self.vertices.len() < 3 {
@@ -232,7 +235,7 @@ impl Loop3D {
     /// Retrieves the normal of the vector.
     /// 
     /// # Note
-    /// If the [`Polygon3D`] has less than 3 vertices, then
+    /// If the [`Loop3D`] has less than 3 vertices, then
     /// the Normal will be `Vector3D(0., 0., 0.)`, which is the default.
     pub fn normal(&self) -> Vector3D {
         self.normal
@@ -261,7 +264,7 @@ impl Loop3D {
         Ok(aux < 10. * f64::EPSILON)
     }
 
-    /// Tests whether a [`Point3D`] dwells inside of the [`Polygon3D`].
+    /// Tests whether a [`Point3D`] dwells inside of the [`Loop3D`].
     pub fn test_point(&self, point: Point3D) -> Result<bool, String> {
         // Check if the loop is done
         if !self.closed {
@@ -859,6 +862,35 @@ mod testing {
             Point3D::new( 1., -2., 0.),
         )));
 
+    }
+
+    #[test]
+    fn test_valid_to_add(){
+        let mut outer = Loop3D::new();
+
+        let p0 = Point3D::new(0., 0., 0.);
+        assert!(outer.valid_to_add(p0).is_ok());
+        outer.push(p0).unwrap();
+
+        let p1 = Point3D::new(0., 3., 0.);
+        assert!(outer.valid_to_add(p1).is_ok());
+        outer.push(p1).unwrap();
+
+        let p2 = Point3D::new(3., 3., 0.);
+        assert!(outer.valid_to_add(p2).is_ok());
+        outer.push(p2).unwrap();
+
+        let p3 = Point3D::new(5., 5., 0.);
+        assert!(outer.valid_to_add(p3).is_ok());
+        outer.push(p3).unwrap();
+
+        let p4 = Point3D::new(3., 6., 0.);
+        assert!(outer.valid_to_add(p4).is_ok());
+        outer.push(p4).unwrap();
+
+        let p5 = Point3D::new(0., 5., 0.);
+        assert!(outer.valid_to_add(p5).is_ok());
+        
     }
 
 
