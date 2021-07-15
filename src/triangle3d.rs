@@ -6,42 +6,15 @@ use crate::vector3d::Vector3D;
 
 pub struct Triangle3D {
     // Vertices
-    v0: Point3D,
-    v1: Point3D,
-    v2: Point3D,
-
-    // Segments
-    s0: Segment3D,
-    s1: Segment3D,
-    s2: Segment3D,
-
-    // Neighbours
-    n0: i32,
-    n1: i32,
-    n2: i32,
-
-    // Constraints
-    c0: bool,
-    c1: bool,
-    c2: bool,
-
-    // Other info about the triangle.
-    area: f64,
-    circumradius: f64,
-    aspect_ratio: f64,
-    circumcenter: Point3D,
-    centroid: Point3D,
+    a: Point3D,
+    b: Point3D,
+    c: Point3D,
     normal: Vector3D,
-
-    valid: bool,
-
-    // This will be
-    // assigned when pushing it into a
-    // triangulation.
-    index: usize,
+    area: f64,    
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
 pub enum PointInTriangle {
     VertexA,
     VertexB,
@@ -67,9 +40,8 @@ impl Triangle3D {
     pub fn new(
         vertex_a: Point3D,
         vertex_b: Point3D,
-        vertex_c: Point3D,
-        i: usize,
-    ) -> Result<Triangle3D, String> {
+        vertex_c: Point3D,        
+    ) -> Result<Self, String> {
         // check that points are not the same
         if vertex_a.compare(vertex_b) || vertex_a.compare(vertex_c) || vertex_b.compare(vertex_c) {
             let msg = "Trying to build a Triangle3D with two equal points".to_string();
@@ -84,134 +56,78 @@ impl Triangle3D {
 
         // Build the triangle
         let mut t = Triangle3D {
-            v0: vertex_a,
-            v1: vertex_b,
-            v2: vertex_c,
+            a: vertex_a,
+            b: vertex_b,
+            c: vertex_c,            
 
-            s0: Segment3D::new(vertex_a, vertex_b),
-            s1: Segment3D::new(vertex_b, vertex_c),
-            s2: Segment3D::new(vertex_c, vertex_a),
-
-            n0: -1,
-            n1: -1,
-            n2: -1,
-
-            c0: false,
-            c1: false,
-            c2: false,
-
-            area: -1.,
-            aspect_ratio: -1.,
-            circumradius: -1.,
-            circumcenter: Point3D::new(0., 0., 0.),
-            centroid: Point3D::new(0., 0., 0.),
-            normal: Vector3D::new(0., 0., 0.),
-
-            index: i,
-            valid: true,
+            area: -1.,            
+            normal: Vector3D::new(0., 0., 0.),            
         };
 
         t.set_area();
-        t.set_circumradius();
-        t.set_aspect_ratio();
-        t.set_circumcenter();
-        t.set_centroid();
-        t.set_normal();
+        t.set_normal();        
 
         Ok(t)
     }
 
-    pub fn index(&self) -> usize {
-        self.index
-    }
+    
 
-    pub fn invalidate(&mut self) {
-        self.valid = false
-    }
-
-    pub fn is_valid(&self) -> bool {
-        self.valid
-    }
-
-    pub fn set_neighbour(&mut self, edge: usize, i: usize) -> Result<(), String> {
-        match edge {
-            0 => self.n0 = i as i32,
-            1 => self.n1 = i as i32,
-            2 => self.n2 = i as i32,
-            _ => {
-                return Err(format!(
-                    "Trying to set neighbour with index '{}'... it is out of bounds",
-                    i
-                ))
-            }
-        }
-        Ok(())
-    }
-
-    pub fn neighbour(&self, edge: usize) -> Result<i32, String> {
-        match edge {
-            0 => Ok(self.n0),
-            1 => Ok(self.n1),
-            2 => Ok(self.n2),
-            _ => Err(format!(
-                "Trying to get neighbour with index '{}'... it is out of bounds",
-                edge
-            )),
-        }
-    }
-
+    
     /* Normal */
 
     /// Calculates the normal of the Triangle
     fn set_normal(&mut self) {
-        let b_a = self.v1 - self.v0;
-        let c_a = self.v2 - self.v1;
+        let b_a = self.b - self.a;
+        let c_a = self.c - self.b;
         self.normal = b_a.cross(c_a);
         self.normal.normalize();
     }
 
+    /// Gets the normal of the [`Triangle3D`]. This value is
+    /// cached, so this should be fast.
     pub fn normal(&self) -> Vector3D {
         self.normal
     }
 
-    /* Area */
+    
 
-    fn set_area(&mut self) {
-        if self.area < 0. {
-            let a = self.s0.length();
-            let b = self.s1.length();
-            let c = self.s2.length();
 
-            self.area = ((c + b + a)
-                * ((c + b + a) / 2. - a)
-                * ((c + b + a) / 2. - b)
-                * ((c + b + a) / 2. - c)
-                / 2.)
-                .sqrt();
-        }
+    /// Sets the area of the [`Triangle3D`]. This is used when 
+    /// constructing the [`Triangle3D`]
+    fn set_area(&mut self){
+        let ab = self.ab().length();
+        let bc = self.bc().length();
+        let ca = self.ca().length();
+
+        self.area = ((ca + bc + ab)
+        * ((ca + bc + ab) / 2. - ab)
+        * ((ca + bc + ab) / 2. - bc)
+        * ((ca + bc + ab) / 2. - ca)
+        / 2.).sqrt();
     }
 
+    /// Gets the Area of the [`Triangle3D`]... it is cached when creater
     pub fn area(&self) -> f64 {
-        self.area
+        self.area            
     }
 
-    /* Circumradius */
-
-    fn set_circumradius(&mut self) {
-        let a = self.s0.length();
-        let b = self.s1.length();
-        let c = self.s2.length();
-        let s = (a + b + c) * (b + c - a) * (c + a - b) * (a + b - c);
-        self.circumradius = a * b * c / s.sqrt();
-    }
-
+    
+    /// Gets the Circumradus of the [`Triangle3D`]. This value
+    /// is not cached, so it might be slow to rely on this
+    /// too often.
     pub fn circumradius(&self) -> f64 {
-        self.circumradius
+        let a = self.ab().length();
+        let b = self.bc().length();
+        let c = self.ca().length();
+        let s = (a + b + c) * (b + c - a) * (c + a - b) * (a + b - c);
+        a * b * c / s.sqrt()
     }
 
-    /* Asect ratio */
+    
 
-    fn set_aspect_ratio(&mut self) {
+    /// Gets the Aspect Ratio of the [`Triangle3D`]. This is useful
+    /// for triangulating polygons.
+    pub fn aspect_ratio(&self) -> f64 {
         let mut min_segment = 1E19;
         for i in 0..3 {
             let s = self.segment(i).unwrap();
@@ -219,19 +135,16 @@ impl Triangle3D {
                 min_segment = s.length();
             }
         }
-        let ar = self.circumradius() / min_segment;
-        self.aspect_ratio = ar;
+        // return
+        self.circumradius() / min_segment
+        
     }
 
-    pub fn aspect_ratio(&self) -> f64 {
-        self.aspect_ratio
-    }
-
-    /* Circumcenter */
-
-    fn set_circumcenter(&mut self) {
-        let ab = self.v1 - self.v0;
-        let ac = self.v2 - self.v0;
+    
+    /// retrieves the Circumcenter
+    pub fn circumcenter(&self) -> Point3D {
+        let ab = self.b - self.a;
+        let ac = self.c - self.a;
 
         let ab_cross_ac = ab.cross(ac);
 
@@ -243,34 +156,29 @@ impl Triangle3D {
             + ac.cross(ab_cross_ac) * ab_sq_length)
             / (2. * ab_x_ac_sq_length);
 
-        self.circumcenter = self.v0 + a_center;
+        self.a + a_center
     }
 
-    pub fn circumcenter(&self) -> Point3D {
-        self.circumcenter
-    }
+    
 
-    /* Centroid */
-
-    fn set_centroid(&mut self) {
-        let dx = self.v0.x + self.v1.x + self.v2.x;
-        let dy = self.v0.y + self.v1.y + self.v2.y;
-        let dz = self.v0.z + self.v1.z + self.v2.z;
-
-        self.centroid = Point3D::new(dx / 3., dy / 3., dz / 3.);
-    }
-
+    /// Gets the centroid of the [`Triangle3D`]. This value
+    /// is not cached, so it might be slow to rely on this
+    /// too often.
     pub fn centroid(&self) -> Point3D {
-        self.centroid
+        let dx = self.a.x + self.b.x + self.c.x;
+        let dy = self.a.y + self.b.y + self.c.y;
+        let dz = self.a.z + self.b.z + self.c.z;
+
+        Point3D::new(dx / 3., dy / 3., dz / 3.)
     }
 
     /* Other */
 
     pub fn vertex(&self, i: usize) -> Result<Point3D, String> {
         match i {
-            0 => Ok(self.v0),
-            1 => Ok(self.v1),
-            2 => Ok(self.v2),
+            0 => Ok(self.a),
+            1 => Ok(self.b),
+            2 => Ok(self.c),
             _ => Err(format!(
                 "Trying to get vertex with index '{}'... it is out of bounds",
                 i
@@ -280,25 +188,25 @@ impl Triangle3D {
 
     /// Retrieves the first vertex of an A,B,C [`Triangle3D`]
     pub fn a(&self) -> Point3D {
-        self.v0
+        self.a
     }
 
     /// Retrieves the second vertex of an A,B,C [`Triangle3D`]
     pub fn b(&self) -> Point3D {
-        self.v1
+        self.b
     }
 
     /// Retrieves the third vertex of an A,B,C [`Triangle3D`]
     pub fn c(&self) -> Point3D {
-        self.v0
+        self.c
     }
 
     /// Retrieves a segment of an A,B,C [`Triangle3D`]
     pub fn segment(&self, i: usize) -> Result<Segment3D, String> {
         match i {
-            0 => Ok(self.s0),
-            1 => Ok(self.s1),
-            2 => Ok(self.s2),
+            0 => Ok(self.ab()),
+            1 => Ok(self.bc()),
+            2 => Ok(self.ca()),
             _ => Err(format!(
                 "Trying to get Segment with index '{}'... it is out of bounds",
                 i
@@ -308,17 +216,17 @@ impl Triangle3D {
 
     /// Retrieves the first segment of an A,B,C [`Triangle3D`]
     pub fn ab(&self) -> Segment3D {
-        self.s0
+        Segment3D::new(self.a, self.b)
     }
 
     /// Retrieves the second segment of an A,B,C [`Triangle3D`]
     pub fn bc(&self) -> Segment3D {
-        self.s1
+        Segment3D::new(self.b, self.c)
     }
 
     /// Retrieves the third segment of an A,B,C [`Triangle3D`]
     pub fn ca(&self) -> Segment3D {
-        self.s2
+        Segment3D::new(self.c, self.a)
     }
 
     /// Tests whether a point—which is assumed to be within the plane
@@ -363,9 +271,9 @@ impl Triangle3D {
     /// which allows us to position the point within the triangle.
     pub fn test_point(&self, p: Point3D) -> PointInTriangle {
         // get vertices
-        let vertex_a = self.v0;
-        let vertex_b = self.v1;
-        let vertex_c = self.v2;
+        let vertex_a = self.a;
+        let vertex_b = self.b;
+        let vertex_c = self.c;
 
         // Compute vectors
         let e1 = vertex_b - vertex_a;
@@ -412,92 +320,59 @@ impl Triangle3D {
         }
     }
 
-    pub fn get_edge_index_by_points(&self, a: Point3D, b: Point3D) -> Option<usize> {
-        if a.compare(self.s0.start()) && b.compare(self.s0.end())
-            || a.compare(self.s0.end()) && b.compare(self.s0.start())
-        {
-            return Some(0);
+    /// Gets the edge number corresponding to a [`Segment3D`] in the
+    /// Triangle.
+    pub fn get_edge_index_from_segment(&self,s:&Segment3D)->Option<usize>{
+        if s.compare(&self.ab()){
+            Some(0)
+        }else if s.compare(&self.bc()){
+            Some(1)
+        }else if s.compare(&self.ca()){
+            Some(2)
+        }else{
+            None
         }
-
-        if a.compare(self.s1.start()) && b.compare(self.s1.end())
-            || a.compare(self.s1.end()) && b.compare(self.s1.start())
-        {
-            return Some(1);
-        }
-
-        if a.compare(self.s2.start()) && b.compare(self.s2.end())
-            || a.compare(self.s2.end()) && b.compare(self.s2.start())
-        {
-            return Some(2);
-        }
-
-        None
     }
 
+    pub fn get_edge_index_from_points(&self, a: Point3D, b: Point3D) -> Option<usize> {
+        let segment = Segment3D::new(a,b);
+        self.get_edge_index_from_segment(&segment)        
+    }
+
+    /// Checks if a [`Triangle3D`] contains a certain Vertex in
+    /// the same position as a [`Point3D`] `p`
     pub fn has_vertex(&self, p: Point3D) -> bool {
         // is this faster than iterate?
-        if self.v0.compare(p) {
-            return true;
+        if self.a.compare(p) {
+            true
+        }else if self.b.compare(p) {
+            true
+        } else if self.c.compare(p) {
+            true
+        }else{
+            false
         }
-        if self.v1.compare(p) {
-            return true;
-        }
-        if self.v2.compare(p) {
-            return true;
-        }
-
-        false
     }
 
+    /// Checks whether three [`Triangle3D`] objects are made
+    /// of he same vertices.
+    /// 
+    /// Vertices do not need to be in the same order,
+    /// necessarily... So, check if the three vertices
+    /// are in the other triangle.
     pub fn compare(&self, t: &Triangle3D) -> bool {
-        // Vertices do not need to be in the same order,
-        // necessarily... So, check if the three vertices
-        // are in the other triangle.
 
         // is this faster than iterate?
-        if !t.has_vertex(self.v0) {
+        if !t.has_vertex(self.a) {
             return false;
         }
-        if !t.has_vertex(self.v1) {
+        if !t.has_vertex(self.b) {
             return false;
         }
-        if !t.has_vertex(self.v2) {
+        if !t.has_vertex(self.c) {
             return false;
         }
         true
-    }
-
-    pub fn constrain(&mut self, i: usize) -> Result<(), String> {
-        match i {
-            0 => {
-                self.c0 = true;
-                Ok(())
-            }
-            1 => {
-                self.c1 = true;
-                Ok(())
-            }
-            2 => {
-                self.c2 = true;
-                Ok(())
-            }
-            _ => Err(format!(
-                "Trying to constrain a vertex with index '{}'... it is out of bounds",
-                i
-            )),
-        }
-    }
-
-    pub fn is_constrained(&self, i: usize) -> Result<bool, String> {
-        match i {
-            0 => Ok(self.c0),
-            1 => Ok(self.c1),
-            2 => Ok(self.c2),
-            _ => Err(format!(
-                "Checking for a constrained vertex with index '{}'... it is out of bounds",
-                i
-            )),
-        }
     }
 }
 
@@ -582,21 +457,19 @@ mod testing {
         let b = Point3D::new(6., 0., 0.);
         let c = Point3D::new(0., 8., 0.);
 
-        let t = Triangle3D::new(a, b, c, 2).unwrap();
-
-        assert_eq!(t.index(), 2);
-
+        let t = Triangle3D::new(a, b, c).unwrap();
+        
         // Test vertices
-        assert!(t.v0.compare(a));
-        assert!(t.v1.compare(b));
-        assert!(t.v2.compare(c));
+        assert!(t.a.compare(a));
+        assert!(t.b.compare(b));
+        assert!(t.c.compare(c));
 
-        let v0 = t.vertex(0).unwrap();
-        assert!(v0.compare(a));
-        let v1 = t.vertex(1).unwrap();
-        assert!(v1.compare(b));
-        let v2 = t.vertex(2).unwrap();
-        assert!(v2.compare(c));
+        let a = t.vertex(0).unwrap();
+        assert!(a.compare(a));
+        let b = t.vertex(1).unwrap();
+        assert!(b.compare(b));
+        let c = t.vertex(2).unwrap();
+        assert!(c.compare(c));
 
         // test segments
         let ab = t.segment(0).unwrap();
@@ -636,7 +509,7 @@ mod testing {
         let b = Point3D::new(1., 0., 0.);
         let c = Point3D::new(0., 1., 0.);
 
-        let triangle = Triangle3D::new(a, b, c, 1).unwrap();
+        let triangle = Triangle3D::new(a, b, c).unwrap();
 
         // Vertex A.
         assert!(PointInTriangle::VertexA == triangle.test_point(a));
@@ -676,7 +549,7 @@ mod testing {
         let b = Point3D::new(l, 0., 0.);
         let c = Point3D::new(0., l, 0.);
 
-        let t = Triangle3D::new(a, b, c, 2).unwrap();
+        let t = Triangle3D::new(a, b, c).unwrap();
 
         let center1 = t.circumcenter();
         assert!(center1.compare(Point3D::new(0., 0., 0.)));
@@ -690,7 +563,7 @@ mod testing {
         let b2 = Point3D::new(l + cx, 0. + cy, cz);
         let c2 = Point3D::new(0. + cx, l + cy, cz);
 
-        let t2 = Triangle3D::new(a2, b2, c2, 2).unwrap();
+        let t2 = Triangle3D::new(a2, b2, c2).unwrap();
 
         let center2 = t2.circumcenter();
 
@@ -701,25 +574,25 @@ mod testing {
         let b3 = Point3D::new(1., 4., 0.);
         let c3 = Point3D::new(5., 4., 0.);
 
-        let t3 = Triangle3D::new(a3, b3, c3, 1).unwrap();
+        let t3 = Triangle3D::new(a3, b3, c3).unwrap();
         let center3 = t3.circumcenter();
         assert!(center3.compare(Point3D::new(3., 4., 0.)));
     }
 
     #[test]
-    fn test_get_edge_index_by_points() {
+    fn test_get_edge_index_from_points() {
         let a = Point3D::new(0., 0., 0.);
         let b = Point3D::new(6., 0., 0.);
         let c = Point3D::new(0., 8., 0.);
 
-        let t = Triangle3D::new(a, b, c, 0).unwrap();
+        let t = Triangle3D::new(a, b, c).unwrap();
 
-        assert_eq!(t.get_edge_index_by_points(a, b), Some(0));
-        assert_eq!(t.get_edge_index_by_points(b, a), Some(0));
-        assert_eq!(t.get_edge_index_by_points(b, c), Some(1));
-        assert_eq!(t.get_edge_index_by_points(c, b), Some(1));
-        assert_eq!(t.get_edge_index_by_points(c, a), Some(2));
-        assert_eq!(t.get_edge_index_by_points(a, c), Some(2));
+        assert_eq!(t.get_edge_index_from_segment(&Segment3D::new(a, b)), Some(0));
+        assert_eq!(t.get_edge_index_from_segment(&Segment3D::new(b, a)), Some(0));
+        assert_eq!(t.get_edge_index_from_segment(&Segment3D::new(b, c)), Some(1));
+        assert_eq!(t.get_edge_index_from_segment(&Segment3D::new(c, b)), Some(1));
+        assert_eq!(t.get_edge_index_from_segment(&Segment3D::new(c, a)), Some(2));
+        assert_eq!(t.get_edge_index_from_segment(&Segment3D::new(a, c)), Some(2));
 
         // test segments
         let ab = t.segment(0).unwrap();
@@ -743,7 +616,7 @@ mod testing {
 
         let not_there = Point3D::new(12., 1., 99.);
 
-        let t = Triangle3D::new(a, b, c, 0).unwrap();
+        let t = Triangle3D::new(a, b, c).unwrap();
 
         assert!(t.has_vertex(a));
         assert!(t.has_vertex(b));
@@ -751,52 +624,12 @@ mod testing {
 
         assert!(!t.has_vertex(not_there));
 
-        let t2 = Triangle3D::new(a, c, b, 0).unwrap();
+        let t2 = Triangle3D::new(a, c, b).unwrap();
         assert!(t.compare(&t2));
 
-        let t3 = Triangle3D::new(a, c, not_there, 0).unwrap();
+        let t3 = Triangle3D::new(a, c, not_there).unwrap();
         assert!(!t.compare(&t3));
     }
 
-    #[test]
-    fn test_constraints() {
-        let l = 3.;
-        let a = Point3D::new(-l, 0., 0.);
-        let b = Point3D::new(l, 0., 0.);
-        let c = Point3D::new(0., l, 0.);
-
-        let mut t = Triangle3D::new(a, b, c, 2).unwrap();
-
-        assert!(!t.is_constrained(0).unwrap());
-        assert!(!t.is_constrained(1).unwrap());
-        assert!(!t.is_constrained(2).unwrap());
-        assert!(t.is_constrained(3).is_err());
-
-        t.constrain(0).unwrap();
-
-        assert!(t.is_constrained(0).unwrap());
-        assert!(!t.is_constrained(1).unwrap());
-        assert!(!t.is_constrained(2).unwrap());
-
-        assert!(t.constrain(3).is_err());
-    }
-
-    #[test]
-    fn test_set_neighbour() {
-        // This should work.
-        let l = 3.;
-        let a = Point3D::new(-l, 0., 0.);
-        let b = Point3D::new(l, 0., 0.);
-        let c = Point3D::new(0., l, 0.);
-
-        let mut t1 = Triangle3D::new(a, b, c, 0).unwrap();
-
-        assert!(t1.set_neighbour(0, 1).is_ok());
-        assert!(t1.set_neighbour(1, 11).is_ok());
-        assert!(t1.set_neighbour(2, 111).is_ok());
-
-        assert_eq!(t1.n0, 1);
-        assert_eq!(t1.n1, 11);
-        assert_eq!(t1.n2, 111);
-    }
+    
 }
