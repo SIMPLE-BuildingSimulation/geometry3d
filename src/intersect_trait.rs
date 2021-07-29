@@ -26,12 +26,12 @@ impl SurfaceSide {
             // the direction a bit, and try again
 
             // Let's get a vector that is normal to the direction.
-            let normal_dir = if ray_dir.x().abs() > f64::EPSILON {
-                Vector3D::new(-ray_dir.y() / ray_dir.x(), 1., 0.)
-            } else if ray_dir.y().abs() > f64::EPSILON {
-                Vector3D::new(1., -ray_dir.x() / ray_dir.y(), 0.)
-            } else if ray_dir.z().abs() > f64::EPSILON {
-                Vector3D::new(1., 0., -ray_dir.x() / ray_dir.z())
+            let normal_dir = if ray_dir.x.abs() > f64::EPSILON {
+                Vector3D::new(-ray_dir.y / ray_dir.x, 1., 0.)
+            } else if ray_dir.y.abs() > f64::EPSILON {
+                Vector3D::new(1., -ray_dir.x / ray_dir.y, 0.)
+            } else if ray_dir.z.abs() > f64::EPSILON {
+                Vector3D::new(1., 0., -ray_dir.x / ray_dir.z)
             } else {
                 panic!("Direction of the given Ray3D is a Zero vector");
             };
@@ -45,13 +45,27 @@ impl SurfaceSide {
 }
 
 pub trait Intersect {
+
+    /// The name of the figure. Useful for debugging.
+    const ID : &'static str;
+
     /// Intercects a [`Ray3D]` traveling forward with an object, returning the distance
     /// `t` and the normal [`Vector3D`] at that point. If the distance
     /// is negative (i.e., the object is behind the plane), it should return
     /// [`None`].
     ///
     /// Do not asume that the ray will be normalized
-    fn intersect(&self, ray: &Ray3D) -> Option<(f64, Vector3D, SurfaceSide)>;
+    fn intersect(&self, ray: &Ray3D) -> Option<f64>;
+
+    /// Gets the normal at the intersection, flipping it if necessary
+    fn normal_at_intersection(&self, ray: &Ray3D, t: f64)->(Vector3D, SurfaceSide);
+
+    /// Checks whether a certain object is infinite
+    /// 
+    /// defaults to `false`
+    fn is_infinite(&self)->bool{
+        false
+    }
 }
 
 #[cfg(test)]

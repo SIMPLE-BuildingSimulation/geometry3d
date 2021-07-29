@@ -3,10 +3,9 @@ use std::fmt;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vector3D {
-    x: f64,
-    y: f64,
-    z: f64,
-    length: f64, // cached for speed.
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl fmt::Display for Vector3D {
@@ -16,26 +15,41 @@ impl fmt::Display for Vector3D {
 }
 
 impl Vector3D {
-    pub fn new(x: f64, y: f64, z: f64) -> Vector3D {
-        let l2 = x * x + y * y + z * z;
+    pub fn new(x: f64, y: f64, z: f64) -> Vector3D {        
         Vector3D {
             x,
             y,
             z,
-            length: l2.sqrt(),
         }
     }
 
-    pub fn x(&self) -> f64 {
-        self.x
-    }
 
-    pub fn y(&self) -> f64 {
-        self.y
-    }
 
-    pub fn z(&self) -> f64 {
-        self.z
+    /// Gets a normalized [`Vector3D`] that is perpendicular
+    /// to `self`
+    pub fn get_perpendicular(&self)->Result<Self,String>{
+        const TINY:f64 = 100.*f64::EPSILON;
+        let x: f64;
+        let y: f64;
+        let z: f64;
+        if self.x.abs()>TINY{
+            // Choose y and z to be 1.
+            y = 1.; z = 1.;
+            x = (-self.y - self.z)/self.x;
+        }else if self.y.abs()>TINY{
+            // Choosexy and z to be 1.
+            x = 1.; z = 1.;
+            y = (-self.x - self.z)/self.y;
+        }else if self.z.abs()>TINY{
+            // Choosex x and y to be 1.
+            x = 1.; y = 1.;
+            z = (-self.x - self.y)/self.z;
+        }else{
+            return Err(format!("Trying to get a Vector3D perpendicular to a Zero Vector (self = {})",self))
+        }
+        let mut ret = Self::new(x,y,z);
+        ret.normalize();
+        Ok(ret)
     }
 
     pub fn compare(&self, p: Vector3D) -> bool {
@@ -52,8 +66,12 @@ impl Vector3D {
         Vector3D::new(dx, dy, dz)
     }
 
-    pub fn length(&self) -> f64 {
-        self.length
+    pub fn length(&self) -> f64 {        
+        self.length_squared().sqrt()
+    }
+
+    pub fn length_squared(&self) -> f64 {
+        self.x * self.x + self.y * self.y + self.z * self.z        
     }
 
     pub fn normalize(&mut self) {
@@ -61,8 +79,6 @@ impl Vector3D {
         self.x /= l;
         self.y /= l;
         self.z /= l;
-
-        self.length = 1.0;
     }
 
     pub fn get_normalized(&self) -> Vector3D {
@@ -70,16 +86,17 @@ impl Vector3D {
         Vector3D {
             x: self.x / l,
             y: self.y / l,
-            z: self.z / l,
-            length: 1.0,
+            z: self.z / l,            
         }
     }
 
     pub fn is_zero(&self) -> bool {
+        let tiny = 100. * f64::EPSILON;
         let l = self.length();
-        l < 1E-10
+        l <= tiny
     }
 
+    /// Checks if two vectors are parallel
     pub fn is_parallel(&self, v: Vector3D) -> bool {
         // If any of them is zero, false
         if v.is_zero() || self.is_zero() {
@@ -132,6 +149,7 @@ impl Vector3D {
         }
     } // end of is_parallel
 
+    /// Checks if two vectors are parallel and follow the same direction.
     pub fn is_same_direction(&self, v: Vector3D) -> bool {
         if !self.is_parallel(v) {
             // If they are not parallel, don't bother
@@ -246,6 +264,33 @@ mod testing {
     use super::*;
 
     #[test]
+    fn test_get_perpendicular(){
+        fn check(v:Vector3D)->Result<(),String>{
+            let perp = v.get_perpendicular()?;
+            if (v*perp).abs() > 100.*f64::EPSILON {
+                return Err(format!("Vector {} is not perpendicular with vector {} (dot prod is {})", v, perp, (v*perp).abs()))
+            }
+            if (1.-perp.length()).abs() > f64::EPSILON {
+                return Err(format!("Perpendicular Vector {} is not normalized", perp))
+            }            
+            Ok(())
+        }
+
+        check(Vector3D::new(0., 0., 1.)).unwrap();
+        check(Vector3D::new(0., 1., 1.)).unwrap();
+        check(Vector3D::new(0., 1., 0.)).unwrap();
+        check(Vector3D::new(1., 1., 0.)).unwrap();
+        check(Vector3D::new(1., 0., 0.)).unwrap();
+
+        check(Vector3D::new(3., 0., 0.)).unwrap();
+        check(Vector3D::new(3., 123.1, 0.)).unwrap();
+        check(Vector3D::new(-3., -123.1, 0.)).unwrap();
+        check(Vector3D::new(-3., -123.1, 10.)).unwrap();
+
+        assert!(check(Vector3D::new(0., 0., 0.)).is_err());
+    }
+
+    #[test]
     fn test_new() {
         let x = 1.0;
         let y = 2.0;
@@ -256,9 +301,9 @@ mod testing {
         assert_eq!(y, pt.y);
         assert_eq!(z, pt.z);
 
-        assert_eq!(x, pt.x());
-        assert_eq!(y, pt.y());
-        assert_eq!(z, pt.z());
+        assert_eq!(x, pt.x);
+        assert_eq!(y, pt.y);
+        assert_eq!(z, pt.z);
     }
 
     #[test]

@@ -49,12 +49,12 @@ impl Segment3D {
             let ab = self.end - self.start;
             let ap = point - self.start;
             let ret: f64;
-            if ab.x().abs() > f64::EPSILON {
-                ret = ap.x() / ab.x();
-            } else if ab.y().abs() > f64::EPSILON {
-                ret = ap.y() / ab.y();
-            } else if ab.z().abs() > f64::EPSILON {
-                ret = ap.z() / ab.z();
+            if ab.x.abs() > f64::EPSILON {
+                ret = ap.x / ab.x;
+            } else if ab.y.abs() > f64::EPSILON {
+                ret = ap.y / ab.y;
+            } else if ab.z.abs() > f64::EPSILON {
+                ret = ap.z / ab.z;
             } else {
                 return Err("Checking if Segment3D of length 0 contains a Point3D".to_string());
             }
@@ -87,15 +87,15 @@ impl Segment3D {
 
         let alpha: f64;
         let beta: f64;
-        if a1b1.x().abs() > TINY {
-            alpha = (a2.x - a1.x) / a1b1.x();
-            beta = (a2.x - a1.x) / a1b1.x();
-        } else if a1b1.y().abs() > TINY {
-            alpha = (a2.y - a1.y) / a1b1.y();
-            beta = (a2.y - a1.y) / a1b1.y();
-        } else if a1b1.z().abs() > TINY {
-            alpha = (a2.z - a1.z) / a1b1.z();
-            beta = (a2.z - a1.z) / a1b1.z();
+        if a1b1.x.abs() > TINY {
+            alpha = (a2.x - a1.x) / a1b1.x;
+            beta = (a2.x - a1.x) / a1b1.x;
+        } else if a1b1.y.abs() > TINY {
+            alpha = (a2.y - a1.y) / a1b1.y;
+            beta = (a2.y - a1.y) / a1b1.y;
+        } else if a1b1.z.abs() > TINY {
+            alpha = (a2.z - a1.z) / a1b1.z;
+            beta = (a2.z - a1.z) / a1b1.z;
         } else {
             // We should never get here.
             let msg = "Trying to check whether a segment is contained in a zero-length segment"
@@ -117,7 +117,7 @@ impl Segment3D {
     /// ```
     /// use geometry3d::point3d::Point3D;
     /// use geometry3d::segment3d::Segment3D;
-    /// 
+    ///
     /// let vertical = Segment3D::new(Point3D::new(0., 0., -1.), Point3D::new(0., 0., 1.));
     /// let horizontal = Segment3D::new(Point3D::new(-1., 0., 0.), Point3D::new(1., 0., 0.));
     /// assert_eq!(horizontal.get_intersection_pt(&vertical), Some((0.5, 0.5)));
@@ -153,19 +153,19 @@ impl Segment3D {
         let det: f64;
 
         // Check for intersection.
-        if normal.z().abs() > f64::EPSILON {
-            det = a.y() * b.x() - a.x() * b.y();
+        if normal.z.abs() > f64::EPSILON {
+            det = a.y * b.x - a.x * b.y;
 
-            t_a = (b.y() * delta.x() - b.x() * delta.y()) / det;
-            t_b = (a.y() * delta.x() - a.x() * delta.y()) / det;
-        } else if normal.x().abs() > f64::EPSILON {
-            det = a.y() * b.z() - a.z() * b.y();
-            t_a = (b.y() * delta.z() - b.z() * delta.y()) / det;
-            t_b = (a.y() * delta.z() - a.z() * delta.y()) / det;
-        } else if normal.y().abs() > f64::EPSILON {
-            det = a.x() * b.z() - a.z() * b.x();
-            t_a = (b.x() * delta.z() - b.z() * delta.x()) / det;
-            t_b = (a.x() * delta.z() - a.z() * delta.x()) / det;
+            t_a = (b.y * delta.x - b.x * delta.y) / det;
+            t_b = (a.y * delta.x - a.x * delta.y) / det;
+        } else if normal.x.abs() > f64::EPSILON {
+            det = a.y * b.z - a.z * b.y;
+            t_a = (b.y * delta.z - b.z * delta.y) / det;
+            t_b = (a.y * delta.z - a.z * delta.y) / det;
+        } else if normal.y.abs() > f64::EPSILON {
+            det = a.x * b.z - a.z * b.x;
+            t_a = (b.x * delta.z - b.z * delta.x) / det;
+            t_b = (a.x * delta.z - a.z * delta.x) / det;
         } else {
             return None;
         }

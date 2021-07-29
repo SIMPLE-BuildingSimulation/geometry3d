@@ -3,8 +3,8 @@ use crate::loop3d::Loop3D;
 use crate::plane3d::Plane3D;
 use crate::point3d::Point3D;
 use crate::ray3d::Ray3D;
-use crate::vector3d::Vector3D;
 use crate::segment3d::Segment3D;
+use crate::vector3d::Vector3D;
 
 pub struct Polygon3D {
     outer: Loop3D,
@@ -14,17 +14,25 @@ pub struct Polygon3D {
 }
 
 impl Intersect for Polygon3D {
-    fn intersect(&self, ray: &Ray3D) -> Option<(f64, Vector3D, SurfaceSide)> {
-        
+    
+    const ID : &'static str = "polygon";
+
+    fn normal_at_intersection(&self, ray: &Ray3D, t: f64)->(Vector3D, SurfaceSide){
+        let p = self.outer[0];
+        let poly_plane = Plane3D::new(p, self.normal);
+        poly_plane.normal_at_intersection(ray, t)
+    }
+
+    fn intersect(&self, ray: &Ray3D) -> Option<f64> {
         let p = self.outer[0];
 
         let poly_plane = Plane3D::new(p, self.normal);
-        if let Some((t, normal, side)) = poly_plane.intersect(ray) {
+        if let Some(t) = poly_plane.intersect(ray) {
             let intersection = ray.project(t);
             match self.test_point(intersection) {
                 Ok(is_in) => {
                     if is_in {
-                        Some((t, normal, side))
+                        Some(t)
                     } else {
                         None
                     }
@@ -55,9 +63,14 @@ impl Polygon3D {
         })
     }
 
+    /// Retrieves the normal to the Polygon
+    pub fn normal(&self) -> Vector3D {
+        self.normal
+    }
+
     /// Calculates the average of the [`Point3D`] in the Outer [`Loop3D`]
     pub fn outer_centroid(&self) -> Point3D {
-        let mut centroid = Point3D::new(0., 0., 0.);                
+        let mut centroid = Point3D::new(0., 0., 0.);
         let outer = self.outer();
         for v in outer.vertices() {
             centroid += *v;
@@ -126,7 +139,7 @@ impl Polygon3D {
         }
 
         // Check that all the points are inside the polygon.point3d
-        for p in hole.vertices() {                                    
+        for p in hole.vertices() {
             if !self.test_point(*p)? {
                 let msg = "At least one of the points in your hole are not inside the polygon"
                     .to_string();
@@ -138,10 +151,9 @@ impl Polygon3D {
         let n_inner = self.inner.len();
         for n_loop in 0..n_inner {
             let inner = &self.inner[n_loop];
-            
-            for inner_p in inner.vertices(){
-                
-                // Check point in the hole we are making                
+
+            for inner_p in inner.vertices() {
+                // Check point in the hole we are making
                 if hole.test_point(*inner_p)? {
                     let msg = "Apparently another hole in your Polygon3D would be inside the new hole you are making".to_string();
                     return Err(msg);
@@ -149,7 +161,7 @@ impl Polygon3D {
             }
         }
 
-        // All good now! Add it.        
+        // All good now! Add it.
         let hole_area = hole.area()?;
 
         // reduce area
@@ -168,7 +180,7 @@ impl Polygon3D {
 
     /// Gets a single [`Loop3D`] representing the same [`Polygon3D`]
     /// geometry, but without any holes
-    /// 
+    ///
     /// This is a pretty terible algorithm... but I doubt
     /// it is the bottleneck in my applications.
     ///
@@ -177,13 +189,13 @@ impl Polygon3D {
     /// geometries.
 
     pub fn get_closed_loop(&self) -> Loop3D {
-        
         //get the number of interior loops
         let n_inner_loops = self.inner.len();
 
         //initialize the loop by cloning the current outer loop
         let mut ret_loop = self.outer.clone();
-        
+        ret_loop.open();
+
         // We will use this for checking whether the inner
         // loop should be reversed or not.
         let outer_normal = self.outer.normal();
@@ -205,7 +217,6 @@ impl Polygon3D {
             let n_ext_vertices = ret_loop.n_vertices();
             for j in 0..n_ext_vertices {
                 let ext_vertex = ret_loop[j];
-                
 
                 for k in 0..n_inner_loops {
                     // continue if already processed
@@ -265,8 +276,7 @@ impl Polygon3D {
                                 % n_inner_loop_vertices;
                         }
 
-                        let inner_vertex =
-                            self.inner[min_inner_loop_id][vertex_to_add];                        
+                        let inner_vertex = self.inner[min_inner_loop_id][vertex_to_add];
 
                         let x = inner_vertex.x;
                         let y = inner_vertex.y;
@@ -285,20 +295,19 @@ impl Polygon3D {
             // flag ret_loop as processed (instead of deleting it)
             processed_inner_loops.push(inner_loop_id);
         } // end iterating inner loops
-
+          // ret_loop.close().unwrap();
         ret_loop
     } // end of get_closed_polygon
 
-
     /// Checks whether the [`Polygon3D`] contains a certain [`Segment3D`]
     /// in any of its loops
-    pub fn contains_segment(&self,s:&Segment3D)->bool{
-        if self.outer.contains_segment(s){
-            return true
+    pub fn contains_segment(&self, s: &Segment3D) -> bool {
+        if self.outer.contains_segment(s) {
+            return true;
         }
-        for inner in self.inner.iter(){
-            if inner.contains_segment(s){
-                return true
+        for inner in self.inner.iter() {
+            if inner.contains_segment(s) {
+                return true;
             }
         }
         false
@@ -333,7 +342,8 @@ mod testing {
             origin: Point3D::new(2.1, -3.1, 100.),
             direction: Vector3D::new(0., 0., -1.),
         };
-        if let Some((t, normal, side)) = polygon.intersect(&ray) {
+        if let Some(t) = polygon.intersect(&ray) {
+            let (normal, side) = polygon.normal_at_intersection(&ray, t);
             assert_eq!(side, SurfaceSide::Front);
             assert_eq!(normal, Vector3D::new(0., 0., 1.));
             assert_eq!(t, 100.);
@@ -345,7 +355,8 @@ mod testing {
             origin: Point3D::new(2.1, -3.1, -100.),
             direction: Vector3D::new(0., 0., 1.),
         };
-        if let Some((t, normal, side)) = polygon.intersect(&ray) {
+        if let Some(t) = polygon.intersect(&ray) {
+            let (normal, side) = polygon.normal_at_intersection(&ray, t);
             assert_eq!(side, SurfaceSide::Back);
             assert_eq!(normal, Vector3D::new(0., 0., -1.));
             assert_eq!(t, 100.);
@@ -354,7 +365,6 @@ mod testing {
         }
     }
 
-    
     #[test]
     fn test_new() {
         // It should not work if we don't close it.
@@ -496,42 +506,42 @@ mod testing {
         // 0
         let p = closed[0];
         assert!(p.compare(Point3D::new(-2., -2., 0.)));
-        
+
         // 1
         let p = closed[1];
         assert!(p.compare(Point3D::new(-1., -1., 0.)));
-        
+
         // 2
         let p = closed[2];
         assert!(p.compare(Point3D::new(-1., 1., 0.)));
-        
+
         // 3
         let p = closed[3];
         assert!(p.compare(Point3D::new(1., 1., 0.)));
-        
+
         // 4
         let p = closed[4];
         assert!(p.compare(Point3D::new(1., -1., 0.)));
-        
+
         // 5
         let p = closed[5];
         assert!(p.compare(Point3D::new(-1., -1., 0.)));
-        
+
         // 6... Back to exterior
         let p = closed[6];
         assert!(p.compare(Point3D::new(-2., -2., 0.)));
-        
+
         // 7.
         let p = closed[7];
         assert!(p.compare(Point3D::new(6., -2., 0.)));
-        
+
         // 8
         let p = closed[8];
         assert!(p.compare(Point3D::new(6., 6., 0.)));
-        
+
         // 9
         let p = closed[9];
-        assert!(p.compare(Point3D::new(-2., 6., 0.)));        
+        assert!(p.compare(Point3D::new(-2., 6., 0.)));
     }
 
     #[test]
@@ -564,54 +574,52 @@ mod testing {
         // 0
         let p = closed[0];
         assert!(p.compare(Point3D::new(-2., -2., 0.)));
-        
 
         // 1
         let p = closed[1];
-        assert!(p.compare(Point3D::new(-1., -1., 0.)));        
+        assert!(p.compare(Point3D::new(-1., -1., 0.)));
 
-        // 2        
+        // 2
         let p = closed[2];
         assert!(p.compare(Point3D::new(-1., 1., 0.)));
-        
+
         // 3
         let p = closed[3];
         assert!(p.compare(Point3D::new(1., 1., 0.)));
-        
+
         // 4
         let p = closed[4];
         assert!(p.compare(Point3D::new(1., -1., 0.)));
-        
+
         // 5
         let p = closed[5];
-        assert!(p.compare(Point3D::new(-1., -1., 0.)));        
+        assert!(p.compare(Point3D::new(-1., -1., 0.)));
 
         // 6... Back to exterior
         let p = closed[6];
         assert!(p.compare(Point3D::new(-2., -2., 0.)));
-        
+
         // 7.
         let p = closed[7];
         assert!(p.compare(Point3D::new(6., -2., 0.)));
-        
+
         // 8
         let p = closed[8];
         assert!(p.compare(Point3D::new(6., 6., 0.)));
-        
+
         // 9
         let p = closed[9];
-        assert!(p.compare(Point3D::new(-2., 6., 0.)));        
+        assert!(p.compare(Point3D::new(-2., 6., 0.)));
     }
 
-
     #[test]
-    fn test_contains_segment(){
+    fn test_contains_segment() {
         let mut outer = Loop3D::new();
         let p0 = Point3D::new(-2., -2., 0.);
         let p1 = Point3D::new(2., -2., 0.);
         let p2 = Point3D::new(2., 2., 0.);
         let p3 = Point3D::new(-2., 2., 0.);
-        
+
         outer.push(p0).unwrap(); // 0
         outer.push(p1).unwrap(); // 1
         outer.push(p2).unwrap(); // 2
@@ -633,39 +641,39 @@ mod testing {
         l.cut_hole(inner).unwrap();
 
         // Existing segments, in both directions
-        assert!(l.contains_segment(&Segment3D::new(p0,p1)));
-        assert!(l.contains_segment(&Segment3D::new(p1,p2)));
-        assert!(l.contains_segment(&Segment3D::new(p2,p3)));
-        assert!(l.contains_segment(&Segment3D::new(p3,p0)));
-        assert!(l.contains_segment(&Segment3D::new(p3,p2)));
-        assert!(l.contains_segment(&Segment3D::new(p2,p1)));
-        assert!(l.contains_segment(&Segment3D::new(p1,p0)));
-        assert!(l.contains_segment(&Segment3D::new(p0,p3)));
+        assert!(l.contains_segment(&Segment3D::new(p0, p1)));
+        assert!(l.contains_segment(&Segment3D::new(p1, p2)));
+        assert!(l.contains_segment(&Segment3D::new(p2, p3)));
+        assert!(l.contains_segment(&Segment3D::new(p3, p0)));
+        assert!(l.contains_segment(&Segment3D::new(p3, p2)));
+        assert!(l.contains_segment(&Segment3D::new(p2, p1)));
+        assert!(l.contains_segment(&Segment3D::new(p1, p0)));
+        assert!(l.contains_segment(&Segment3D::new(p0, p3)));
 
-        assert!(l.contains_segment(&Segment3D::new(ip0,ip1)));
-        assert!(l.contains_segment(&Segment3D::new(ip1,ip2)));
-        assert!(l.contains_segment(&Segment3D::new(ip2,ip3)));
-        assert!(l.contains_segment(&Segment3D::new(ip3,ip0)));
-        assert!(l.contains_segment(&Segment3D::new(ip3,ip2)));
-        assert!(l.contains_segment(&Segment3D::new(ip2,ip1)));
-        assert!(l.contains_segment(&Segment3D::new(ip1,ip0)));
-        assert!(l.contains_segment(&Segment3D::new(ip0,ip3)));
+        assert!(l.contains_segment(&Segment3D::new(ip0, ip1)));
+        assert!(l.contains_segment(&Segment3D::new(ip1, ip2)));
+        assert!(l.contains_segment(&Segment3D::new(ip2, ip3)));
+        assert!(l.contains_segment(&Segment3D::new(ip3, ip0)));
+        assert!(l.contains_segment(&Segment3D::new(ip3, ip2)));
+        assert!(l.contains_segment(&Segment3D::new(ip2, ip1)));
+        assert!(l.contains_segment(&Segment3D::new(ip1, ip0)));
+        assert!(l.contains_segment(&Segment3D::new(ip0, ip3)));
 
         // Diagonals
-        assert!(!l.contains_segment(&Segment3D::new(p1,p3)));
-        assert!(!l.contains_segment(&Segment3D::new(p3,p1)));
-        assert!(!l.contains_segment(&Segment3D::new(p0,p2)));
-        assert!(!l.contains_segment(&Segment3D::new(p2,p0)));
+        assert!(!l.contains_segment(&Segment3D::new(p1, p3)));
+        assert!(!l.contains_segment(&Segment3D::new(p3, p1)));
+        assert!(!l.contains_segment(&Segment3D::new(p0, p2)));
+        assert!(!l.contains_segment(&Segment3D::new(p2, p0)));
 
-        assert!(!l.contains_segment(&Segment3D::new(ip1,ip3)));
-        assert!(!l.contains_segment(&Segment3D::new(ip3,ip1)));
-        assert!(!l.contains_segment(&Segment3D::new(ip0,ip2)));
-        assert!(!l.contains_segment(&Segment3D::new(ip2,ip0)));
+        assert!(!l.contains_segment(&Segment3D::new(ip1, ip3)));
+        assert!(!l.contains_segment(&Segment3D::new(ip3, ip1)));
+        assert!(!l.contains_segment(&Segment3D::new(ip0, ip2)));
+        assert!(!l.contains_segment(&Segment3D::new(ip2, ip0)));
 
         // Segment inside
         assert!(!l.contains_segment(&Segment3D::new(
             Point3D::new(-0.5, -0.5, 0.),
-            Point3D::new( 0.5,  0.5, 0.),
+            Point3D::new(0.5, 0.5, 0.),
         )));
 
         // Segment that crosses from in to out
@@ -677,8 +685,7 @@ mod testing {
         // Segment contained in another segment
         assert!(!l.contains_segment(&Segment3D::new(
             Point3D::new(-1., -2., 0.),
-            Point3D::new( 1., -2., 0.),
+            Point3D::new(1., -2., 0.),
         )));
-
     }
 }

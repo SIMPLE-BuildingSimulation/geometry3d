@@ -2,7 +2,6 @@ use crate::point3d::*;
 use crate::segment3d::*;
 use crate::vector3d::*;
 
-
 #[derive(Clone)]
 pub struct Loop3D {
     vertices: Vec<Point3D>,
@@ -21,16 +20,19 @@ impl std::ops::Index<usize> for Loop3D {
     type Output = Point3D;
 
     fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.vertices.len(){
-            panic!("Trying to get a vertex out of bounds... {} available, index was {}", self.vertices.len(), index);
+        if index >= self.vertices.len() {
+            panic!(
+                "Trying to get a vertex out of bounds... {} available, index was {}",
+                self.vertices.len(),
+                index
+            );
         }
         &self.vertices[index]
     }
 }
 
 impl Loop3D {
-
-    /// Creates a new and empty [`Loop3D`]. It has a Zero Normal and an 
+    /// Creates a new and empty [`Loop3D`]. It has a Zero Normal and an
     /// area of -1. These attributes are filled automatically when pushing
     /// vertices into the Loop.
     pub fn new() -> Loop3D {
@@ -43,28 +45,28 @@ impl Loop3D {
     }
 
     /// Borrows the vertices
-    pub fn vertices(&self)->&[Point3D]{
+    pub fn vertices(&self) -> &[Point3D] {
         &self.vertices
     }
 
     /// Removes a vertex
-    pub fn remove(&mut self, i: usize){
+    pub fn remove(&mut self, i: usize) {
         self.vertices.remove(i);
     }
 
-    /// Checks whether a [`Point3D`] can be added to a [`Loop3D`] while keeping 
+    /// Checks whether a [`Point3D`] can be added to a [`Loop3D`] while keeping
     /// it valid
-    /// 
+    ///
     /// It checks that:
     /// * That the [`Loop3D`] has not been closed yet
     /// * that the new [`Point3D`] is coplanar witht he rest of the [`Point3D`]    
     /// * Adding the [`Point3D`] will not make the [`Loop3D`] intersect with itself
-    fn valid_to_add(&self, point:Point3D)->Result<(),String>{
+    fn valid_to_add(&self, point: Point3D) -> Result<(), String> {
         //check if it is closed
         if self.closed {
             return Err("Trying to add a point to a closed Loop3D".to_string());
         }
-        
+
         // Check if we can already validate coplanarity
         if !self.normal.is_zero() {
             // Normal should be there.
@@ -83,7 +85,7 @@ impl Loop3D {
                 let v = self.vertices[i];
                 let v_p1 = self.vertices[i + 1];
                 let this_s = Segment3D::new(v, v_p1);
-                // Check the point of intersection.                
+                // Check the point of intersection.
                 if new_edge.intersect(&this_s, &mut intersect) {
                     return Err(
                         "Trying to push a point that would make the Loop3D intersect with itself"
@@ -95,38 +97,35 @@ impl Loop3D {
         Ok(())
     }
 
-    
-
-    /// Pushes a new [`Point3D`] into the [`Loop3D`]. 
-    /// 
+    /// Pushes a new [`Point3D`] into the [`Loop3D`].
+    ///
     /// If the [`Point3D`] being
     /// pushed is collinear with the previous two, then instead of pushing a new
     /// [`Point3D`] it will update the last one (i.e., because the shape and area)
     /// of the [`Loop3D`] will still be the same.
-    /// 
-    /// Returns an error if the point being added would make the [`Loop3D`] 
-    /// intersect itself, or if the new [`Point3D`] is not coplanar with the 
+    ///
+    /// Returns an error if the point being added would make the [`Loop3D`]
+    /// intersect itself, or if the new [`Point3D`] is not coplanar with the
     /// [`Loop3D`], or if the [`Loop3D`] is closed.
     pub fn push(&mut self, point: Point3D) -> Result<(), String> {
-        
         // Check the point
         self.valid_to_add(point)?;
 
         let n = self.vertices.len();
-        
+
         // If there are previous points, Check the points before the new addition
         if n >= 2 {
             let a = self.vertices[n - 2];
-            let b = self.vertices[n-1];
+            let b = self.vertices[n - 1];
 
             if a.is_collinear(b, point).unwrap() {
-                // if it is collinear, update last point instead of 
+                // if it is collinear, update last point instead of
                 // adding a new one
-                self.vertices[n-1]=point;
-            }else{
+                self.vertices[n - 1] = point;
+            } else {
                 self.vertices.push(point);
-            }    
-        }else{
+            }
+        } else {
             self.vertices.push(point);
         }
 
@@ -153,7 +152,7 @@ impl Loop3D {
         let mut inter = Point3D::new(0., 0., 0.);
         let n = self.n_vertices();
         // It cannot intercept any
-        for i in 0..n + 1 {
+        for i in 0..=n {
             let a = self.vertices[i % n];
             let b = self.vertices[(i + 1) % n];
 
@@ -169,16 +168,19 @@ impl Loop3D {
 
         true // return
     }
-    
+
+    /// Opens a [`Loop3D`]
+    pub fn open(&mut self) {
+        self.closed = false
+    }
 
     /// Closes a [`Loop3D`], calculating its area and checking the connection
-    /// between the first and last vertex. If the first and the last 
+    /// between the first and last vertex. If the first and the last
     pub fn close(&mut self) -> Result<(), String> {
         // Check if we can try to close now...
         if self.vertices.len() < 3 {
             return Err("Trying to close a Loop3D with less than 3 vertices".to_string());
         }
-                
 
         // Check the last vertex for collinearity
         let n = self.vertices.len();
@@ -191,8 +193,8 @@ impl Loop3D {
             self.vertices.pop();
         }
 
-        // Check if closing would intercept 
-        self.valid_to_add(self.vertices[0])?;        
+        // Check if closing would intercept
+        self.valid_to_add(self.vertices[0])?;
 
         // Check the first vertex for collinearity
         let n = self.vertices.len();
@@ -204,19 +206,19 @@ impl Loop3D {
             // collinear. Remove the last vertex
             self.vertices.remove(0);
         }
-    
+
         // Close
         self.closed = true;
         self.set_area()?;
         Ok(())
     }
 
-
     /// Sets the normal [`Vector3D`] for a [`Loop3D`]
-    fn set_normal(&mut self) -> Result<(),String>{
-
+    fn set_normal(&mut self) -> Result<(), String> {
         if self.vertices.len() < 3 {
-            return Err("Trying to set the normal of a Polygon3D with less than three Point3D".to_string())
+            return Err(
+                "Trying to set the normal of a Polygon3D with less than three Point3D".to_string(),
+            );
         }
 
         let a = self.vertices[0];
@@ -233,7 +235,7 @@ impl Loop3D {
     }
 
     /// Retrieves the normal of the vector.
-    /// 
+    ///
     /// # Note
     /// If the [`Loop3D`] has less than 3 vertices, then
     /// the Normal will be `Vector3D(0., 0., 0.)`, which is the default.
@@ -241,7 +243,7 @@ impl Loop3D {
         self.normal
     }
 
-    /// Checks whether a [`Point3D`] is coplanar with the rest of the 
+    /// Checks whether a [`Point3D`] is coplanar with the rest of the
     /// points.
     pub fn is_coplanar(&self, p: Point3D) -> Result<bool, String> {
         // This should not happen, but you never know..
@@ -281,12 +283,12 @@ impl Loop3D {
         // Ray cast
         let d = (point - self.vertices[0]) * 1000000.; // Should be enough...?
         let ray = Segment3D::new(point, point + d);
-        
-        let mut n_cross = 0;        
+
+        let mut n_cross = 0;
         let n = self.vertices.len();
         for i in 0..n {
             let a = self.vertices[i];
-            let b = self.vertices[(i+1)%n];            
+            let b = self.vertices[(i + 1) % n];
             let s = Segment3D::new(a, b);
 
             // Check if the point is in the segment.
@@ -294,15 +296,14 @@ impl Loop3D {
                 return Ok(true);
             }
 
-            // Check if the ray and the segment touch. We only consuder 
-            // touching at the start (e.g., t_a between [0 and 1) ) in 
+            // Check if the ray and the segment touch. We only consuder
+            // touching at the start (e.g., t_a between [0 and 1) ) in
             // order not to count vertices twice.
-            if let Some((t_a, t_b)) = s.get_intersection_pt(&ray) {                                 
+            if let Some((t_a, t_b)) = s.get_intersection_pt(&ray) {
                 if (0. ..1.).contains(&t_a) && (0. ..=1.).contains(&t_b) {
                     n_cross += 1;
-                }                 
+                }
             }
-            
         }
         // If did not touch OR touched an odd number of
         // times, then it was outside
@@ -333,13 +334,13 @@ impl Loop3D {
         }
 
         // We need to go around from 0 to N vertices,
-        // ... so, n+1 valid vertices.        
+        // ... so, n+1 valid vertices.
         let mut v = self.vertices[0].as_vector3d();
         let mut v_p1 = self.vertices[1].as_vector3d();
         for i in 2..n + 2 {
             rhs += v.cross(v_p1);
             v = v_p1;
-            v_p1 = self.vertices[i%n].as_vector3d();
+            v_p1 = self.vertices[i % n].as_vector3d();
         }
 
         let area = self.normal * rhs / 2.0;
@@ -351,12 +352,12 @@ impl Loop3D {
     }
 
     /// Returns the area of the [`Loop3D`]
-    pub fn area(&self) -> Result<f64,String> {
-        if !self.is_closed(){
+    pub fn area(&self) -> Result<f64, String> {
+        if !self.is_closed() {
             Err("Trying to get the area of an open Loop3D".to_string())
-        }else{
+        } else {
             Ok(self.area)
-        }        
+        }
     }
 
     /// Indicates whether the [`Loop3D`] has been closed already
@@ -364,14 +365,14 @@ impl Loop3D {
         self.closed
     }
 
-    /// Checks whether the [`Loop3D`] contains a [`Segment3D`] `s` 
-    pub fn contains_segment(&self, s: &Segment3D)->bool{
+    /// Checks whether the [`Loop3D`] contains a [`Segment3D`] `s`
+    pub fn contains_segment(&self, s: &Segment3D) -> bool {
         let n = self.vertices.len();
-        for (i,v) in self.vertices.iter().enumerate(){
-            let next_v = self.vertices[(i+1)%n];
-            let segment = Segment3D::new(*v,next_v);
-            if segment.compare(s){
-                return true
+        for (i, v) in self.vertices.iter().enumerate() {
+            let next_v = self.vertices[(i + 1) % n];
+            let segment = Segment3D::new(*v, next_v);
+            if segment.compare(s) {
+                return true;
             }
         }
         false
@@ -386,7 +387,6 @@ impl Loop3D {
 mod testing {
     use super::*;
 
-    
     #[test]
     fn test_new() {
         let l = Loop3D::new();
@@ -400,7 +400,6 @@ mod testing {
         let v_clone = v.clone();
         assert_eq!(v, v_cp);
         assert_eq!(v, v_clone);
-        
     }
 
     #[test]
@@ -419,22 +418,22 @@ mod testing {
         l.push(Point3D::new(4., 5., 6.)).unwrap();
         assert_eq!(l.n_vertices(), 2);
         assert_eq!(l[1], Point3D::new(4., 5., 6.));
-        
+
         // Collinear point in the middle
         let mut l = Loop3D::new();
         assert_eq!(0, l.vertices.len());
-        l.push(Point3D::new(-2., -2., 0.)).unwrap(); // 0                
+        l.push(Point3D::new(-2., -2., 0.)).unwrap(); // 0
         assert_eq!(1, l.vertices.len());
         l.push(Point3D::new(0., -2., 0.)).unwrap(); // 1 -- collinear point
         assert_eq!(2, l.vertices.len());
-        l.push(Point3D::new(2., -2., 0.)).unwrap(); // 2 
+        l.push(Point3D::new(2., -2., 0.)).unwrap(); // 2
         assert_eq!(2, l.vertices.len());
         l.push(Point3D::new(2., 2., 0.)).unwrap(); // 3
         assert_eq!(l.n_vertices(), 3);
         l.push(Point3D::new(-2., 2., 0.)).unwrap(); // 4
-        assert_eq!(l.n_vertices(), 4);                
+        assert_eq!(l.n_vertices(), 4);
         l.close().unwrap();
-        assert_eq!(l.n_vertices(), 4);   
+        assert_eq!(l.n_vertices(), 4);
         assert_eq!(l.area, 16.);
 
         assert_eq!(l[0], Point3D::new(-2., -2., 0.));
@@ -442,18 +441,17 @@ mod testing {
         assert_eq!(l[2], Point3D::new(2., 2., 0.));
         assert_eq!(l[3], Point3D::new(-2., 2., 0.));
 
-        
         // Collinear point in the end
         let mut l = Loop3D::new();
         assert_eq!(0, l.vertices.len());
-        l.push(Point3D::new(-2., -2., 0.)).unwrap(); // 0                
+        l.push(Point3D::new(-2., -2., 0.)).unwrap(); // 0
         assert_eq!(1, l.vertices.len());
-        l.push(Point3D::new(2., -2., 0.)).unwrap(); // 1 
-        assert_eq!(2, l.vertices.len());        
+        l.push(Point3D::new(2., -2., 0.)).unwrap(); // 1
+        assert_eq!(2, l.vertices.len());
         l.push(Point3D::new(2., 2., 0.)).unwrap(); // 2
         assert_eq!(l.n_vertices(), 3);
         l.push(Point3D::new(-2., 2., 0.)).unwrap(); // 3
-        assert_eq!(l.n_vertices(), 4);                
+        assert_eq!(l.n_vertices(), 4);
         l.push(Point3D::new(-2., 0., 0.)).unwrap(); // 4 -- collinear point... will be removed when closing
         assert_eq!(5, l.vertices.len());
         l.close().unwrap();
@@ -467,15 +465,15 @@ mod testing {
         // Collinear point in the beginning
         let mut l = Loop3D::new();
         assert_eq!(0, l.vertices.len());
-        l.push(Point3D::new(0., -2., 0.)).unwrap(); // 0  -- collinear point... will be removed when closing              
+        l.push(Point3D::new(0., -2., 0.)).unwrap(); // 0  -- collinear point... will be removed when closing
         assert_eq!(1, l.vertices.len());
-        l.push(Point3D::new(2., -2., 0.)).unwrap(); // 1 
-        assert_eq!(2, l.vertices.len());        
+        l.push(Point3D::new(2., -2., 0.)).unwrap(); // 1
+        assert_eq!(2, l.vertices.len());
         l.push(Point3D::new(2., 2., 0.)).unwrap(); // 2
         assert_eq!(l.n_vertices(), 3);
         l.push(Point3D::new(-2., 2., 0.)).unwrap(); // 3
-        assert_eq!(l.n_vertices(), 4);                
-        l.push(Point3D::new(-2., -2., 0.)).unwrap(); // 4 
+        assert_eq!(l.n_vertices(), 4);
+        l.push(Point3D::new(-2., -2., 0.)).unwrap(); // 4
         assert_eq!(5, l.vertices.len());
         l.close().unwrap();
         assert_eq!(l.n_vertices(), 4);
@@ -484,10 +482,6 @@ mod testing {
         assert_eq!(l[1], Point3D::new(2., 2., 0.));
         assert_eq!(l[2], Point3D::new(-2., 2., 0.));
         assert_eq!(l[3], Point3D::new(-2., -2., 0.));
-
-
-
-
 
         // INTERSECT WITH ITSELF.
 
@@ -786,8 +780,6 @@ mod testing {
         assert!(the_loop.close().is_ok());
     }
 
-    
-
     #[test]
     fn test_is_diagonal() {
         let mut l = Loop3D::new();
@@ -817,7 +809,7 @@ mod testing {
     }
 
     #[test]
-    fn test_contains_segment(){
+    fn test_contains_segment() {
         let mut l = Loop3D::new();
         let p0 = Point3D::new(-2., -2., 0.);
         let p1 = Point3D::new(2., -2., 0.);
@@ -829,25 +821,25 @@ mod testing {
         l.push(p3).unwrap(); // 3
 
         // Existing segments, in both directions
-        assert!(l.contains_segment(&Segment3D::new(p0,p1)));
-        assert!(l.contains_segment(&Segment3D::new(p1,p2)));
-        assert!(l.contains_segment(&Segment3D::new(p2,p3)));
-        assert!(l.contains_segment(&Segment3D::new(p3,p0)));
-        assert!(l.contains_segment(&Segment3D::new(p3,p2)));
-        assert!(l.contains_segment(&Segment3D::new(p2,p1)));
-        assert!(l.contains_segment(&Segment3D::new(p1,p0)));
-        assert!(l.contains_segment(&Segment3D::new(p0,p3)));
+        assert!(l.contains_segment(&Segment3D::new(p0, p1)));
+        assert!(l.contains_segment(&Segment3D::new(p1, p2)));
+        assert!(l.contains_segment(&Segment3D::new(p2, p3)));
+        assert!(l.contains_segment(&Segment3D::new(p3, p0)));
+        assert!(l.contains_segment(&Segment3D::new(p3, p2)));
+        assert!(l.contains_segment(&Segment3D::new(p2, p1)));
+        assert!(l.contains_segment(&Segment3D::new(p1, p0)));
+        assert!(l.contains_segment(&Segment3D::new(p0, p3)));
 
         // Diagonals
-        assert!(!l.contains_segment(&Segment3D::new(p1,p3)));
-        assert!(!l.contains_segment(&Segment3D::new(p3,p1)));
-        assert!(!l.contains_segment(&Segment3D::new(p0,p2)));
-        assert!(!l.contains_segment(&Segment3D::new(p2,p0)));
+        assert!(!l.contains_segment(&Segment3D::new(p1, p3)));
+        assert!(!l.contains_segment(&Segment3D::new(p3, p1)));
+        assert!(!l.contains_segment(&Segment3D::new(p0, p2)));
+        assert!(!l.contains_segment(&Segment3D::new(p2, p0)));
 
         // Segment inside
         assert!(!l.contains_segment(&Segment3D::new(
             Point3D::new(-0.5, -0.5, 0.),
-            Point3D::new( 0.5,  0.5, 0.),
+            Point3D::new(0.5, 0.5, 0.),
         )));
 
         // Segment that crosses from in to out
@@ -859,13 +851,12 @@ mod testing {
         // Segment contained in another segment
         assert!(!l.contains_segment(&Segment3D::new(
             Point3D::new(-1., -2., 0.),
-            Point3D::new( 1., -2., 0.),
+            Point3D::new(1., -2., 0.),
         )));
-
     }
 
     #[test]
-    fn test_valid_to_add(){
+    fn test_valid_to_add() {
         let mut outer = Loop3D::new();
 
         let p0 = Point3D::new(0., 0., 0.);
@@ -890,9 +881,5 @@ mod testing {
 
         let p5 = Point3D::new(0., 5., 0.);
         assert!(outer.valid_to_add(p5).is_ok());
-        
     }
-
-
-    
 }

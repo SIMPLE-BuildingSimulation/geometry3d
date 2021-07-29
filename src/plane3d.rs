@@ -39,7 +39,10 @@ impl Plane3D {
 }
 
 impl Intersect for Plane3D {
-    fn intersect(&self, ray: &Ray3D) -> Option<(f64, Vector3D, SurfaceSide)> {
+    
+    const ID : &'static str = "plane";
+
+    fn intersect(&self, ray: &Ray3D) -> Option<f64> {
         let den = self.normal * ray.direction;
         // They do not intercect
         if den.abs() < f64::EPSILON {
@@ -49,10 +52,14 @@ impl Intersect for Plane3D {
         if t < 0. {
             None
         } else {
-            // return
-            let (side, normal) = SurfaceSide::get_side(self.normal, ray.direction);
-            Some((t, normal, side))
+            // return            
+            Some(t)
         }
+    }
+
+    fn normal_at_intersection(&self, ray: &Ray3D, _t: f64)->(Vector3D, SurfaceSide){
+        let (side, normal) = SurfaceSide::get_side(self.normal, ray.direction);
+        (normal,side)
     }
 }
 
@@ -80,7 +87,8 @@ mod testing {
             origin: Point3D::new(2.1, -3.1, 100.),
             direction: Vector3D::new(0., 0., -1.),
         };
-        if let Some((t, normal, side)) = plane.intersect(&ray) {
+        if let Some(t) = plane.intersect(&ray) {
+            let (normal,side)=plane.normal_at_intersection(&ray, t);
             assert_eq!(side, SurfaceSide::Front);
             assert_eq!(normal, plane.normal);
             assert_eq!(t, 100. - p.z);

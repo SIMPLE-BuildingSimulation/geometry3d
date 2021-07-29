@@ -10,10 +10,10 @@ pub struct Triangle3D {
     b: Point3D,
     c: Point3D,
     normal: Vector3D,
-    area: f64,    
+    area: f64,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 #[repr(u8)]
 pub enum PointInTriangle {
     VertexA,
@@ -36,12 +36,18 @@ impl PointInTriangle {
     }
 }
 
+impl std::fmt::Display for Triangle3D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Triangle3D[\n\t{}\n\t{}\n\t{}\n]\n",
+            self.a, self.b, self.c
+        )
+    }
+}
+
 impl Triangle3D {
-    pub fn new(
-        vertex_a: Point3D,
-        vertex_b: Point3D,
-        vertex_c: Point3D,        
-    ) -> Result<Self, String> {
+    pub fn new(vertex_a: Point3D, vertex_b: Point3D, vertex_c: Point3D) -> Result<Self, String> {
         // check that points are not the same
         if vertex_a.compare(vertex_b) || vertex_a.compare(vertex_c) || vertex_b.compare(vertex_c) {
             let msg = "Trying to build a Triangle3D with two equal points".to_string();
@@ -58,21 +64,18 @@ impl Triangle3D {
         let mut t = Triangle3D {
             a: vertex_a,
             b: vertex_b,
-            c: vertex_c,            
+            c: vertex_c,
 
-            area: -1.,            
-            normal: Vector3D::new(0., 0., 0.),            
+            area: -1.,
+            normal: Vector3D::new(0., 0., 0.),
         };
 
         t.set_area();
-        t.set_normal();        
+        t.set_normal();
 
         Ok(t)
     }
 
-    
-
-    
     /* Normal */
 
     /// Calculates the normal of the Triangle
@@ -89,29 +92,26 @@ impl Triangle3D {
         self.normal
     }
 
-    
-
-
-    /// Sets the area of the [`Triangle3D`]. This is used when 
+    /// Sets the area of the [`Triangle3D`]. This is used when
     /// constructing the [`Triangle3D`]
-    fn set_area(&mut self){
+    fn set_area(&mut self) {
         let ab = self.ab().length();
         let bc = self.bc().length();
         let ca = self.ca().length();
 
         self.area = ((ca + bc + ab)
-        * ((ca + bc + ab) / 2. - ab)
-        * ((ca + bc + ab) / 2. - bc)
-        * ((ca + bc + ab) / 2. - ca)
-        / 2.).sqrt();
+            * ((ca + bc + ab) / 2. - ab)
+            * ((ca + bc + ab) / 2. - bc)
+            * ((ca + bc + ab) / 2. - ca)
+            / 2.)
+            .sqrt();
     }
 
     /// Gets the Area of the [`Triangle3D`]... it is cached when creater
     pub fn area(&self) -> f64 {
-        self.area            
+        self.area
     }
 
-    
     /// Gets the Circumradus of the [`Triangle3D`]. This value
     /// is not cached, so it might be slow to rely on this
     /// too often.
@@ -122,8 +122,6 @@ impl Triangle3D {
         let s = (a + b + c) * (b + c - a) * (c + a - b) * (a + b - c);
         a * b * c / s.sqrt()
     }
-
-    
 
     /// Gets the Aspect Ratio of the [`Triangle3D`]. This is useful
     /// for triangulating polygons.
@@ -137,10 +135,8 @@ impl Triangle3D {
         }
         // return
         self.circumradius() / min_segment
-        
     }
 
-    
     /// retrieves the Circumcenter
     pub fn circumcenter(&self) -> Point3D {
         let ab = self.b - self.a;
@@ -158,8 +154,6 @@ impl Triangle3D {
 
         self.a + a_center
     }
-
-    
 
     /// Gets the centroid of the [`Triangle3D`]. This value
     /// is not cached, so it might be slow to rely on this
@@ -295,22 +289,23 @@ impl Triangle3D {
         let w = 1. - alpha - beta;
 
         // Check if point is in triangle
-        if alpha >= -f64::EPSILON && beta >= -f64::EPSILON && w >= -f64::EPSILON {
+        const TINY: f64 = 100. * f64::EPSILON;
+        if alpha >= -TINY && beta >= -TINY && w >= -TINY {
             // Somewhere in the triangle
-            if alpha <= f64::EPSILON && beta <= f64::EPSILON {
+            if alpha <= TINY && beta <= TINY {
                 // w is 1... Vertex A
                 PointInTriangle::VertexA
-            } else if alpha <= f64::EPSILON && w <= f64::EPSILON {
+            } else if alpha <= TINY && w <= TINY {
                 // beta is 1; Vertex C
                 PointInTriangle::VertexC
-            } else if beta <= f64::EPSILON && w <= f64::EPSILON {
+            } else if beta <= TINY && w <= TINY {
                 // Alpha is 1; Vertex B
                 PointInTriangle::VertexB
-            } else if alpha <= f64::EPSILON {
+            } else if alpha <= TINY {
                 PointInTriangle::EdgeAC
-            } else if w <= f64::EPSILON {
+            } else if w <= TINY {
                 PointInTriangle::EdgeBC
-            } else if beta <= f64::EPSILON {
+            } else if beta <= TINY {
                 PointInTriangle::EdgeAB
             } else {
                 PointInTriangle::Inside
@@ -322,21 +317,21 @@ impl Triangle3D {
 
     /// Gets the edge number corresponding to a [`Segment3D`] in the
     /// Triangle.
-    pub fn get_edge_index_from_segment(&self,s:&Segment3D)->Option<usize>{
-        if s.compare(&self.ab()){
+    pub fn get_edge_index_from_segment(&self, s: &Segment3D) -> Option<usize> {
+        if s.compare(&self.ab()) {
             Some(0)
-        }else if s.compare(&self.bc()){
+        } else if s.compare(&self.bc()) {
             Some(1)
-        }else if s.compare(&self.ca()){
+        } else if s.compare(&self.ca()) {
             Some(2)
-        }else{
+        } else {
             None
         }
     }
 
     pub fn get_edge_index_from_points(&self, a: Point3D, b: Point3D) -> Option<usize> {
-        let segment = Segment3D::new(a,b);
-        self.get_edge_index_from_segment(&segment)        
+        let segment = Segment3D::new(a, b);
+        self.get_edge_index_from_segment(&segment)
     }
 
     /// Checks if a [`Triangle3D`] contains a certain Vertex in
@@ -345,23 +340,22 @@ impl Triangle3D {
         // is this faster than iterate?
         if self.a.compare(p) {
             true
-        }else if self.b.compare(p) {
+        } else if self.b.compare(p) {
             true
         } else if self.c.compare(p) {
             true
-        }else{
+        } else {
             false
         }
     }
 
     /// Checks whether three [`Triangle3D`] objects are made
     /// of he same vertices.
-    /// 
+    ///
     /// Vertices do not need to be in the same order,
     /// necessarily... So, check if the three vertices
     /// are in the other triangle.
     pub fn compare(&self, t: &Triangle3D) -> bool {
-
         // is this faster than iterate?
         if !t.has_vertex(self.a) {
             return false;
@@ -377,13 +371,16 @@ impl Triangle3D {
 }
 
 fn det_3x3(col0: &Vector3D, col1: &Vector3D, col2: &Vector3D) -> f64 {
-    col0.x() * (col1.y() * col2.z() - col2.y() * col1.z())
-        - col1.x() * (col0.y() * col2.z() - col2.y() * col0.z())
-        + col2.x() * (col0.y() * col1.z() - col1.y() * col0.z())
+    col0.x * (col1.y * col2.z - col2.y * col1.z)
+        - col1.x * (col0.y * col2.z - col2.y * col0.z)
+        + col2.x * (col0.y * col1.z - col1.y * col0.z)
 }
 
 impl Intersect for Triangle3D {
-    fn intersect(&self, ray: &Ray3D) -> Option<(f64, Vector3D, SurfaceSide)> {
+    
+    const ID : &'static str = "triangle";
+
+    fn intersect(&self, ray: &Ray3D) -> Option<f64> {
         // Solve `Rorigin+t*Rdirection = A + alpha*(B-A) + beta*(C-A)`;
         // Meaning:
         // alpha(A-B) + beta(A-C) + t*Rdirection = (A - Rorigin)
@@ -405,9 +402,13 @@ impl Intersect for Triangle3D {
         if t < 0. || alpha + beta > 1. || alpha < 0. || beta < 0. {
             None
         } else {
-            let (side, normal) = SurfaceSide::get_side(self.normal, ray.direction);
-            Some((t, normal, side))
+            Some(t)            
         }
+    }
+
+    fn normal_at_intersection(&self, ray: &Ray3D, _t: f64)->(Vector3D, SurfaceSide){
+        let (side, normal) = SurfaceSide::get_side(self.normal, ray.direction);
+        (normal, side)
     }
 }
 
@@ -458,7 +459,7 @@ mod testing {
         let c = Point3D::new(0., 8., 0.);
 
         let t = Triangle3D::new(a, b, c).unwrap();
-        
+
         // Test vertices
         assert!(t.a.compare(a));
         assert!(t.b.compare(b));
@@ -512,33 +513,42 @@ mod testing {
         let triangle = Triangle3D::new(a, b, c).unwrap();
 
         // Vertex A.
-        assert!(PointInTriangle::VertexA == triangle.test_point(a));
+        assert_eq!(PointInTriangle::VertexA, triangle.test_point(a));
 
         // Vertex B.
-        assert!(PointInTriangle::VertexB == triangle.test_point(b));
+        assert_eq!(PointInTriangle::VertexB, triangle.test_point(b));
 
         // Vertex C.
-        assert!(PointInTriangle::VertexC == triangle.test_point(c));
+        assert_eq!(PointInTriangle::VertexC, triangle.test_point(c));
 
         // Segment AB.
         let p = Point3D::new(0.5, 0., 0.);
-        assert!(PointInTriangle::EdgeAB == triangle.test_point(p));
+        assert_eq!(PointInTriangle::EdgeAB, triangle.test_point(p));
 
         // Segment AC.
         let p = Point3D::new(0., 0.5, 0.);
-        assert!(PointInTriangle::EdgeAC == triangle.test_point(p));
+        assert_eq!(PointInTriangle::EdgeAC, triangle.test_point(p));
 
         // Segment BC.
         let p = Point3D::new(0.5, 0.5, 0.);
-        assert!(PointInTriangle::EdgeBC == triangle.test_point(p));
+        assert_eq!(PointInTriangle::EdgeBC, triangle.test_point(p));
 
         // Point outside
         let p = Point3D::new(0., -1., 0.);
-        assert!(PointInTriangle::Outside == triangle.test_point(p));
+        assert_eq!(PointInTriangle::Outside, triangle.test_point(p));
 
         // Point inside
         let p = Point3D::new(0.1, 0.1, 0.);
-        assert!(PointInTriangle::Inside == triangle.test_point(p));
+        assert_eq!(PointInTriangle::Inside, triangle.test_point(p));
+
+        // CASE 2
+        let a = Point3D::new(2., 2., 0.);
+        let b = Point3D::new(0., 0., 0.);
+        let c = Point3D::new(4., 0., 0.);
+        let triangle = Triangle3D::new(a, b, c).unwrap();
+        let p = Point3D::new(2., 0., 0.);
+
+        assert_eq!(PointInTriangle::EdgeBC, triangle.test_point(p));
     }
 
     #[test]
@@ -587,12 +597,30 @@ mod testing {
 
         let t = Triangle3D::new(a, b, c).unwrap();
 
-        assert_eq!(t.get_edge_index_from_segment(&Segment3D::new(a, b)), Some(0));
-        assert_eq!(t.get_edge_index_from_segment(&Segment3D::new(b, a)), Some(0));
-        assert_eq!(t.get_edge_index_from_segment(&Segment3D::new(b, c)), Some(1));
-        assert_eq!(t.get_edge_index_from_segment(&Segment3D::new(c, b)), Some(1));
-        assert_eq!(t.get_edge_index_from_segment(&Segment3D::new(c, a)), Some(2));
-        assert_eq!(t.get_edge_index_from_segment(&Segment3D::new(a, c)), Some(2));
+        assert_eq!(
+            t.get_edge_index_from_segment(&Segment3D::new(a, b)),
+            Some(0)
+        );
+        assert_eq!(
+            t.get_edge_index_from_segment(&Segment3D::new(b, a)),
+            Some(0)
+        );
+        assert_eq!(
+            t.get_edge_index_from_segment(&Segment3D::new(b, c)),
+            Some(1)
+        );
+        assert_eq!(
+            t.get_edge_index_from_segment(&Segment3D::new(c, b)),
+            Some(1)
+        );
+        assert_eq!(
+            t.get_edge_index_from_segment(&Segment3D::new(c, a)),
+            Some(2)
+        );
+        assert_eq!(
+            t.get_edge_index_from_segment(&Segment3D::new(a, c)),
+            Some(2)
+        );
 
         // test segments
         let ab = t.segment(0).unwrap();
@@ -630,6 +658,4 @@ mod testing {
         let t3 = Triangle3D::new(a, c, not_there).unwrap();
         assert!(!t.compare(&t3));
     }
-
-    
 }

@@ -22,50 +22,54 @@ impl Sphere3D {
 }
 
 impl Intersect for Sphere3D {
-    fn intersect(&self, ray: &Ray3D) -> Option<(f64, Vector3D, SurfaceSide)> {
-        let a = ray.direction * ray.direction;
+    
+    const ID : &'static str = "sphere";
+
+    fn intersect(&self, ray: &Ray3D) -> Option<f64> {
+        // Force ray.direction to be normalized
+        debug_assert!((1.-ray.direction.length()).abs() < 100.*f64::EPSILON);
+        // let a = ray.direction * ray.direction;        
         let b = 2. * (ray.origin * ray.direction - ray.direction * self.centre);
         let c = ray.origin * ray.origin - 2. * (ray.origin * self.centre) + self.centre_squared
             - self.r_squared;
 
-        let discr = b * b - 4. * a * c;
+        let discr = b * b - 4. */* a **/ c;
         if discr < 0.0 {
             return None;
         }
-        let t1 = (-b + discr.sqrt()) / 2. / a;
-        let t2 = (-b - discr.sqrt()) / 2. / a;
+        let discr_sqrt = discr.sqrt();
+        
+        // Postpone the division
+        let double_t1 = -b + discr_sqrt;// / 2./ a;
+        let double_t2 = -b - discr_sqrt;// / 2./ a;
 
-        // Auxiliar function
-        fn calc_normal(s: &Sphere3D, t: f64, ray: &Ray3D) -> Vector3D {
-            let inter_point = ray.project(t);
-            let mut r = inter_point - s.centre;
-            r.normalize();
-            r
-        }
-
+        
         // Return the smallest positive value.
-        if t1 > 0. && t2 > 0. {
-            if t1 > t2 {
-                let normal = calc_normal(self, t2, ray);
-                let (side, normal) = SurfaceSide::get_side(normal, ray.direction);
-                Some((t2, normal, side))
+        let t : f64;
+        if double_t1 > 0. && double_t2 > 0. {
+            if double_t1 > double_t2 {
+                t =double_t2/2.;                
             } else {
-                let normal = calc_normal(self, t1, ray);
-                let (side, normal) = SurfaceSide::get_side(normal, ray.direction);
-                Some((t1, normal, side))
+                t = double_t1/2.;                
             }
-        } else if t1 > 0. && t2 < 0. {
-            let normal = calc_normal(self, t1, ray);
-            let (side, normal) = SurfaceSide::get_side(normal, ray.direction);
-            Some((t1, normal, side))
-        } else if t1 < 0. && t2 > 0. {
-            let normal = calc_normal(self, t2, ray);
-            let (side, normal) = SurfaceSide::get_side(normal, ray.direction);
-            Some((t2, normal, side))
+        } else if double_t1 > 0. && double_t2 < 0. {
+            t = double_t1/2.;            
+        } else if double_t1 < 0. && double_t2 > 0. {
+            t = double_t2/2.;            
         } else {
             // both negative
-            None
+            return None
         }
+        
+        Some(t)
+    }
+
+    fn normal_at_intersection(&self, ray: &Ray3D, t: f64)->(Vector3D, SurfaceSide){
+        let inter_point = ray.project(t);
+        let mut r = inter_point - self.centre;        
+        r.normalize();
+        let (side, normal) = SurfaceSide::get_side(r, ray.direction);
+        (normal, side)
     }
 }
 
@@ -105,7 +109,7 @@ mod testing {
         }
 
         // Test 1: Towards the centre outside
-        let r = 1.;
+        let r = 1.4;
         let centre = Point3D::new(0.0, 0.0, 0.0);
         let origin = Point3D::new(0.0, -10.0, 0.0);
         let sphere = Sphere3D::new(r, centre);
@@ -114,18 +118,19 @@ mod testing {
             origin,
             direction: Vector3D::new(0., 1., 0.),
         };
-        if let Some((t, normal, side)) = sphere.intersect(&ray) {
-            let exp_t = 9.;
-            assert!((t - exp_t).abs() < f64::EPSILON);
-            assert_eq!(exp.unwrap(), ray.project(t));
-            assert_eq!(normal, Vector3D::new(0., -1., 0.));
+        if let Some(t) = sphere.intersect(&ray) {
+            let (normal, side) = sphere.normal_at_intersection(&ray, t);
+            let exp_t = 10. - r;
+            assert!((t - exp_t).abs() < 100.*f64::EPSILON);
+            assert!((exp.unwrap()- ray.project(t)).length() < 100.*f64::EPSILON);
+            assert!( (normal-Vector3D::new(0., -1., 0.)).length()< 100.*f64::EPSILON);
             assert!(matches![side, SurfaceSide::Front]);
         } else {
             panic!("Wrong intersection!!")
         }
 
         // Test 2: Towards the centre from inside
-        let r = 1.;
+        let r = 2.1;
         let centre = Point3D::new(0.0, 0.0, 0.0);
         let origin = Point3D::new(0.0, 0.0, 0.0);
         let sphere = Sphere3D::new(r, centre);
@@ -134,18 +139,19 @@ mod testing {
             origin,
             direction: Vector3D::new(0., -1., 0.),
         };
-        if let Some((t, normal, side)) = sphere.intersect(&ray) {
+        if let Some(t) = sphere.intersect(&ray) {
+            let (normal, side) = sphere.normal_at_intersection(&ray, t);
             let exp_t = r;
             assert!((t - exp_t).abs() < f64::EPSILON);
-            assert_eq!(exp.unwrap(), ray.project(t));
-            assert_eq!(normal, Vector3D::new(0., 1., 0.));
+            assert!((exp.unwrap()- ray.project(t)).length() < 100.*f64::EPSILON);
+            assert!((normal- Vector3D::new(0., 1., 0.)).length()< 100.*f64::EPSILON);
             assert!(matches![side, SurfaceSide::Back]);
         } else {
             panic!("Wrong intersection!!")
         }
 
         // Test 3: Towards the centre outside
-        let r = 1.;
+        let r = 1.123;
         let centre = Point3D::new(3.0, 0.0, -2.0);
         let origin = Point3D::new(3.0, -10.0, -2.0);
         let sphere = Sphere3D::new(r, centre);
@@ -154,18 +160,19 @@ mod testing {
             origin,
             direction: Vector3D::new(0., 1., 0.),
         };
-        if let Some((t, normal, side)) = sphere.intersect(&ray) {
-            let exp_t = 9.;
+        if let Some(t) = sphere.intersect(&ray) {
+            let (normal, side) = sphere.normal_at_intersection(&ray, t);
+            let exp_t = 10. - r;
             assert!((t - exp_t).abs() < f64::EPSILON);
-            assert_eq!(exp.unwrap(), ray.project(t));
-            assert_eq!(normal, Vector3D::new(0., -1., 0.));
+            assert!( (exp.unwrap()- ray.project(t)).length() < 100.*f64::EPSILON);
+            assert!( (normal- Vector3D::new(0., -1., 0.)).length()< 100.*f64::EPSILON);
             assert!(matches![side, SurfaceSide::Front]);
         } else {
             panic!("Wrong intersection!!")
         }
 
         // Test 4: Towards the centre from inside
-        let r = 1.;
+        let r = 1.2;
         let centre = Point3D::new(7.1, 0.0, 2.0);
         let origin = Point3D::new(7.1, 0.0, 2.0);
         let sphere = Sphere3D::new(r, centre);
@@ -174,11 +181,12 @@ mod testing {
             origin,
             direction: Vector3D::new(0., -1., 0.),
         };
-        if let Some((t, normal, side)) = sphere.intersect(&ray) {
+        if let Some(t) = sphere.intersect(&ray) {
+            let (normal, side) = sphere.normal_at_intersection(&ray, t);
             let exp_t = r;
             assert!((t - exp_t).abs() < f64::EPSILON);
-            assert_eq!(exp.unwrap(), ray.project(t));
-            assert_eq!(normal, Vector3D::new(0., 1., 0.));
+            assert!( (exp.unwrap()- ray.project(t)).length() < 100.*f64::EPSILON);
+            assert!((normal- Vector3D::new(0., 1., 0.)).length()< 100.*f64::EPSILON);
             assert!(matches![side, SurfaceSide::Back]);
         } else {
             panic!("Wrong intersection!!")
@@ -196,7 +204,8 @@ mod testing {
             origin,
             direction: Vector3D::new(0., 1., 0.),
         };
-        if let Some((t, _normal, side)) = sphere.intersect(&ray) {
+        if let Some(t) = sphere.intersect(&ray) {
+            let (_normal, side) = sphere.normal_at_intersection(&ray, t);
             // let exp_t = 9.;
             // assert!((t - exp_t).abs()< f64::EPSILON);
             assert!((exp.unwrap() - ray.project(t)).length() < 0.0001);
@@ -216,7 +225,8 @@ mod testing {
             origin,
             direction: Vector3D::new(0., -1., 0.),
         };
-        if let Some((t, _normal, side)) = sphere.intersect(&ray) {
+        if let Some(t) = sphere.intersect(&ray) {
+            let (_normal, side) = sphere.normal_at_intersection(&ray, t);
             // let exp_t = r;
             // assert!((t - exp_t).abs()< f64::EPSILON);
             assert_eq!(exp.unwrap(), ray.project(t));
@@ -236,11 +246,12 @@ mod testing {
             origin,
             direction: Vector3D::new(0., 1., 0.),
         };
-        if let Some((t, normal, side)) = sphere.intersect(&ray) {
+        if let Some(t) = sphere.intersect(&ray) {
+            let (normal, side) = sphere.normal_at_intersection(&ray, t);
             let exp_t = 9.;
             assert!((t - exp_t).abs() < f64::EPSILON);
-            assert_eq!(exp.unwrap(), ray.project(t));
-            assert_eq!(normal, Vector3D::new(0., -1., 0.));
+            assert!( (exp.unwrap()- ray.project(t)).length()< 100.*f64::EPSILON);
+            assert!((normal- Vector3D::new(0., -1., 0.)).length()< 100.*f64::EPSILON);
             assert!(matches![side, SurfaceSide::Front]);
         } else {
             panic!("Wrong intersection!!")
@@ -256,11 +267,12 @@ mod testing {
             origin,
             direction: Vector3D::new(0., -1., 0.),
         };
-        if let Some((t, normal, side)) = sphere.intersect(&ray) {
+        if let Some(t) = sphere.intersect(&ray) {
+            let (normal, side) = sphere.normal_at_intersection(&ray, t);
             let exp_t = r;
             assert!((t - exp_t).abs() < f64::EPSILON);
-            assert_eq!(exp.unwrap(), ray.project(t));
-            assert_eq!(normal, Vector3D::new(0., 1., 0.));
+            assert!((exp.unwrap()- ray.project(t)).length()< 100.*f64::EPSILON);
+            assert!((normal- Vector3D::new(0., 1., 0.)).length()< 100.*f64::EPSILON);
             assert!(matches![side, SurfaceSide::Back]);
         } else {
             panic!("Wrong intersection!!")

@@ -35,8 +35,8 @@ impl Point3D {
     }
 
     pub fn compare(&self, p: Point3D) -> bool {
-        let eps = 1E-10;
-        (self.x - p.x).abs() < eps && (self.y - p.y).abs() < eps && (self.z - p.z).abs() < eps
+        const EPS: f64 = 100. * f64::EPSILON;
+        (self.x - p.x).abs() < EPS && (self.y - p.y).abs() < EPS && (self.z - p.z).abs() < EPS
     }
 
     pub fn is_collinear(self, b: Point3D, c: Point3D) -> Result<bool, String> {
@@ -53,8 +53,9 @@ impl Point3D {
 
         let ab = b - self;
         let bc = c - b;
+        let cross = ab.cross(bc).length();
 
-        Ok(ab.cross(bc).is_zero())
+        Ok(cross < 1e-6)
     }
 }
 
@@ -63,9 +64,9 @@ impl std::ops::Add<Vector3D> for Point3D {
 
     fn add(self, other: Vector3D) -> Point3D {
         Point3D {
-            x: self.x + other.x(),
-            y: self.y + other.y(),
-            z: self.z + other.z(),
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
         }
     }
 }
@@ -91,9 +92,9 @@ impl std::ops::AddAssign for Point3D {
 
 impl std::ops::AddAssign<Vector3D> for Point3D {
     fn add_assign(&mut self, other: Vector3D) {
-        self.x += other.x();
-        self.y += other.y();
-        self.z += other.z();
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
     }
 }
 
@@ -110,9 +111,9 @@ impl std::ops::Sub<&Vector3D> for &Point3D {
 
     fn sub(self, other: &Vector3D) -> Point3D {
         Point3D {
-            x: self.x - other.x(),
-            y: self.y - other.y(),
-            z: self.z - other.z(),
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
         }
     }
 }
@@ -121,7 +122,7 @@ impl std::ops::Mul<Vector3D> for Point3D {
     type Output = f64;
 
     fn mul(self, other: Vector3D) -> f64 {
-        self.x * other.x() + self.y * other.y() + self.z * other.z()
+        self.x * other.x + self.y * other.y + self.z * other.z
     }
 }
 
@@ -357,23 +358,23 @@ mod testing {
         let ini = Point3D::new(x, y, z);
         let fin = Point3D::new(2.0 * x, 2.0 * y, 2.0 * z);
         let delta = fin - ini;
-        assert_eq!(delta.x(), x);
-        assert_eq!(delta.y(), y);
-        assert_eq!(delta.z(), z);
+        assert_eq!(delta.x, x);
+        assert_eq!(delta.y, y);
+        assert_eq!(delta.z, z);
 
         let ini = Point3D::new(x, y, z);
         let fin = Point3D::new(0.0 * x, 0.0 * y, 0.0 * z);
         let delta = fin - ini;
-        assert_eq!(delta.x(), -x);
-        assert_eq!(delta.y(), -y);
-        assert_eq!(delta.z(), -z);
+        assert_eq!(delta.x, -x);
+        assert_eq!(delta.y, -y);
+        assert_eq!(delta.z, -z);
 
         let ini = Point3D::new(0.0, 0.0, 0.0);
         let fin = Point3D::new(2.0 * x, 2.0 * y, 2.0 * z);
         let delta = fin - ini;
-        assert_eq!(delta.x(), 2.0 * x);
-        assert_eq!(delta.y(), 2.0 * y);
-        assert_eq!(delta.z(), 2.0 * z);
+        assert_eq!(delta.x, 2.0 * x);
+        assert_eq!(delta.y, 2.0 * y);
+        assert_eq!(delta.z, 2.0 * z);
     }
 
     #[test]
@@ -385,9 +386,9 @@ mod testing {
         let p = Point3D::new(x, y, z);
         let v = p.as_vector3d();
 
-        assert_eq!(x, v.x());
-        assert_eq!(y, v.y());
-        assert_eq!(z, v.z());
+        assert_eq!(x, v.x);
+        assert_eq!(y, v.y);
+        assert_eq!(z, v.z);
     }
 
     #[test]
