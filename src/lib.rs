@@ -10,3 +10,4 @@ pub mod triangle3d;
 pub mod triangulation3d;
 pub mod vector3d;
 pub mod distant_source3d;
+pub mod transform;
