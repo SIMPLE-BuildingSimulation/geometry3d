@@ -1,11 +1,13 @@
+use crate::Float;
+
 use crate::point3d::Point3D;
 use std::fmt;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vector3D {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
+    pub x: Float,
+    pub y: Float,
+    pub z: Float,
 }
 
 impl fmt::Display for Vector3D {
@@ -15,47 +17,64 @@ impl fmt::Display for Vector3D {
 }
 
 impl Vector3D {
-    pub fn new(x: f64, y: f64, z: f64) -> Vector3D {        
-        Vector3D {
-            x,
-            y,
-            z,
+    pub fn new(x: Float, y: Float, z: Float) -> Vector3D {
+        Vector3D { x, y, z }
+    }
+
+    pub fn abs(&self) -> Self {
+        Self {
+            x: self.x.abs(),
+            y: self.y.abs(),
+            z: self.z.abs(),
         }
     }
 
-
+    /// Transforms a [`Vector3D`] into a [`Point3D`]
+    pub fn as_point3d(&self) -> Point3D {
+        Point3D {
+            x: self.x,
+            y: self.y,
+            z: self.z,
+        }
+    }
 
     /// Gets a normalized [`Vector3D`] that is perpendicular
     /// to `self`
-    pub fn get_perpendicular(&self)->Result<Self,String>{
-        const TINY:f64 = 100.*f64::EPSILON;
-        let x: f64;
-        let y: f64;
-        let z: f64;
-        if self.x.abs()>TINY{
+    pub fn get_perpendicular(&self) -> Result<Self, String> {
+        const TINY: Float = 100. * Float::EPSILON;
+        let x: Float;
+        let y: Float;
+        let z: Float;
+        if self.x.abs() > TINY {
             // Choose y and z to be 1.
-            y = 1.; z = 1.;
-            x = (-self.y - self.z)/self.x;
-        }else if self.y.abs()>TINY{
+            y = 1.;
+            z = 1.;
+            x = (-self.y - self.z) / self.x;
+        } else if self.y.abs() > TINY {
             // Choosexy and z to be 1.
-            x = 1.; z = 1.;
-            y = (-self.x - self.z)/self.y;
-        }else if self.z.abs()>TINY{
+            x = 1.;
+            z = 1.;
+            y = (-self.x - self.z) / self.y;
+        } else if self.z.abs() > TINY {
             // Choosex x and y to be 1.
-            x = 1.; y = 1.;
-            z = (-self.x - self.y)/self.z;
-        }else{
-            return Err(format!("Trying to get a Vector3D perpendicular to a Zero Vector (self = {})",self))
+            x = 1.;
+            y = 1.;
+            z = (-self.x - self.y) / self.z;
+        } else {
+            return Err(format!(
+                "Trying to get a Vector3D perpendicular to a Zero Vector (self = {})",
+                self
+            ));
         }
-        let mut ret = Self::new(x,y,z);
+        let mut ret = Self::new(x, y, z);
         ret.normalize();
         Ok(ret)
     }
 
     pub fn compare(&self, p: Vector3D) -> bool {
-        (self.x - p.x).abs() < f64::EPSILON
-            && (self.y - p.y).abs() < f64::EPSILON
-            && (self.z - p.z).abs() < f64::EPSILON
+        (self.x - p.x).abs() < Float::EPSILON
+            && (self.y - p.y).abs() < Float::EPSILON
+            && (self.z - p.z).abs() < Float::EPSILON
     }
 
     pub fn cross(&self, v: Vector3D) -> Vector3D {
@@ -66,12 +85,12 @@ impl Vector3D {
         Vector3D::new(dx, dy, dz)
     }
 
-    pub fn length(&self) -> f64 {        
+    pub fn length(&self) -> Float {
         self.length_squared().sqrt()
     }
 
-    pub fn length_squared(&self) -> f64 {
-        self.x * self.x + self.y * self.y + self.z * self.z        
+    pub fn length_squared(&self) -> Float {
+        self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     pub fn normalize(&mut self) {
@@ -86,12 +105,12 @@ impl Vector3D {
         Vector3D {
             x: self.x / l,
             y: self.y / l,
-            z: self.z / l,            
+            z: self.z / l,
         }
     }
 
     pub fn is_zero(&self) -> bool {
-        let tiny = 100. * f64::EPSILON;
+        let tiny = 100. * Float::EPSILON;
         let l = self.length();
         l <= tiny
     }
@@ -109,29 +128,29 @@ impl Vector3D {
         }
 
         // This closure will be useful later.
-        let check_other = |k_in: f64, v1: f64, v2: f64| {
-            if v2.abs() > f64::EPSILON {
+        let check_other = |k_in: Float, v1: Float, v2: Float| {
+            if v2.abs() > Float::EPSILON {
                 // Can be divided. Check if division
                 // results in K (or close to it).
-                (v1 / v2 - k_in).abs() < f64::EPSILON
+                (v1 / v2 - k_in).abs() < Float::EPSILON
             } else {
                 // Cannot be divided... check if v1 is
                 // also tiny
-                v1.abs() < f64::EPSILON
+                v1.abs() < Float::EPSILON
             }
         };
 
         // If they point in the same direction, K should be the same in all cases.
         // This value (1.0) is never really used I think, but I need to
         // initialize the variable... otherwise I get  warming.
-        let k; // = 1.0 as f64;
-        if v.x.abs() > f64::EPSILON {
+        let k; // = 1.0 as Float;
+        if v.x.abs() > Float::EPSILON {
             // Let's try anchoring at X
             k = self.x / v.x;
 
             // Check if Y and Z have the same K.
             check_other(k, self.y, v.y) && check_other(k, self.z, v.z)
-        } else if v.y.abs() > f64::EPSILON {
+        } else if v.y.abs() > Float::EPSILON {
             // Let's try anchoring at Y
             k = self.y / v.y;
 
@@ -164,51 +183,51 @@ impl Vector3D {
 }
 
 impl std::ops::Mul<Vector3D> for Vector3D {
-    type Output = f64;
+    type Output = Float;
 
-    fn mul(self, other: Vector3D) -> f64 {
+    fn mul(self, other: Vector3D) -> Float {
         {
             self.x * other.x + self.y * other.y + self.z * other.z
         }
     }
 }
 
-impl std::ops::Mul<f64> for Vector3D {
+impl std::ops::Mul<Float> for Vector3D {
     type Output = Vector3D;
 
-    fn mul(self, s: f64) -> Vector3D {
+    fn mul(self, s: Float) -> Vector3D {
         Vector3D::new(self.x * s, self.y * s, self.z * s)
     }
 }
 
 impl std::ops::Mul<Point3D> for Vector3D {
-    type Output = f64;
+    type Output = Float;
 
-    fn mul(self, other: Point3D) -> f64 {
+    fn mul(self, other: Point3D) -> Float {
         {
             self.x * other.x + self.y * other.y + self.z * other.z
         }
     }
 }
 
-impl std::ops::MulAssign<f64> for Vector3D {
-    fn mul_assign(&mut self, s: f64) {
+impl std::ops::MulAssign<Float> for Vector3D {
+    fn mul_assign(&mut self, s: Float) {
         self.x *= s;
         self.y *= s;
         self.z *= s;
     }
 }
 
-impl std::ops::Div<f64> for Vector3D {
+impl std::ops::Div<Float> for Vector3D {
     type Output = Vector3D;
 
-    fn div(self, s: f64) -> Vector3D {
+    fn div(self, s: Float) -> Vector3D {
         Vector3D::new(self.x / s, self.y / s, self.z / s)
     }
 }
 
-impl std::ops::DivAssign<f64> for Vector3D {
-    fn div_assign(&mut self, s: f64) {
+impl std::ops::DivAssign<Float> for Vector3D {
+    fn div_assign(&mut self, s: Float) {
         self.x /= s;
         self.y /= s;
         self.z /= s;
@@ -264,15 +283,20 @@ mod testing {
     use super::*;
 
     #[test]
-    fn test_get_perpendicular(){
-        fn check(v:Vector3D)->Result<(),String>{
+    fn test_get_perpendicular() {
+        fn check(v: Vector3D) -> Result<(), String> {
             let perp = v.get_perpendicular()?;
-            if (v*perp).abs() > 100.*f64::EPSILON {
-                return Err(format!("Vector {} is not perpendicular with vector {} (dot prod is {})", v, perp, (v*perp).abs()))
+            if (v * perp).abs() > 100. * Float::EPSILON {
+                return Err(format!(
+                    "Vector {} is not perpendicular with vector {} (dot prod is {})",
+                    v,
+                    perp,
+                    (v * perp).abs()
+                ));
             }
-            if (1.-perp.length()).abs() > f64::EPSILON {
-                return Err(format!("Perpendicular Vector {} is not normalized", perp))
-            }            
+            if (1. - perp.length()).abs() > Float::EPSILON {
+                return Err(format!("Perpendicular Vector {} is not normalized", perp));
+            }
             Ok(())
         }
 
@@ -466,7 +490,7 @@ mod testing {
         let x = Vector3D::new(a, a, a);
 
         let l = x.length();
-        let delta = l - (3.0 as f64).sqrt() * a;
+        let delta = l - (3.0 as Float).sqrt() * a;
         assert!(delta.abs() < 1E-10);
     }
 

@@ -1,4 +1,5 @@
-use crate::intersect_trait::{Intersect, SurfaceSide};
+use crate::Float;
+// use crate::intersect_trait::{Intersect, SurfaceSide};
 use crate::point3d::Point3D;
 use crate::ray3d::Ray3D;
 use crate::vector3d::Vector3D;
@@ -18,7 +19,7 @@ pub struct Plane3D {
     pub normal: Vector3D,
 
     /// The D coefficient in the equation explained earlier.    
-    pub d: f64,
+    pub d: Float,
 }
 
 impl Plane3D {
@@ -34,34 +35,51 @@ impl Plane3D {
     }
 
     pub fn test_point(&self, point: Point3D) -> bool {
-        (self.normal * point - self.d).abs() < f64::EPSILON
+        (self.normal * point - self.d).abs() < Float::EPSILON
     }
-}
 
-impl Intersect for Plane3D {
-    
-    const ID : &'static str = "plane";
-
-    fn intersect(&self, ray: &Ray3D) -> Option<f64> {
+    pub fn intersect(&self, ray: &Ray3D) -> Option<Float> {
         let den = self.normal * ray.direction;
         // They do not intercect
-        if den.abs() < f64::EPSILON {
+        if den.abs() < Float::EPSILON {
             return None;
         }
         let t = (self.d - self.normal * ray.origin) / den;
         if t < 0. {
             None
         } else {
-            // return            
+            // return
             Some(t)
         }
     }
-
-    fn normal_at_intersection(&self, ray: &Ray3D, _t: f64)->(Vector3D, SurfaceSide){
-        let (side, normal) = SurfaceSide::get_side(self.normal, ray.direction);
-        (normal,side)
-    }
 }
+
+// impl Intersect for Plane3D {
+
+//     fn id(&self)->&'static str{
+//         "plane"
+//     }
+
+//     fn intersect(&self, ray: &Ray3D) -> Option<Float> {
+//         let den = self.normal * ray.direction;
+//         // They do not intercect
+//         if den.abs() < Float::EPSILON {
+//             return None;
+//         }
+//         let t = (self.d - self.normal * ray.origin) / den;
+//         if t < 0. {
+//             None
+//         } else {
+//             // return
+//             Some(t)
+//         }
+//     }
+
+//     fn normal_at_intersection(&self, ray: &Ray3D, _t: Float) -> (Vector3D, SurfaceSide) {
+//         let (side, normal) = SurfaceSide::get_side(self.normal, ray.direction);
+//         (normal, side)
+//     }
+// }
 
 #[cfg(test)]
 mod testing {
@@ -77,23 +95,23 @@ mod testing {
         assert_eq!(plane.d, n * p);
     }
 
-    #[test]
-    fn test_plane_intersect() {
-        let p = Point3D::new(1.2, 2.2, 2.1);
-        let mut n = Vector3D::new(0., 0., 1.);
-        n.normalize();
-        let plane = Plane3D::new(p, n);
-        let ray = Ray3D {
-            origin: Point3D::new(2.1, -3.1, 100.),
-            direction: Vector3D::new(0., 0., -1.),
-        };
-        if let Some(t) = plane.intersect(&ray) {
-            let (normal,side)=plane.normal_at_intersection(&ray, t);
-            assert_eq!(side, SurfaceSide::Front);
-            assert_eq!(normal, plane.normal);
-            assert_eq!(t, 100. - p.z);
-        } else {
-            panic!("Did not intersect!")
-        }
-    }
+    // #[test]
+    // fn test_plane_intersect() {
+    //     let p = Point3D::new(1.2, 2.2, 2.1);
+    //     let mut n = Vector3D::new(0., 0., 1.);
+    //     n.normalize();
+    //     let plane = Plane3D::new(p, n);
+    //     let ray = Ray3D {
+    //         origin: Point3D::new(2.1, -3.1, 100.),
+    //         direction: Vector3D::new(0., 0., -1.),
+    //     };
+    //     if let Some(t) = plane.intersect(&ray) {
+    //         let (normal, side) = plane.normal_at_intersection(&ray, t);
+    //         assert_eq!(side, SurfaceSide::Front);
+    //         assert_eq!(normal, plane.normal);
+    //         assert_eq!(t, 100. - p.z);
+    //     } else {
+    //         panic!("Did not intersect!")
+    //     }
+    // }
 }

@@ -1,8 +1,12 @@
-use crate::intersect_trait::{Intersect, SurfaceSide};
+use std::rc::Rc;
+
+use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
 use crate::point3d::*;
 use crate::ray3d::Ray3D;
 use crate::segment3d::*;
+use crate::transform::Transform;
 use crate::vector3d::Vector3D;
+use crate::Float;
 
 pub struct Triangle3D {
     // Vertices
@@ -10,7 +14,7 @@ pub struct Triangle3D {
     b: Point3D,
     c: Point3D,
     normal: Vector3D,
-    area: f64,
+    area: Float,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -108,14 +112,14 @@ impl Triangle3D {
     }
 
     /// Gets the Area of the [`Triangle3D`]... it is cached when creater
-    pub fn area(&self) -> f64 {
+    pub fn area(&self) -> Float {
         self.area
     }
 
     /// Gets the Circumradus of the [`Triangle3D`]. This value
     /// is not cached, so it might be slow to rely on this
     /// too often.
-    pub fn circumradius(&self) -> f64 {
+    pub fn circumradius(&self) -> Float {
         let a = self.ab().length();
         let b = self.bc().length();
         let c = self.ca().length();
@@ -125,7 +129,7 @@ impl Triangle3D {
 
     /// Gets the Aspect Ratio of the [`Triangle3D`]. This is useful
     /// for triangulating polygons.
-    pub fn aspect_ratio(&self) -> f64 {
+    pub fn aspect_ratio(&self) -> Float {
         let mut min_segment = 1E19;
         for i in 0..3 {
             let s = self.segment(i).unwrap();
@@ -289,7 +293,7 @@ impl Triangle3D {
         let w = 1. - alpha - beta;
 
         // Check if point is in triangle
-        const TINY: f64 = 100. * f64::EPSILON;
+        const TINY: Float = 100. * Float::EPSILON;
         if alpha >= -TINY && beta >= -TINY && w >= -TINY {
             // Somewhere in the triangle
             if alpha <= TINY && beta <= TINY {
@@ -368,22 +372,19 @@ impl Triangle3D {
         }
         true
     }
-}
 
-fn det_3x3(col0: &Vector3D, col1: &Vector3D, col2: &Vector3D) -> f64 {
-    col0.x * (col1.y * col2.z - col2.y * col1.z)
-        - col1.x * (col0.y * col2.z - col2.y * col0.z)
-        + col2.x * (col0.y * col1.z - col1.y * col0.z)
-}
-
-impl Intersect for Triangle3D {
-    
-    const ID : &'static str = "triangle";
-
-    fn intersect(&self, ray: &Ray3D) -> Option<f64> {
-        // Solve `Rorigin+t*Rdirection = A + alpha*(B-A) + beta*(C-A)`;
+    /// Intersects a [`Ray3D`] in local coordinates with the [`Triangle3D`]. Returns the
+    /// a [`Point3D`] of intersection and the values `u` and `v`, indicating
+    /// the parametric coordinates of the point of intersection
+    pub fn basic_intersection(
+        &self,
+        ray: &Ray3D,
+        _o_error: Point3D,
+        _d_error: Point3D,
+    ) -> Option<(Point3D, Float, Float)> {
+        // Solve `Rorigin+t*Rdirection = A + u*(B-A) + v*(C-A)`;
         // Meaning:
-        // alpha(A-B) + beta(A-C) + t*Rdirection = (A - Rorigin)
+        // u(A-B) + v(A-C) + t*Rdirection = (A - Rorigin)
         // Solve this with Cramer's rule
 
         let a_ro = self.a() - ray.origin;
@@ -393,23 +394,78 @@ impl Intersect for Triangle3D {
 
         let det_a = det_3x3(&a_b, &a_c, &rd);
 
-        let alpha = det_3x3(&a_ro, &a_c, &rd) / det_a;
-        let beta = det_3x3(&a_b, &a_ro, &rd) / det_a;
+        let u = det_3x3(&a_ro, &a_c, &rd) / det_a;
+        let v = det_3x3(&a_b, &a_ro, &rd) / det_a;
         let t = det_3x3(&a_b, &a_c, &a_ro) / det_a;
 
         // t must be positive, and alpha, beta and gamma must add to 1 and
         // be positive
-        if t < 0. || alpha + beta > 1. || alpha < 0. || beta < 0. {
+        if t < 0. || u + v > 1. || u < 0. || v < 0. {
             None
         } else {
-            Some(t)            
+            Some((ray.project(t), u, v))
         }
     }
+} // end of impl Triangle3D
 
-    fn normal_at_intersection(&self, ray: &Ray3D, _t: f64)->(Vector3D, SurfaceSide){
-        let (side, normal) = SurfaceSide::get_side(self.normal, ray.direction);
-        (normal, side)
+fn det_3x3(col0: &Vector3D, col1: &Vector3D, col2: &Vector3D) -> Float {
+    col0.x * (col1.y * col2.z - col2.y * col1.z) - col1.x * (col0.y * col2.z - col2.y * col0.z)
+        + col2.x * (col0.y * col1.z - col1.y * col0.z)
+}
+
+impl Intersect for Triangle3D {
+    fn id(&self) -> &'static str {
+        "triangle"
     }
+
+    fn transform(&self) -> &Option<Rc<Transform>> {
+        &None
+    }
+
+    fn area(&self) -> Float {
+        self.area()
+    }
+
+    fn intersect_local_ray(
+        &self,
+        ray: &Ray3D,
+        o_error: Point3D,
+        d_error: Point3D,
+    ) -> Option<IntersectionInfo> {
+        let (phit, u, v) = self.basic_intersection(ray, o_error, d_error)?;
+
+        let dpdu = self.b() - self.a();
+        let dpdv = self.c() - self.a();
+        let normal = dpdu.cross(dpdv).get_normalized();
+        let (normal, side) = SurfaceSide::get_side(normal, ray.direction);
+
+        Some(IntersectionInfo {
+            p: phit,
+            u,
+            v,
+            dpdu,
+            dpdv,
+            dndu: Vector3D::new(0., 0., 0.),
+            dndv: Vector3D::new(0., 0., 0.),
+            normal,
+            side,
+        })
+    }
+
+    fn simple_intersect_local_ray(
+        &self,
+        ray: &Ray3D,
+        o_error: Point3D,
+        d_error: Point3D,
+    ) -> Option<Point3D> {
+        let (p, _u, _v) = self.basic_intersection(ray, o_error, d_error)?;
+        Some(p)
+    }
+
+    // fn normal_at_intersection(&self, ray: &Ray3D, _t: Float) -> (Vector3D, SurfaceSide) {
+    //     let (side, normal) = SurfaceSide::get_side(self.normal, ray.direction);
+    //     (normal, side)
+    // }
 }
 
 /***********/

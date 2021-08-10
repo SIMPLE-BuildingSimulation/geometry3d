@@ -1,10 +1,12 @@
+use crate::Float;
+
 use crate::vector3d::*;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Point3D {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
+    pub x: Float,
+    pub y: Float,
+    pub z: Float,
 }
 
 impl std::fmt::Display for Point3D {
@@ -14,28 +16,33 @@ impl std::fmt::Display for Point3D {
 }
 
 impl Point3D {
-    pub fn new(x: f64, y: f64, z: f64) -> Point3D {
+    pub fn new(x: Float, y: Float, z: Float) -> Point3D {
         Point3D { x, y, z }
+    }
+
+    pub fn is_zero(&self) -> bool {
+        const TINY: Float = 100. * Float::EPSILON;
+        self.x.abs() < TINY && self.y.abs() < TINY && self.z.abs() < TINY
     }
 
     pub fn as_vector3d(&self) -> Vector3D {
         Vector3D::new(self.x, self.y, self.z)
     }
 
-    pub fn squared_distance(&self, point: Point3D) -> f64 {
+    pub fn squared_distance(&self, point: Point3D) -> Float {
         let dx = (self.x - point.x) * (self.x - point.x);
         let dy = (self.y - point.y) * (self.y - point.y);
         let dz = (self.z - point.z) * (self.z - point.z);
         dx + dy + dz
     }
 
-    pub fn distance(&self, point: Point3D) -> f64 {
+    pub fn distance(&self, point: Point3D) -> Float {
         let d2 = self.squared_distance(point);
         d2.sqrt()
     }
 
     pub fn compare(&self, p: Point3D) -> bool {
-        const EPS: f64 = 100. * f64::EPSILON;
+        const EPS: Float = 100. * Float::EPSILON;
         (self.x - p.x).abs() < EPS && (self.y - p.y).abs() < EPS && (self.z - p.z).abs() < EPS
     }
 
@@ -119,25 +126,25 @@ impl std::ops::Sub<&Vector3D> for &Point3D {
 }
 
 impl std::ops::Mul<Vector3D> for Point3D {
-    type Output = f64;
+    type Output = Float;
 
-    fn mul(self, other: Vector3D) -> f64 {
+    fn mul(self, other: Vector3D) -> Float {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 }
 
 impl std::ops::Mul<Point3D> for Point3D {
-    type Output = f64;
+    type Output = Float;
 
-    fn mul(self, other: Point3D) -> f64 {
+    fn mul(self, other: Point3D) -> Float {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 }
 
-impl std::ops::Mul<f64> for Point3D {
+impl std::ops::Mul<Float> for Point3D {
     type Output = Self;
 
-    fn mul(self, other: f64) -> Self {
+    fn mul(self, other: Float) -> Self {
         Self {
             x: self.x * other,
             y: self.y * other,
@@ -146,18 +153,18 @@ impl std::ops::Mul<f64> for Point3D {
     }
 }
 
-impl std::ops::MulAssign<f64> for Point3D {
-    fn mul_assign(&mut self, other: f64) {
+impl std::ops::MulAssign<Float> for Point3D {
+    fn mul_assign(&mut self, other: Float) {
         self.x *= other;
         self.y *= other;
         self.z *= other;
     }
 }
 
-impl std::ops::Div<f64> for Point3D {
+impl std::ops::Div<Float> for Point3D {
     type Output = Self;
 
-    fn div(self, other: f64) -> Self {
+    fn div(self, other: Float) -> Self {
         Self {
             x: self.x / other,
             y: self.y / other,
@@ -166,8 +173,8 @@ impl std::ops::Div<f64> for Point3D {
     }
 }
 
-impl std::ops::DivAssign<f64> for Point3D {
-    fn div_assign(&mut self, other: f64) {
+impl std::ops::DivAssign<Float> for Point3D {
+    fn div_assign(&mut self, other: Float) {
         self.x /= other;
         self.y /= other;
         self.z /= other;

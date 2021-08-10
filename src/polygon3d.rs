@@ -1,49 +1,55 @@
-use crate::intersect_trait::{Intersect, SurfaceSide};
 use crate::loop3d::Loop3D;
-use crate::plane3d::Plane3D;
 use crate::point3d::Point3D;
-use crate::ray3d::Ray3D;
 use crate::segment3d::Segment3D;
 use crate::vector3d::Vector3D;
+use crate::Float;
 
 pub struct Polygon3D {
     outer: Loop3D,
     inner: Vec<Loop3D>,
-    area: f64,
+    area: Float,
     normal: Vector3D,
+    // A pointer to the [`Transform`] associated with this [`Sphere3D`]
+    // transform: Option<Rc<Transform>>,
+
+    // Does the transform change the hand-ness of the coordinate system?
+    // transform_reverses: bool,
 }
 
-impl Intersect for Polygon3D {
-    
-    const ID : &'static str = "polygon";
+// impl Intersect for Polygon3D {
+//     fn id(&self) -> &'static str {
+//         "polygon"
+//     }
 
-    fn normal_at_intersection(&self, ray: &Ray3D, t: f64)->(Vector3D, SurfaceSide){
-        let p = self.outer[0];
-        let poly_plane = Plane3D::new(p, self.normal);
-        poly_plane.normal_at_intersection(ray, t)
-    }
+//     fn area(&self)->Float{
+//         self.area()
+//     }
 
-    fn intersect(&self, ray: &Ray3D) -> Option<f64> {
-        let p = self.outer[0];
+//     fn transform(&self)->&Option<Rc<Transform>>{
+//         &self.transform
+//     }
 
-        let poly_plane = Plane3D::new(p, self.normal);
-        if let Some(t) = poly_plane.intersect(ray) {
-            let intersection = ray.project(t);
-            match self.test_point(intersection) {
-                Ok(is_in) => {
-                    if is_in {
-                        Some(t)
-                    } else {
-                        None
-                    }
-                }
-                Err(e) => panic!("When intersecting Polygon3D: {}", e),
-            }
-        } else {
-            None
-        }
-    }
-}
+//     fn intersect_local_ray(&self, ray: &Ray3D, o_error: Point3D, d_error: Point3D) -> Option<IntersectionInfo> {
+//         let p = self.outer[0];
+
+//         let poly_plane = Plane3D::new(p, self.normal);
+//         if let Some(t) = poly_plane.intersect(ray) {
+//             let intersection = ray.project(t);
+//             match self.test_point(intersection) {
+//                 Ok(is_in) => {
+//                     if is_in {
+//                         Some(t)
+//                     } else {
+//                         None
+//                     }
+//                 }
+//                 Err(e) => panic!("When intersecting Polygon3D: {}", e),
+//             }
+//         } else {
+//             None
+//         }
+//     }
+// }
 
 impl Polygon3D {
     /// Creates a new [`Loop3D`] without any holes
@@ -63,6 +69,11 @@ impl Polygon3D {
         })
     }
 
+    // pub fn normal_at_intersection(&self, ray: &Ray3D, t: Float) -> (Vector3D, SurfaceSide) {
+    //     let p = self.outer[0];
+    //     SurfaceSide::get_side(self.normal, ray.direction)
+    // }
+
     /// Retrieves the normal to the Polygon
     pub fn normal(&self) -> Vector3D {
         self.normal
@@ -75,7 +86,7 @@ impl Polygon3D {
         for v in outer.vertices() {
             centroid += *v;
         }
-        centroid / (outer.n_vertices() as f64)
+        centroid / (outer.n_vertices() as Float)
     }
 
     /// Borrows the Outer [`Loop3D`]
@@ -174,7 +185,7 @@ impl Polygon3D {
     }
 
     /// Gets the area of the [`Polygon3D`]
-    pub fn area(&self) -> f64 {
+    pub fn area(&self) -> Float {
         self.area
     }
 
@@ -322,54 +333,54 @@ impl Polygon3D {
 mod testing {
     use super::*;
 
-    use crate::vector3d::Vector3D;
+    // use crate::vector3d::Vector3D;
 
-    #[test]
-    fn test_polygon_intersect() {
-        // It should not work if we don't close it.
-        let mut the_loop = Loop3D::new();
-        let l = 20. as f64;
-        the_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
-        the_loop.push(Point3D::new(l, -l, 0.)).unwrap();
-        the_loop.push(Point3D::new(l, l, 0.)).unwrap();
-        the_loop.push(Point3D::new(-l, l, 0.)).unwrap();
+    // #[test]
+    // fn test_polygon_intersect() {
+    //     // It should not work if we don't close it.
+    //     let mut the_loop = Loop3D::new();
+    //     let l = 20. as Float;
+    //     the_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
+    //     the_loop.push(Point3D::new(l, -l, 0.)).unwrap();
+    //     the_loop.push(Point3D::new(l, l, 0.)).unwrap();
+    //     the_loop.push(Point3D::new(-l, l, 0.)).unwrap();
 
-        the_loop.close().unwrap();
+    //     the_loop.close().unwrap();
 
-        let polygon = Polygon3D::new(the_loop).unwrap();
+    //     let polygon = Polygon3D::new(the_loop).unwrap();
 
-        let ray = Ray3D {
-            origin: Point3D::new(2.1, -3.1, 100.),
-            direction: Vector3D::new(0., 0., -1.),
-        };
-        if let Some(t) = polygon.intersect(&ray) {
-            let (normal, side) = polygon.normal_at_intersection(&ray, t);
-            assert_eq!(side, SurfaceSide::Front);
-            assert_eq!(normal, Vector3D::new(0., 0., 1.));
-            assert_eq!(t, 100.);
-        } else {
-            panic!("Did not intersect!")
-        }
+    //     let ray = Ray3D {
+    //         origin: Point3D::new(2.1, -3.1, 100.),
+    //         direction: Vector3D::new(0., 0., -1.),
+    //     };
+    //     if let Some(t) = polygon.intersect(&ray) {
+    //         let (normal, side) = polygon.normal_at_intersection(&ray, t);
+    //         assert_eq!(side, SurfaceSide::Front);
+    //         assert_eq!(normal, Vector3D::new(0., 0., 1.));
+    //         assert_eq!(t, 100.);
+    //     } else {
+    //         panic!("Did not intersect!")
+    //     }
 
-        let ray = Ray3D {
-            origin: Point3D::new(2.1, -3.1, -100.),
-            direction: Vector3D::new(0., 0., 1.),
-        };
-        if let Some(t) = polygon.intersect(&ray) {
-            let (normal, side) = polygon.normal_at_intersection(&ray, t);
-            assert_eq!(side, SurfaceSide::Back);
-            assert_eq!(normal, Vector3D::new(0., 0., -1.));
-            assert_eq!(t, 100.);
-        } else {
-            panic!("Did not intersect!")
-        }
-    }
+    //     let ray = Ray3D {
+    //         origin: Point3D::new(2.1, -3.1, -100.),
+    //         direction: Vector3D::new(0., 0., 1.),
+    //     };
+    //     if let Some(t) = polygon.intersect(&ray) {
+    //         let (normal, side) = polygon.normal_at_intersection(&ray, t);
+    //         assert_eq!(side, SurfaceSide::Back);
+    //         assert_eq!(normal, Vector3D::new(0., 0., -1.));
+    //         assert_eq!(t, 100.);
+    //     } else {
+    //         panic!("Did not intersect!")
+    //     }
+    // }
 
     #[test]
     fn test_new() {
         // It should not work if we don't close it.
         let mut the_loop = Loop3D::new();
-        let l = 2. as f64;
+        let l = 2. as Float;
         the_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
         the_loop.push(Point3D::new(l, -l, 0.)).unwrap();
         the_loop.push(Point3D::new(l, l, 0.)).unwrap();
@@ -379,7 +390,7 @@ mod testing {
 
         // It should work if we close it.
         let mut the_loop = Loop3D::new();
-        let l = 2. as f64;
+        let l = 2. as Float;
         the_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
         the_loop.push(Point3D::new(l, -l, 0.)).unwrap();
         the_loop.push(Point3D::new(l, l, 0.)).unwrap();
@@ -396,7 +407,7 @@ mod testing {
         // A square with the center at the origin.
         /*****/
         let mut outer_loop = Loop3D::new();
-        let l = 2. as f64;
+        let l = 2. as Float;
         outer_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
         outer_loop.push(Point3D::new(l, -l, 0.)).unwrap();
         outer_loop.push(Point3D::new(l, l, 0.)).unwrap();
@@ -409,7 +420,7 @@ mod testing {
 
         // Add hole
         let mut hole = Loop3D::new();
-        let l = 2. as f64;
+        let l = 2. as Float;
         hole.push(Point3D::new(-l / 2., -l / 2., 0.)).unwrap();
         hole.push(Point3D::new(l / 2., -l / 2., 0.)).unwrap();
         hole.push(Point3D::new(l / 2., l / 2., 0.)).unwrap();
@@ -425,7 +436,7 @@ mod testing {
         /*****/
 
         let mut outer_loop = Loop3D::new();
-        let l = 2. as f64;
+        let l = 2. as Float;
         outer_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
         outer_loop.push(Point3D::new(l, -l, 0.)).unwrap();
         outer_loop.push(Point3D::new(l, l, 0.)).unwrap();
@@ -435,7 +446,7 @@ mod testing {
         let mut poly = Polygon3D::new(outer_loop).unwrap();
 
         let mut hole = Loop3D::new();
-        let l = 2. as f64;
+        let l = 2. as Float;
         hole.push(Point3D::new(-l / 2., -l / 2., 0.)).unwrap();
         hole.push(Point3D::new(l / 2., -l / 2., 0.)).unwrap();
         hole.push(Point3D::new(0., l / 2., l)).unwrap();
@@ -448,7 +459,7 @@ mod testing {
         /*****/
 
         let mut outer_loop = Loop3D::new();
-        let l = 2. as f64;
+        let l = 2. as Float;
         outer_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
         outer_loop.push(Point3D::new(l, -l, 0.)).unwrap();
         outer_loop.push(Point3D::new(l, l, 0.)).unwrap();
@@ -457,7 +468,7 @@ mod testing {
         let mut poly = Polygon3D::new(outer_loop).unwrap();
 
         let mut hole = Loop3D::new();
-        let l = 2. as f64;
+        let l = 2. as Float;
         hole.push(Point3D::new(-l / 2., -l / 2., 0.)).unwrap();
         hole.push(Point3D::new(l / 2., -l / 2., 0.)).unwrap();
         hole.push(Point3D::new(l / 2., l / 2., 0.)).unwrap();
@@ -466,7 +477,7 @@ mod testing {
         poly.cut_hole(hole).unwrap();
 
         let mut hole = Loop3D::new();
-        let l = 2. as f64;
+        let l = 2. as Float;
         hole.push(Point3D::new(-l / 1.5, -l / 1.5, 0.)).unwrap();
         hole.push(Point3D::new(l / 1.5, -l / 1.5, 0.)).unwrap();
         hole.push(Point3D::new(l / 1.5, l / 1.5, 0.)).unwrap();

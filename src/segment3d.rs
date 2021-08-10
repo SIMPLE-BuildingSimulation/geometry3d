@@ -1,4 +1,6 @@
 use crate::point3d::*;
+use crate::Float;
+use crate::vector3d::Vector3D;
 
 /// An imaginary line starting at one [`Point3D`] and ending
 /// on another [`Point3D`].
@@ -6,7 +8,7 @@ use crate::point3d::*;
 pub struct Segment3D {
     pub start: Point3D,
     pub end: Point3D,
-    pub length: f64,
+    pub length: Float,
 }
 
 impl Segment3D {
@@ -28,7 +30,15 @@ impl Segment3D {
         self.end
     }
 
-    pub fn length(&self) -> f64 {
+    pub fn as_vector3d(&self)->Vector3D{
+        self.end - self.start
+    }
+
+    pub fn as_reversed_vector3d(&self)->Vector3D{
+        self.start - self.end
+    }
+
+    pub fn length(&self) -> Float {
         self.length
     }
 
@@ -48,12 +58,12 @@ impl Segment3D {
         } else {
             let ab = self.end - self.start;
             let ap = point - self.start;
-            let ret: f64;
-            if ab.x.abs() > f64::EPSILON {
+            let ret: Float;
+            if ab.x.abs() > Float::EPSILON {
                 ret = ap.x / ab.x;
-            } else if ab.y.abs() > f64::EPSILON {
+            } else if ab.y.abs() > Float::EPSILON {
                 ret = ap.y / ab.y;
-            } else if ab.z.abs() > f64::EPSILON {
+            } else if ab.z.abs() > Float::EPSILON {
                 ret = ap.z / ab.z;
             } else {
                 return Err("Checking if Segment3D of length 0 contains a Point3D".to_string());
@@ -64,7 +74,7 @@ impl Segment3D {
 
     /// Checks if a [`Segment3D`] contains another [`Segment3D`].
     pub fn contains(&self, input: &Segment3D) -> Result<bool, String> {
-        const TINY: f64 = 100. * f64::EPSILON;
+        const TINY: Float = 100. * Float::EPSILON;
         if self.length() < TINY {
             let msg = "Trying to check whether a segment is contained in a zero-length segment"
                 .to_string();
@@ -85,8 +95,8 @@ impl Segment3D {
         // calculate the interpolation
         let a1b1 = b1 - a1;
 
-        let alpha: f64;
-        let beta: f64;
+        let alpha: Float;
+        let beta: Float;
         if a1b1.x.abs() > TINY {
             alpha = (a2.x - a1.x) / a1b1.x;
             beta = (a2.x - a1.x) / a1b1.x;
@@ -131,7 +141,7 @@ impl Segment3D {
     /// assert_eq!(horizontal.get_intersection_pt(&vertical), Some((-1., 0.5)));
     ///
     /// ```
-    pub fn get_intersection_pt(&self, input: &Segment3D) -> Option<(f64, f64)> {
+    pub fn get_intersection_pt(&self, input: &Segment3D) -> Option<(Float, Float)> {
         let a = self.end - self.start;
         let b = input.end() - input.start();
 
@@ -148,21 +158,21 @@ impl Segment3D {
         }
 
         // They are coplanar... check for intersection
-        let t_a: f64;
-        let t_b: f64;
-        let det: f64;
+        let t_a: Float;
+        let t_b: Float;
+        let det: Float;
 
         // Check for intersection.
-        if normal.z.abs() > f64::EPSILON {
+        if normal.z.abs() > Float::EPSILON {
             det = a.y * b.x - a.x * b.y;
 
             t_a = (b.y * delta.x - b.x * delta.y) / det;
             t_b = (a.y * delta.x - a.x * delta.y) / det;
-        } else if normal.x.abs() > f64::EPSILON {
+        } else if normal.x.abs() > Float::EPSILON {
             det = a.y * b.z - a.z * b.y;
             t_a = (b.y * delta.z - b.z * delta.y) / det;
             t_b = (a.y * delta.z - a.z * delta.y) / det;
-        } else if normal.y.abs() > f64::EPSILON {
+        } else if normal.y.abs() > Float::EPSILON {
             det = a.x * b.z - a.z * b.x;
             t_a = (b.x * delta.z - b.z * delta.x) / det;
             t_b = (a.x * delta.z - a.z * delta.x) / det;
@@ -179,7 +189,7 @@ impl Segment3D {
             Some((t_a, t_b)) => {
                 let a = self.end - self.start;
 
-                if (f64::EPSILON..1.).contains(&t_a) && (f64::EPSILON..1.).contains(&t_b) {
+                if (Float::EPSILON..1.).contains(&t_a) && (Float::EPSILON..1.).contains(&t_b) {
                     *output = self.start + a * t_a;
                     true
                 } else {
@@ -369,9 +379,9 @@ mod testing {
 
     #[test]
     fn test_midpoint() {
-        let x = 1.2312 as f64;
-        let y = 1123.2312 as f64;
-        let z = 31.2312 as f64;
+        let x = 1.2312 as Float;
+        let y = 1123.2312 as Float;
+        let z = 31.2312 as Float;
 
         let o = Point3D::new(0., 0., 0.);
         let end = Point3D::new(x, y, z);
@@ -391,7 +401,7 @@ mod testing {
 
         let main_s = Segment3D::new(a, b);
 
-        let check = |alpha: f64, beta: f64| -> bool {
+        let check = |alpha: Float, beta: Float| -> bool {
             let a2 = a + (b - a) * alpha;
             let b2 = a + (b - a) * beta;
             let s = Segment3D::new(a2, b2);
@@ -412,7 +422,7 @@ mod testing {
         let b = Point3D::new(0., 0., -2.);
         let main_s = Segment3D::new(a, b);
 
-        let check = |alpha: f64, beta: f64| -> bool {
+        let check = |alpha: Float, beta: Float| -> bool {
             let a2 = a + (b - a) * alpha;
             let b2 = a + (b - a) * beta;
             let s = Segment3D::new(a2, b2);
@@ -434,7 +444,7 @@ mod testing {
 
         let main_s = Segment3D::new(a, b);
 
-        let check = |alpha: f64, beta: f64| -> bool {
+        let check = |alpha: Float, beta: Float| -> bool {
             let a2 = a + (b - a) * alpha;
             let b2 = a + (b - a) * beta;
             let s = Segment3D::new(a2, b2);
@@ -457,7 +467,7 @@ mod testing {
 
         let main_s = Segment3D::new(a, b);
 
-        let check = |alpha: f64, beta: f64| -> bool {
+        let check = |alpha: Float, beta: Float| -> bool {
             let a2 = a + (b - a) * alpha;
             let b2 = a + (b - a) * beta;
             let s = Segment3D::new(a2, b2);

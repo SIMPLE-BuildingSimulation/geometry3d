@@ -1,13 +1,14 @@
 use crate::point3d::*;
 use crate::segment3d::*;
 use crate::vector3d::*;
+use crate::Float;
 
 #[derive(Clone)]
 pub struct Loop3D {
     vertices: Vec<Point3D>,
     normal: Vector3D,
     closed: bool,
-    area: f64,
+    area: Float,
 }
 
 impl Default for Loop3D {
@@ -263,7 +264,7 @@ impl Loop3D {
         let d = first_point - p;
 
         let aux = (self.normal * d).abs();
-        Ok(aux < 10. * f64::EPSILON)
+        Ok(aux < 10. * Float::EPSILON)
     }
 
     /// Tests whether a [`Point3D`] dwells inside of the [`Loop3D`].
@@ -287,6 +288,7 @@ impl Loop3D {
         let mut n_cross = 0;
         let n = self.vertices.len();
         for i in 0..n {
+            
             let a = self.vertices[i];
             let b = self.vertices[(i + 1) % n];
             let s = Segment3D::new(a, b);
@@ -296,12 +298,28 @@ impl Loop3D {
                 return Ok(true);
             }
 
-            // Check if the ray and the segment touch. We only consuder
+            // Check if the ray and the segment touch. We only consider
             // touching at the start (e.g., t_a between [0 and 1) ) in
             // order not to count vertices twice.
-            if let Some((t_a, t_b)) = s.get_intersection_pt(&ray) {
-                if (0. ..1.).contains(&t_a) && (0. ..=1.).contains(&t_b) {
-                    n_cross += 1;
+            if let Some((t_a, t_b)) = s.get_intersection_pt(&ray) {                
+                // If the ray intersects
+                if (0. ..=1.).contains(&t_b) && (0. ..=1.).contains(&t_a) {
+                    if t_a < Float::EPSILON  {
+                        // if the intersection is at the start of the segment
+                        let side_normal = d.cross(s.as_vector3d());
+                        if side_normal.is_same_direction(self.normal){                         
+                            n_cross += 1
+                        }
+                    }else if t_a < 1.  {
+                        // intersection is within the segment (not including the end)                        
+                        n_cross += 1;
+                    }else{
+                        // if the intersection is at the end of the segment                        
+                        let side_normal = d.cross(s.as_reversed_vector3d());
+                        if side_normal.is_same_direction(self.normal){                            
+                            n_cross += 1
+                        }
+                    }
                 }
             }
         }
@@ -311,7 +329,7 @@ impl Loop3D {
     } // end of test_point
 
     /// Calculates and caches the area of the [`Loop3D`]
-    fn set_area(&mut self) -> Result<f64, String> {
+    fn set_area(&mut self) -> Result<Float, String> {
         if !self.closed {
             let msg = "Trying to calculate the area of a Loop3D that is not closed".to_string();
             return Err(msg);
@@ -352,7 +370,7 @@ impl Loop3D {
     }
 
     /// Returns the area of the [`Loop3D`]
-    pub fn area(&self) -> Result<f64, String> {
+    pub fn area(&self) -> Result<Float, String> {
         if !self.is_closed() {
             Err("Trying to get the area of an open Loop3D".to_string())
         } else {
@@ -539,7 +557,7 @@ mod testing {
     fn test_point_convex_loop_exterior() {
         //Vector3D normal = Vector3D(0, 0, 1);
         let mut the_loop = Loop3D::new();
-        let l = 1. / (2 as f64).sqrt();
+        let l = 1. / (2 as Float).sqrt();
         the_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
         the_loop.push(Point3D::new(l, -l, 0.)).unwrap();
         the_loop.push(Point3D::new(l, l, 0.)).unwrap();
@@ -555,8 +573,8 @@ mod testing {
         //Vector3D normal = Vector3D(0, 0, 1);
         let mut the_loop = Loop3D::new();
 
-        let l = 1.0 / (2 as f64).sqrt();
-        let bigl = 2. / (2 as f64).sqrt();
+        let l = 1.0 / (2 as Float).sqrt();
+        let bigl = 2. / (2 as Float).sqrt();
 
         the_loop.push(Point3D::new(-bigl, -bigl, 0.)).unwrap();
         the_loop.push(Point3D::new(0.0, -bigl, 0.)).unwrap(); // collinear point, moving in X
@@ -583,8 +601,8 @@ mod testing {
         //Vector3D normal = Vector3D(0, 0, 1);
         let mut the_loop = Loop3D::new();
 
-        let l = 1. / (2 as f64).sqrt();
-        let bigl = 2. / (2 as f64).sqrt();
+        let l = 1. / (2 as Float).sqrt();
+        let bigl = 2. / (2 as Float).sqrt();
 
         the_loop.push(Point3D::new(-bigl, -bigl, 0.)).unwrap();
         the_loop.push(Point3D::new(0.0, -bigl, 0.)).unwrap(); // collinear point, moving in X
@@ -636,11 +654,38 @@ mod testing {
     }
 
     #[test]
+    fn test_point_through_vertex(){
+        //Vector3D normal = Vector3D(0, 0, 1);
+        let mut the_loop = Loop3D::new();
+        let l = 1.;
+        let bigl = 3.;
+
+        the_loop.push(Point3D::new(0.,0., 0.)).unwrap();
+        the_loop.push(Point3D::new(bigl, 0., 0.)).unwrap(); 
+        the_loop.push(Point3D::new(bigl, bigl, 0.)).unwrap();
+        the_loop.push(Point3D::new(0., bigl, 0.)).unwrap(); 
+        the_loop.push(Point3D::new(0.,0., 0.)).unwrap();
+        
+        the_loop.push(Point3D::new(l,l, 0.)).unwrap();
+        the_loop.push(Point3D::new(l,2.*l, 0.)).unwrap();
+        the_loop.push(Point3D::new(2.*l,2.*l, 0.)).unwrap();
+        the_loop.push(Point3D::new(2.*l,l, 0.)).unwrap();
+        the_loop.push(Point3D::new(l,l, 0.)).unwrap();    
+
+        the_loop.close().unwrap();
+
+        let r = the_loop
+            .test_point(Point3D::new(l / 2., l, 0.))
+            .unwrap();
+        assert!(r);
+    }
+
+    #[test]
     fn test_point_concave_loop_interior_with_clean() {
         //Vector3D normal = Vector3D(0, 0, 1);
         let mut the_loop = Loop3D::new();
-        let l = 1. / (2 as f64).sqrt();
-        let bigl = 2. / (2 as f64).sqrt();
+        let l = 1. / (2 as Float).sqrt();
+        let bigl = 2. / (2 as Float).sqrt();
 
         the_loop.push(Point3D::new(-bigl, -bigl, 0.)).unwrap();
         the_loop.push(Point3D::new(0., -bigl, 0.)).unwrap(); // collinear point, moving in X
@@ -660,8 +705,8 @@ mod testing {
 
         let r = the_loop
             .test_point(Point3D::new(
-                -1.5 / (2 as f64).sqrt(),
-                -1.5 / (2 as f64).sqrt(),
+                -1.5 / (2 as Float).sqrt(),
+                -1.5 / (2 as Float).sqrt(),
                 0.,
             ))
             .unwrap();
@@ -671,7 +716,7 @@ mod testing {
     #[test]
     fn test_point_non_coplanar() {
         let mut the_loop = Loop3D::new();
-        let l = 1. / (2 as f64).sqrt();
+        let l = 1. / (2 as Float).sqrt();
 
         the_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
         the_loop.push(Point3D::new(-l, l, 0.)).unwrap();
@@ -681,8 +726,8 @@ mod testing {
 
         let r = the_loop
             .test_point(Point3D::new(
-                -1.5 / (2 as f64).sqrt(),
-                -1.5 / (2 as f64).sqrt(),
+                -1.5 / (2 as Float).sqrt(),
+                -1.5 / (2 as Float).sqrt(),
                 1.,
             ))
             .unwrap();
