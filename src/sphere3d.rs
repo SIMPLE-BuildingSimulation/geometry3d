@@ -7,6 +7,7 @@ use crate::ray3d::Ray3D;
 use crate::round_error::ApproxFloat;
 use crate::transform::Transform;
 use crate::vector3d::Vector3D;
+// use crate::utils::solve_quadratic;
 
 /// A Full or Partial sphere in three dimensions, centered at the origin
 ///
@@ -15,7 +16,7 @@ use crate::vector3d::Vector3D;
 /// $`\theta`$ defines the latitude (i.e., it goes from 0 to 190 degrees).
 pub struct Sphere3D {
     /// The radius of the `Sphere3D`
-    radius: Float,
+    pub radius: Float,
 
     /// The position of the lower clipping plane on the Z axis
     zmin: Float,
@@ -49,6 +50,16 @@ impl Sphere3D {
     /// will be attached to it.
     pub fn new(radius: Float, centre: Point3D) -> Self {
         Self::new_partial(radius, centre, -2. * radius, 2. * radius, 360.)
+    }
+
+    /// Gets the [`Point3D`] of the [`Sphere3D`] that represents its
+    /// centre, after transformation.
+    pub fn centre(&self)-> Point3D {
+        let o = Point3D::new(0.,0.,0.);
+        match &self.transform{
+            None=>o,
+            Some(t)=>t.transform_pt(o)
+        }
     }
 
     /// Creates a new full [`Sphere3D`] of a certain `radius` and
@@ -134,7 +145,93 @@ impl Sphere3D {
         }
     }
 
-    pub fn basic_intersection(
+    // pub fn basic_intersection (
+    //     &self,
+    //     ray: &Ray3D,
+    //     _o_error: Point3D,
+    //     _d_error: Point3D,
+    // ) -> Option<(Point3D, Float)> {
+        
+    //     let a = ray.direction * ray.direction;
+    //     let b = 2.*(ray.origin * ray.direction);
+    //     let c = ray.origin * ray.origin - self.radius*self.radius;
+
+    //     let (t0,t1)=solve_quadratic(a,b,c)?;
+    //     #[cfg(debug_assertions)]
+    //     if t0.is_nan() || t1.is_nan() || t0.is_infinite() || t1.is_infinite(){
+    //         panic!("After solve_quadratic in Sphere intersection: t0 = {}, t1 = {}", t0, t1);
+    //     }
+    //     debug_assert!(t1 >= t0 );
+    //     // t0 < t1... so, check if they are possitive
+    //     if t1 <= 0.0 {
+    //         return None;
+    //     }
+
+    //     // We now know that t1 hits... check t0
+    //     let (mut thit, hit_is_t1) = if t0 > 0. {
+    //         // if t0 is a valid hit, keep that
+    //         (t0, false)
+    //     } else {
+    //         // else, use t1 (which we know works...)
+    //         (t1, true)
+    //     };
+
+    //     // We might try to do the same with 'thit' = t1, later
+    //     let calc_phit_and_phi = |thit: Float| -> (Point3D, Float) {
+    //         // Calculate point of intersection.
+    //         let mut phit = ray.project(thit);
+    //         // refine in order to avoid error accumulation
+    //         phit *= self.radius / phit.as_vector3d().length();
+
+    //         // Avoid a singularity on top of the sphere
+    //         let limit = 1e-5 * self.radius;
+    //         if phit.x.abs() < limit && phit.y.abs() < limit {
+    //             phit.x = limit
+    //         }
+
+    //         // calc phi
+    //         let mut phi = phit.y.atan2(phit.x);
+    //         if phi < 0. {
+    //             phi += 2. * PI;
+    //         }
+    //         (phit, phi)
+    //     };
+    //     let (mut phit, mut phi) = calc_phit_and_phi(thit);
+
+    //     // Check intersection against clipping parameters...
+    //     // it is possible that the first hit misses, but the second
+    //     // does not
+    //     if (self.zmin > -self.radius && phit.z < self.zmin) || // zmin is limiting but 'thit' missed it
+    //         (self.zmax <  self.radius && phit.z > self.zmax) || // zmax is limiting but 'thit' missed it
+    //         phi > self.phi_max
+    //     // 'thit' missed due to the phi limitation
+    //     {
+    //         // if this was already t1, then we missed the sphere
+    //         if hit_is_t1 {
+    //             return None;
+    //         }
+    //         // else, try with t1.
+    //         thit = t1;
+
+    //         // recalculate
+    //         let (new_phit, new_phi) = calc_phit_and_phi(thit);
+
+    //         if (self.zmin > -self.radius && new_phit.z < self.zmin) || // zmin is limiting but 'thit' missed it
+    //             (self.zmax <  self.radius && new_phit.z > self.zmax) || // zmax is limiting but 'thit' missed it
+    //             new_phi > self.phi_max
+    //         // 'thit' missed due to the phi limitation
+    //         {
+    //             return None;
+    //         }
+    //         // update values
+    //         phit = new_phit;
+    //         phi = new_phi;
+    //     }
+
+    //     Some((phit, phi))
+    // }
+
+    fn approx_basic_intersection(
         &self,
         ray: &Ray3D,
         o_error: Point3D,
@@ -148,12 +245,16 @@ impl Sphere3D {
         let oy = ApproxFloat::from_value_and_error(ray.origin.y, o_error.y);
         let oz = ApproxFloat::from_value_and_error(ray.origin.z, o_error.z);
 
-        // Force ray.direction to be normalized
+        
         let a = dx * dx + dy * dy + dz * dz;
         let b = (ox * dx + oy * dy + oz * dz) * 2.;
         let c = ox * ox + oy * oy + oz * oz - self.radius * self.radius;
-
+        
         let (t0, t1) = ApproxFloat::solve_quadratic(a, b, c)?;
+        #[cfg(debug_assertions)]
+        if t0.as_float().is_nan() || t1.as_float().is_nan() || t0.as_float().is_infinite() || t1.as_float().is_infinite(){
+            panic!("After solve_quadratic in Sphere intersection: t0.as_float() = {}, t1.as_float() = {}", t0.as_float(), t1.as_float());
+        }        
         debug_assert!(t1.as_float() >= t0.as_float());
         // t0 < t1... so, check if they are possitive
         if t1.low <= 0.0 {
@@ -285,7 +386,7 @@ impl Intersect for Sphere3D {
         d_error: Point3D,
     ) -> Option<Point3D> {
         // Do the first part
-        let (phit, _) = self.basic_intersection(ray, o_error, d_error)?;
+        let (phit, _) = self.approx_basic_intersection(ray, o_error, d_error)?;
         Some(phit)
     }
 
@@ -295,7 +396,7 @@ impl Intersect for Sphere3D {
         o_error: Point3D,
         d_error: Point3D,
     ) -> Option<IntersectionInfo> {
-        let (phit, phi) = self.basic_intersection(ray, o_error, d_error)?;
+        let (phit, phi) = self.approx_basic_intersection(ray, o_error, d_error)?;
 
         self.intersection_info(ray, phit, phi)
     }
@@ -322,6 +423,14 @@ mod testing {
         assert!((s.radius - PI).abs() < Float::EPSILON);
         assert!((s.radius * s.radius - PI * PI).abs() < Float::EPSILON);
         // assert!((s.centre_squared - centre * centre).abs() < Float::EPSILON);
+    }
+
+    #[test]
+    fn test_sphere_centre() {
+        let centre = Point3D::new(2.1, 1.2, -2.);
+        let s = Sphere3D::new(PI, centre);
+        assert_eq!(centre, s.centre());
+        
     }
 
 
@@ -352,6 +461,8 @@ mod testing {
         
 
     }
+
+    
 
     #[test]
     fn test_sphere_intersect() {
@@ -395,6 +506,7 @@ mod testing {
             }
             Ok(())
         }
+        
 
         fn vectors_are_close(p1: Vector3D, p2: Vector3D) -> Result<(), String> {
             let d = (p1 - p2).length();
@@ -508,6 +620,7 @@ mod testing {
         if let Some(info) = sphere.intersect(&ray) {            
             points_are_close(exp.unwrap(), info.p).unwrap();
             assert!(matches![info.side, SurfaceSide::Front]);
+            assert!(info.normal.z > 0.);
         } else {
             panic!("Wrong intersection!!")
         }
@@ -515,7 +628,7 @@ mod testing {
         // Test 6: Towards the centre from inside
         let r = 3.;
         let centre = Point3D::new(1.0, 0.0, -2.0);
-        let origin = Point3D::new(0.9, 0.0, -0.05);
+        let origin = Point3D::new(1.0, 0.0, -0.05);
         let sphere = Sphere3D::new(r, centre);
         let exp = get_intersect(r, centre, origin);
         let ray = Ray3D {
@@ -524,7 +637,8 @@ mod testing {
         };
         if let Some(info) = sphere.intersect(&ray) {
             points_are_close(exp.unwrap(), info.p).unwrap();
-            assert!(matches![info.side, SurfaceSide::Back]);
+            assert!(matches![info.side, SurfaceSide::Back]);            
+            assert!(info.normal.z < 0.);
         } else {
             panic!("Wrong intersection!!")
         }

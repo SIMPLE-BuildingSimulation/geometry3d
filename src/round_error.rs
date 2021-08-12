@@ -137,7 +137,7 @@ impl ApproxFloat {
             return None;
         }
         let discr_sqrt = disc.sqrt();
-
+        
         // Use Muller's method for making this faster...
         let q: ApproxFloat;
         if b.as_float() < 0. {

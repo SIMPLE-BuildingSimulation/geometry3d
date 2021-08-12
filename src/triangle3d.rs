@@ -8,6 +8,38 @@ use crate::transform::Transform;
 use crate::vector3d::Vector3D;
 use crate::Float;
 
+/// Intersects a [`Ray3D`] in local coordinates with Triangle described by the 
+/// [`Point3D`] `a`, `b`, and `c`. 
+/// 
+/// Returns the [`Point3D`] of intersection and the values `u` and `v`, indicating
+/// the parametric coordinates of the point of intersection
+pub fn intersect_triangle(ray: &Ray3D, a: Point3D, b: Point3D, c: Point3D)->Option<(Point3D, Float, Float)>{
+    // Solve `Rorigin+t*Rdirection = A + u*(B-A) + v*(C-A)`;
+        // Meaning:
+        // u(A-B) + v(A-C) + t*Rdirection = (A - Rorigin)
+        // Solve this with Cramer's rule
+        // println!("Intersecting Triangle");
+        let a_ro = a - ray.origin;
+        let a_b = a - b;
+        let a_c = a - c;
+        let rd = ray.direction;
+
+        let det_a = det_3x3(&a_b, &a_c, &rd);        
+
+        let u = det_3x3(&a_ro, &a_c, &rd) / det_a;
+        let v = det_3x3(&a_b, &a_ro, &rd) / det_a;
+        let t = det_3x3(&a_b, &a_c, &a_ro) / det_a;
+
+        // t must be positive, and alpha, beta and gamma must add to 1 and
+        // be positive
+        if t < 0. || u + v > 1. || u < 0. || v < 0. {
+            None
+        } else {
+            Some((ray.project(t), u, v))
+        }
+}
+
+#[derive(Clone,Copy)]
 pub struct Triangle3D {
     // Vertices
     a: Point3D,
@@ -382,29 +414,7 @@ impl Triangle3D {
         _o_error: Point3D,
         _d_error: Point3D,
     ) -> Option<(Point3D, Float, Float)> {
-        // Solve `Rorigin+t*Rdirection = A + u*(B-A) + v*(C-A)`;
-        // Meaning:
-        // u(A-B) + v(A-C) + t*Rdirection = (A - Rorigin)
-        // Solve this with Cramer's rule
-
-        let a_ro = self.a() - ray.origin;
-        let a_b = self.a() - self.b();
-        let a_c = self.a() - self.b();
-        let rd = ray.direction;
-
-        let det_a = det_3x3(&a_b, &a_c, &rd);
-
-        let u = det_3x3(&a_ro, &a_c, &rd) / det_a;
-        let v = det_3x3(&a_b, &a_ro, &rd) / det_a;
-        let t = det_3x3(&a_b, &a_c, &a_ro) / det_a;
-
-        // t must be positive, and alpha, beta and gamma must add to 1 and
-        // be positive
-        if t < 0. || u + v > 1. || u < 0. || v < 0. {
-            None
-        } else {
-            Some((ray.project(t), u, v))
-        }
+        intersect_triangle(ray, self.a(), self.b(), self.c())
     }
 } // end of impl Triangle3D
 
@@ -561,6 +571,72 @@ mod testing {
     }
 
     #[test]
+    fn test_triangle_intersect(){
+        let a = Point3D::new(0., 0., 0.);
+        let b = Point3D::new(1., 0., 0.);
+        let c = Point3D::new(0., 1., 0.);
+
+        let triangle = Triangle3D::new(a, b, c).unwrap();
+                
+        
+        let test_hit = |pt: Point3D, offset: Vector3D, expect_hit: bool|->Result<(),String>{
+            let offset = offset.get_normalized();
+            let ray = Ray3D{
+                origin: pt + offset,
+                direction: offset * -1.
+            };
+
+            if let Some(phit) = triangle.simple_intersect(&ray){
+                if !expect_hit {
+                    return Err(format!("Was NOT expecting hit: pt = {}, offset = {}", pt, offset))
+                }
+                if !phit.compare(pt){
+                    return Err(format!("Hit in incorrect point...: pt = {}, offset = {}, phit = {}", pt, offset, phit))
+                }                
+            }else{
+                if expect_hit {
+                    return Err(format!("WAS expecting hit: pt = {}, offset = {}", pt, offset))
+                }
+            }
+
+            Ok(())
+        };// end of closure
+
+
+        let offset = Vector3D::new(0., 0., -1.);
+        // Vertex A.        
+        test_hit(triangle.a(), offset, true).unwrap();
+        
+        // Vertex B.
+        test_hit(triangle.b(), offset, true).unwrap();        
+
+        // Vertex C.
+        test_hit(triangle.c(), offset, true).unwrap();
+
+        // Segment AB.
+        let p = Point3D::new(0.5, 0., 0.);
+        test_hit(p, offset, true).unwrap();
+
+        // Segment AC.
+        let p = Point3D::new(0., 0.5, 0.);
+        test_hit(p, offset, true).unwrap();
+
+        // Segment BC.
+        let p = Point3D::new(0.5, 0.5, 0.);
+        test_hit(p, offset, true).unwrap();
+
+        // Point outside
+        let p = Point3D::new(0., -1., 0.);
+        test_hit(p, offset, false).unwrap();
+
+        // Point inside
+        let p = Point3D::new(0.1, 0.1, 0.);
+        test_hit(p, offset, true).unwrap();
+
+        
+    }
+
+    #[test]
     fn test_test_point() {
         let a = Point3D::new(0., 0., 0.);
         let b = Point3D::new(1., 0., 0.);
@@ -644,6 +720,8 @@ mod testing {
         let center3 = t3.circumcenter();
         assert!(center3.compare(Point3D::new(3., 4., 0.)));
     }
+
+    
 
     #[test]
     fn test_get_edge_index_from_points() {

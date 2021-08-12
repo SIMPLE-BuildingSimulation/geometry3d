@@ -17,14 +17,15 @@ impl SurfaceSide {
     /// checks whether a [`Ray3D`] is arriving from the front or the back
     /// of the surface
     pub fn get_side(normal: Vector3D, ray_dir: Vector3D) -> (Vector3D, Self) {
+        debug_assert!(normal.length().abs() > 0.00000001);
         let dot = normal * ray_dir;
-        debug_assert!((1.0 - normal.length()).abs() < 0.00000001);
 
         if dot < 0. {
             (normal, Self::Front)
         } else if dot > 0. {
             (normal * -1., Self::Back)
         } else {
+            println!("overtrying get_normal... side... Normal = {}, raydir = {} | N*ray_dir = {}", normal, ray_dir, normal * ray_dir);
             // It is perpendicular, meaning that the dot product
             // gives us no information. We need a small hack: Deviate
             // the direction a bit, and try again
@@ -54,6 +55,8 @@ pub struct IntersectionInfo {
     /// The point of intersection
     pub p: Point3D,
 
+    // pub perror: Point3D,
+
     /// The normal [`Vector3D`] at the interaction.
     /// Must have the value of (dpdu x dpdv).normalize() ... use
     /// ShadingInfo::new(..) and this is done automatically
@@ -79,6 +82,8 @@ pub struct IntersectionInfo {
 
     /// The position `v` of the intersection point
     pub v: Float,
+
+    
 }
 
 impl IntersectionInfo {
@@ -99,7 +104,7 @@ impl IntersectionInfo {
         let big_g = dpdv * dpdv;
         let normal = dpdv.cross(dpdu).get_normalized();
         let (normal, side) = SurfaceSide::get_side(normal, ray.direction);
-
+        
         let e = normal * d2p_duu;
         let f = normal * d2p_duv;
         let g = normal * d2p_dvv;
@@ -194,7 +199,7 @@ pub trait Intersect {
     /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, returning the distance
     /// `t` and the normal [`Vector3D`] at that point. If the distance
     /// is negative (i.e., the object is behind the plane), it should return
-    /// [`None`].    
+    /// [`None`]. Returns detailed [`IntersectionInfo`] about the intersaction .
     fn intersect(&self, ray: &Ray3D) -> Option<IntersectionInfo> {
         // Transform ray into object space, if needed
         let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
@@ -212,6 +217,32 @@ pub trait Intersect {
                     Some(info.transform(t))
                 } else {
                     Some(info)
+                }
+            }
+        }
+    }
+
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, returning the distance
+    /// `t` and the normal [`Vector3D`] at that point. If the distance
+    /// is negative (i.e., the object is behind the plane), it should return
+    /// [`None`]. Returns only the point of intersection.
+    fn simple_intersect(&self, ray: &Ray3D) -> Option<Point3D> {
+        // Transform ray into object space, if needed
+        let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
+            t.inv_transform_ray(ray)
+        } else {
+            let t = Transform::new();
+            t.inv_transform_ray(ray)
+        };
+
+        // Intersect, and return transformed back... if needed
+        match self.simple_intersect_local_ray(&local_ray, o_error, d_error) {
+            None => None,
+            Some(phit) => {
+                if let Some(t) = self.transform() {
+                    Some(t.transform_pt(phit))
+                } else {
+                    Some(phit)
                 }
             }
         }

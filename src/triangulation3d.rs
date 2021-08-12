@@ -131,7 +131,7 @@ impl TriPiece {
 
         Ok(t)
     }
-
+    
     fn invalidate(&mut self) {
         self.valid = false
     }
@@ -190,6 +190,10 @@ impl Triangulation3D {
             n_valid_triangles: 0,
             triangles: Vec::with_capacity(i),
         }
+    }
+
+    pub fn into_trilist(&self)->Vec<Triangle3D>{
+        self.triangles.iter().map(|t| t.triangle).collect()
     }
 
     /// Triangulates a [`Polygon3D`] using the simple ear

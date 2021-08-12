@@ -89,7 +89,7 @@ impl Intersect for DistantSource3D {
         let phi = 0.5; // I don't think this value is relevant
         let disk = self.get_proxy_disk(t);
         // Get basic info and update
-        let mut info = disk.intersection_info(ray, phit, phi)?;
+        let mut info = disk.intersection_info(ray, ray.project(t), phi)?;
         info.p = phit;
         Some(info)
     }
