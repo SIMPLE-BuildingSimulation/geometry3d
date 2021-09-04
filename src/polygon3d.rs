@@ -4,52 +4,14 @@ use crate::segment3d::Segment3D;
 use crate::vector3d::Vector3D;
 use crate::Float;
 
+#[derive(Clone)]
 pub struct Polygon3D {
     outer: Loop3D,
     inner: Vec<Loop3D>,
     area: Float,
-    normal: Vector3D,
-    // A pointer to the [`Transform`] associated with this [`Sphere3D`]
-    // transform: Option<Rc<Transform>>,
-
-    // Does the transform change the hand-ness of the coordinate system?
-    // transform_reverses: bool,
+    normal: Vector3D,    
 }
 
-// impl Intersect for Polygon3D {
-//     fn id(&self) -> &'static str {
-//         "polygon"
-//     }
-
-//     fn area(&self)->Float{
-//         self.area()
-//     }
-
-//     fn transform(&self)->&Option<Rc<Transform>>{
-//         &self.transform
-//     }
-
-//     fn intersect_local_ray(&self, ray: &Ray3D, o_error: Point3D, d_error: Point3D) -> Option<IntersectionInfo> {
-//         let p = self.outer[0];
-
-//         let poly_plane = Plane3D::new(p, self.normal);
-//         if let Some(t) = poly_plane.intersect(ray) {
-//             let intersection = ray.project(t);
-//             match self.test_point(intersection) {
-//                 Ok(is_in) => {
-//                     if is_in {
-//                         Some(t)
-//                     } else {
-//                         None
-//                     }
-//                 }
-//                 Err(e) => panic!("When intersecting Polygon3D: {}", e),
-//             }
-//         } else {
-//             None
-//         }
-//     }
-// }
 
 impl Polygon3D {
     /// Creates a new [`Loop3D`] without any holes
