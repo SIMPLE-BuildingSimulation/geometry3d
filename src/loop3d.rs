@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) 2021 Germán Molina
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 use crate::point3d::*;
 use crate::segment3d::*;
 use crate::vector3d::*;
@@ -288,35 +312,34 @@ impl Loop3D {
         let mut n_cross = 0;
         let n = self.vertices.len();
         for i in 0..n {
-            
-            let a = self.vertices[i];
-            let b = self.vertices[(i + 1) % n];
-            let s = Segment3D::new(a, b);
+            let vertex_a = self.vertices[i];
+            let vertex_b = self.vertices[(i + 1) % n];
+            let segment_ab = Segment3D::new(vertex_a, vertex_b);
 
             // Check if the point is in the segment.
-            if s.contains_point(point)? {
+            if segment_ab.contains_point(point)? {
                 return Ok(true);
             }
 
             // Check if the ray and the segment touch. We only consider
             // touching at the start (e.g., t_a between [0 and 1) ) in
             // order not to count vertices twice.
-            if let Some((t_a, t_b)) = s.get_intersection_pt(&ray) {                
+            if let Some((t_a, t_b)) = segment_ab.get_intersection_pt(&ray) {
                 // If the ray intersects
                 if (0. ..=1.).contains(&t_b) && (0. ..=1.).contains(&t_a) {
-                    if t_a < Float::EPSILON  {
+                    if t_a < Float::EPSILON {
                         // if the intersection is at the start of the segment
-                        let side_normal = d.cross(s.as_vector3d());
-                        if side_normal.is_same_direction(self.normal){                         
+                        let side_normal = d.cross(segment_ab.as_vector3d());
+                        if side_normal.is_same_direction(self.normal) {
                             n_cross += 1
                         }
-                    }else if t_a < 1.  {
-                        // intersection is within the segment (not including the end)                        
+                    } else if t_a < 1. {
+                        // intersection is within the segment (not including the end)
                         n_cross += 1;
-                    }else{
-                        // if the intersection is at the end of the segment                        
-                        let side_normal = d.cross(s.as_reversed_vector3d());
-                        if side_normal.is_same_direction(self.normal){                            
+                    } else {
+                        // if the intersection is at the end of the segment
+                        let side_normal = d.cross(segment_ab.as_reversed_vector3d());
+                        if side_normal.is_same_direction(self.normal) {
                             n_cross += 1
                         }
                     }
@@ -654,29 +677,27 @@ mod testing {
     }
 
     #[test]
-    fn test_point_through_vertex(){
+    fn test_point_through_vertex() {
         //Vector3D normal = Vector3D(0, 0, 1);
         let mut the_loop = Loop3D::new();
         let l = 1.;
         let bigl = 3.;
 
-        the_loop.push(Point3D::new(0.,0., 0.)).unwrap();
-        the_loop.push(Point3D::new(bigl, 0., 0.)).unwrap(); 
+        the_loop.push(Point3D::new(0., 0., 0.)).unwrap();
+        the_loop.push(Point3D::new(bigl, 0., 0.)).unwrap();
         the_loop.push(Point3D::new(bigl, bigl, 0.)).unwrap();
-        the_loop.push(Point3D::new(0., bigl, 0.)).unwrap(); 
-        the_loop.push(Point3D::new(0.,0., 0.)).unwrap();
-        
-        the_loop.push(Point3D::new(l,l, 0.)).unwrap();
-        the_loop.push(Point3D::new(l,2.*l, 0.)).unwrap();
-        the_loop.push(Point3D::new(2.*l,2.*l, 0.)).unwrap();
-        the_loop.push(Point3D::new(2.*l,l, 0.)).unwrap();
-        the_loop.push(Point3D::new(l,l, 0.)).unwrap();    
+        the_loop.push(Point3D::new(0., bigl, 0.)).unwrap();
+        the_loop.push(Point3D::new(0., 0., 0.)).unwrap();
+
+        the_loop.push(Point3D::new(l, l, 0.)).unwrap();
+        the_loop.push(Point3D::new(l, 2. * l, 0.)).unwrap();
+        the_loop.push(Point3D::new(2. * l, 2. * l, 0.)).unwrap();
+        the_loop.push(Point3D::new(2. * l, l, 0.)).unwrap();
+        the_loop.push(Point3D::new(l, l, 0.)).unwrap();
 
         the_loop.close().unwrap();
 
-        let r = the_loop
-            .test_point(Point3D::new(l / 2., l, 0.))
-            .unwrap();
+        let r = the_loop.test_point(Point3D::new(l / 2., l, 0.)).unwrap();
         assert!(r);
     }
 

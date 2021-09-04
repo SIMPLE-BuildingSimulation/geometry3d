@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) 2021 Germán Molina
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 use crate::gamma;
 use crate::point3d::Point3D;
 use crate::ray3d::Ray3D;
@@ -26,41 +50,41 @@ impl Default for Transform {
     }
 }
 
-fn mul4x4point(m: &[Float; 16], pt: Point3D) -> Point3D {
+fn mul4x4point(matrix: &[Float; 16], pt: Point3D) -> Point3D {
     let (x, y, z) = (pt.x, pt.y, pt.z);
-    let new_x = m[elem!(0, 0)] * x + m[elem!(0, 1)] * y + m[elem!(0, 2)] * z + m[elem!(0, 3)];
-    let new_y = m[elem!(1, 0)] * x + m[elem!(1, 1)] * y + m[elem!(1, 2)] * z + m[elem!(1, 3)];
-    let new_z = m[elem!(2, 0)] * x + m[elem!(2, 1)] * y + m[elem!(2, 2)] * z + m[elem!(2, 3)];
-    let w = m[elem!(3, 0)] * x + m[elem!(3, 1)] * y + m[elem!(3, 2)] * z + m[elem!(3, 3)];
+    let new_x = matrix[elem!(0, 0)] * x + matrix[elem!(0, 1)] * y + matrix[elem!(0, 2)] * z + matrix[elem!(0, 3)];
+    let new_y = matrix[elem!(1, 0)] * x + matrix[elem!(1, 1)] * y + matrix[elem!(1, 2)] * z + matrix[elem!(1, 3)];
+    let new_z = matrix[elem!(2, 0)] * x + matrix[elem!(2, 1)] * y + matrix[elem!(2, 2)] * z + matrix[elem!(2, 3)];
+    let w = matrix[elem!(3, 0)] * x + matrix[elem!(3, 1)] * y + matrix[elem!(3, 2)] * z + matrix[elem!(3, 3)];
 
     debug_assert!((1.0 - w.abs()) < 2. * Float::EPSILON);
 
     Point3D::new(new_x, new_y, new_z) / w
 }
 
-fn mul4x4vec(m: &[Float; 16], vec: Vector3D) -> Vector3D {
+fn mul4x4vec(matrix: &[Float; 16], vec: Vector3D) -> Vector3D {
     let (x, y, z) = (vec.x, vec.y, vec.z);
-    let new_x = m[elem!(0, 0)] * x + m[elem!(0, 1)] * y + m[elem!(0, 2)] * z;
-    let new_y = m[elem!(1, 0)] * x + m[elem!(1, 1)] * y + m[elem!(1, 2)] * z;
-    let new_z = m[elem!(2, 0)] * x + m[elem!(2, 1)] * y + m[elem!(2, 2)] * z;
+    let new_x = matrix[elem!(0, 0)] * x + matrix[elem!(0, 1)] * y + matrix[elem!(0, 2)] * z;
+    let new_y = matrix[elem!(1, 0)] * x + matrix[elem!(1, 1)] * y + matrix[elem!(1, 2)] * z;
+    let new_z = matrix[elem!(2, 0)] * x + matrix[elem!(2, 1)] * y + matrix[elem!(2, 2)] * z;
 
     Vector3D::new(new_x, new_y, new_z)
 }
 
-fn mul4x4_abs(m: &[Float; 16], x: Float, y: Float, z: Float) -> Point3D {
-    let err_x = (m[elem!(0, 0)] * x).abs()
-        + (m[elem!(0, 1)] * y).abs()
-        + (m[elem!(0, 2)] * z).abs()
-        + m[elem!(0, 3)].abs();
-    let err_y = (m[elem!(1, 0)] * x).abs()
-        + (m[elem!(1, 1)] * y).abs()
-        + (m[elem!(1, 2)] * z).abs()
-        + m[elem!(1, 3)].abs();
+fn mul4x4_abs(matrix: &[Float; 16], x: Float, y: Float, z: Float) -> Point3D {
+    let err_x = (matrix[elem!(0, 0)] * x).abs()
+        + (matrix[elem!(0, 1)] * y).abs()
+        + (matrix[elem!(0, 2)] * z).abs()
+        + matrix[elem!(0, 3)].abs();
+    let err_y = (matrix[elem!(1, 0)] * x).abs()
+        + (matrix[elem!(1, 1)] * y).abs()
+        + (matrix[elem!(1, 2)] * z).abs()
+        + matrix[elem!(1, 3)].abs();
 
-    let err_z = (m[elem!(2, 0)] * x).abs()
-        + (m[elem!(2, 1)] * y).abs()
-        + (m[elem!(2, 2)] * z).abs()
-        + m[elem!(2, 3)].abs();
+    let err_z = (matrix[elem!(2, 0)] * x).abs()
+        + (matrix[elem!(2, 1)] * y).abs()
+        + (matrix[elem!(2, 2)] * z).abs()
+        + matrix[elem!(2, 3)].abs();
 
     Point3D::new(err_x, err_y, err_z)
 }

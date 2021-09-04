@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) 2021 Germán Molina
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 use crate::Float;
 /*
     This section was heavily influenced by
@@ -32,7 +56,7 @@ impl Edge {
         }
     }
 
-    fn to_i(&self) -> usize {
+    fn as_i(&self) -> usize {
         match self {
             Self::Ab => 0,
             Self::Bc => 1,
@@ -45,7 +69,7 @@ impl std::ops::Add<usize> for Edge {
     type Output = Self;
 
     fn add(self, other: usize) -> Self {
-        let i = (self.to_i() + other) % 3;
+        let i = (self.as_i() + other) % 3;
         Self::from_i(i)
     }
 }
@@ -131,7 +155,7 @@ impl TriPiece {
 
         Ok(t)
     }
-    
+
     fn invalidate(&mut self) {
         self.valid = false
     }
@@ -192,7 +216,7 @@ impl Triangulation3D {
         }
     }
 
-    pub fn into_trilist(&self)->Vec<Triangle3D>{
+    pub fn get_trilist(&self) -> Vec<Triangle3D> {
         self.triangles.iter().map(|t| t.triangle).collect()
     }
 
@@ -218,10 +242,7 @@ impl Triangulation3D {
                 for edge_i in 0..3 {
                     let edge = self.triangles[this_i].triangle.segment(edge_i).unwrap();
 
-                    if let Some(_) = self.triangles[other_i]
-                        .triangle
-                        .get_edge_index_from_segment(&edge)
-                    {
+                    if self.triangles[other_i].triangle.get_edge_index_from_segment(&edge).is_some(){
                         self.mark_as_neighbours(this_i, Edge::from_i(edge_i), other_i)?;
                         break; // dont test other edges
                     }
@@ -334,7 +355,7 @@ impl Triangulation3D {
             return Err("Accessing invalid triangle within mark_as_neighbours()".to_string());
         }
         // Get segment... we should panic here, as this is not a user error
-        let seg1 = &self.triangles[i1].triangle.segment(edge_1.to_i()).unwrap();
+        let seg1 = &self.triangles[i1].triangle.segment(edge_1.as_i()).unwrap();
 
         // Check neighbour
         if !self.triangles[i2].valid {
@@ -442,9 +463,9 @@ impl Triangulation3D {
         }
 
         // get vertices
-        let vertex_a = tripiece.triangle.vertex(edge.to_i() % 3).unwrap();
-        let vertex_b = tripiece.triangle.vertex((edge.to_i() + 1) % 3).unwrap();
-        let vertex_c = tripiece.triangle.vertex((edge.to_i() + 2) % 3).unwrap();
+        let vertex_a = tripiece.triangle.vertex(edge.as_i() % 3).unwrap();
+        let vertex_b = tripiece.triangle.vertex((edge.as_i() + 1) % 3).unwrap();
+        let vertex_c = tripiece.triangle.vertex((edge.as_i() + 2) % 3).unwrap();
 
         // Get the oposite side
         let s = Segment3D::new(vertex_a, vertex_b);
@@ -469,7 +490,7 @@ impl Triangulation3D {
         }
     }
 
-    fn flip_diagonal(&mut self, index: usize, edge: Edge) {        
+    fn flip_diagonal(&mut self, index: usize, edge: Edge) {
         // The transformation is as follows:
         //         C                C
         //        /\               /|\
@@ -498,15 +519,15 @@ impl Triangulation3D {
         // get vertices
         let vertex_a = self.triangles[index]
             .triangle
-            .vertex(edge.to_i() % 3)
+            .vertex(edge.as_i() % 3)
             .unwrap();
         let vertex_b = self.triangles[index]
             .triangle
-            .vertex((edge.to_i() + 1) % 3)
+            .vertex((edge.as_i() + 1) % 3)
             .unwrap();
         let vertex_c = self.triangles[index]
             .triangle
-            .vertex((edge.to_i() + 2) % 3)
+            .vertex((edge.as_i() + 2) % 3)
             .unwrap();
         // ... including the oposite side
         let s = Segment3D::new(vertex_a, vertex_b);
@@ -628,7 +649,7 @@ impl Triangulation3D {
         triangle_index: usize,
         edge_to_split: Edge,
         p: Point3D,
-    ) -> Result<(), String> {        
+    ) -> Result<(), String> {
         // We are doing the following:
         //              C                    C
         //             /\                   /|\
@@ -648,7 +669,7 @@ impl Triangulation3D {
 
         let segment_to_split = self.triangles[triangle_index]
             .triangle
-            .segment(edge_to_split.to_i())
+            .segment(edge_to_split.as_i())
             .unwrap();
 
         // Neighbour... this is not necessarily there
@@ -764,7 +785,7 @@ impl Triangulation3D {
 
     /// Adds a point to the interior of a [`Triangle3D`], splitting
     /// it into three
-    fn split_triangle(&mut self, i: usize, point: Point3D) -> Result<(), String> {        
+    fn split_triangle(&mut self, i: usize, point: Point3D) -> Result<(), String> {
         // The transformation is as follows (puts P in the middle,
         // and splits the triangle into three triangles):
         //             A                A
@@ -815,7 +836,7 @@ impl Triangulation3D {
         self.invalidate(i).unwrap();
 
         // Add new triangles, noting their indices
-        // Indices of the new triangles        
+        // Indices of the new triangles
         let cap_i = self.push(vertex_c, vertex_a, point, 0).unwrap();
         let abp_i = self.push(vertex_a, vertex_b, point, 0).unwrap();
         let bcp_i = self.push(vertex_b, vertex_c, point, 0).unwrap();
@@ -854,7 +875,7 @@ impl Triangulation3D {
     /// Runs through the [`Triangulation3D`] checking if it is worth
     /// flipping diagonals. I.e., if flipping the diagonal would make
     /// the aspect ratios become better
-    fn restore_delaunay(&mut self, max_aspect_ratio: Float) {        
+    fn restore_delaunay(&mut self, max_aspect_ratio: Float) {
         // Flipping diagonals does not change the number of triangles.
         let n = self.triangles.len();
 
@@ -918,7 +939,7 @@ impl Triangulation3D {
         index: usize,
         point: Point3D,
         p_location: PointInTriangle,
-    ) -> bool {        
+    ) -> bool {
         if !self.triangles[index].valid {
             panic!("{}", "Trying to add point into an obsolete triangle");
         }
@@ -971,14 +992,15 @@ impl Triangulation3D {
 
     /// Refines a [`Triangulation3D`]. This only works if all then [`Triangle3D`] have their
     /// vertices in the same order, meaning that their `normal` points in the same direction.
-    fn refine(&mut self, max_area: Float, max_aspect_ratio: Float) -> Result<(), String> {        
+    fn refine(&mut self, max_area: Float, max_aspect_ratio: Float) -> Result<(), String> {
         // let n_triangles = self.n_triangles();
 
         let mut any_changes = false;
         for i in 0..self.n_triangles() {
             if !self.triangles[i].valid {
-                // continue;
-                assert!(false);
+                // I think validity of triangles is obsolete and we
+                // should remove it
+                unreachable!();
             }
 
             let area = self.triangles[i].triangle.area();
@@ -1008,7 +1030,6 @@ impl Triangulation3D {
                 self.restore_delaunay(max_aspect_ratio);
                 any_changes = true;
             } else if area > max_area {
-                
                 // try to add the circumcenter
                 let c_center = self.triangles[i].circumcenter;
 
@@ -1021,7 +1042,7 @@ impl Triangulation3D {
                             self.restore_delaunay(max_aspect_ratio);
                         }
                     }
-                    Err(_) => {                        
+                    Err(_) => {
                         // What should I do if the circumcenter is out of the polygon?
                         // For now just add the centroid of it...
                         let centroid = self.triangles[i].centroid;
@@ -1110,8 +1131,6 @@ mod testing {
         max_area: Float,
         max_aspect_ratio: Float,
     ) -> Result<(), String> {
-        
-
         // Test area.
         let mut triangulation_area = 0.;
         let polygon_normal = p.normal();
@@ -1250,7 +1269,6 @@ mod testing {
     // use crate::vector3d::Vector3D;
 
     fn draw_triangulation(filename: &str, cases: Vec<(&str, String)>) {
-        
         return;
 
         let mut file = File::create(format!("./test_data/{}", filename)).unwrap();
@@ -2084,7 +2102,7 @@ mod testing {
         let p = Point3D::new(0., 0., 0.);
 
         let mut t = Triangulation3D::new();
-        t.push(a, b, c, 0).unwrap(); //0        
+        t.push(a, b, c, 0).unwrap(); //0
         t.push(a, c, d, 0).unwrap(); //1
         t.push(b, a, opp, 0).unwrap(); //2
         t.push(a, e, opp, 0).unwrap(); //3
@@ -2111,18 +2129,18 @@ mod testing {
         let two_hemispheres_after = get_triangulation_svg(&t, -l, l, -l, l);
 
         // Check triangles.                          // INDEX:
-        let abc = Triangle3D::new(a, b, c).unwrap(); // Should not be there... replaced by APC        
-        let bao = Triangle3D::new(a, b, opp).unwrap(); // Should not be there... replaced by BPO        
+        let abc = Triangle3D::new(a, b, c).unwrap(); // Should not be there... replaced by APC
+        let bao = Triangle3D::new(a, b, opp).unwrap(); // Should not be there... replaced by BPO
 
         let apc = Triangle3D::new(a, p, c).unwrap(); // 0
         let apc_index = 0;
 
         let acd = Triangle3D::new(a, c, d).unwrap(); // 1
         let acd_index = 1;
-        
+
         let bpo = Triangle3D::new(p, b, opp).unwrap(); // 2
         let bpo_index = 2;
-        
+
         let aeo = Triangle3D::new(a, opp, e).unwrap(); // 3
         let aeo_index = 3;
 
@@ -2131,7 +2149,6 @@ mod testing {
 
         let pao = Triangle3D::new(p, a, opp).unwrap(); // 2
         let pao_index = 5;
-        
 
         // Check indexes (assigned above)... makes it
         // easier to check the neighbourhood.
@@ -2403,7 +2420,7 @@ mod testing {
         let case2 = get_svg(&t, &poly);
         test_triangulation_results(&t, &poly, 9999999., 9999999.).unwrap();
 
-        /* SOMEHOW MORE COMPLICATED CASE ... 6 vertices + hole */        
+        /* SOMEHOW MORE COMPLICATED CASE ... 6 vertices + hole */
         let p0 = Point3D::new(0., 0., 0.);
         let p1 = Point3D::new(3., 0., 0.);
         let p2 = Point3D::new(3., 3., 0.);

@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) 2021 Germán Molina
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 use crate::round_error::ApproxFloat;
 use crate::{Float, PI};
 
@@ -27,7 +51,6 @@ pub struct Cylinder3D {
 
     /// A pointer to the [`Transform`] associated with this [`Sphere3D`]
     transform: Option<Rc<Transform>>,
-
     // Does the transform change the hand-ness of the coordinate system?
     // transform_reverses: bool,
 }
@@ -38,7 +61,6 @@ impl Cylinder3D {
     }
 
     pub fn new_partial(p0: Point3D, p1: Point3D, radius: Float, phi_max: Float) -> Self {
-        
         let l = p1 - p0;
         let (x, y, z) = (l.x, l.y, l.z);
 
@@ -68,8 +90,8 @@ impl Cylinder3D {
                 zmin, zmax
             );
         }
-        let mut phi_max = phi_max;
-        if phi_max < -Float::EPSILON || phi_max > 360. + Float::EPSILON {
+        let mut phi_max = phi_max;        
+        if !(-Float::EPSILON..=360. + Float::EPSILON).contains(&phi_max){
             panic!("when creating a 'cylinder': given phi_max is not between 0 and 360 degrees (it was {})", phi_max);
         }
         phi_max = phi_max.clamp(0., 360.).to_radians();
@@ -84,8 +106,8 @@ impl Cylinder3D {
             zmin,
             zmax,
             phi_max,
+            transform,
             // transform_reverses,
-            transform: transform,
         }
     }
 
@@ -248,13 +270,13 @@ mod testing {
         let r = 2.1;
         let l = 3.2;
         let full_area = 2. * PI * r * l;
-        
+
         // Full cylinder
         let c = Cylinder3D::new_transformed(r, 0., l, 360., None);
         assert_eq!(c.area(), full_area);
 
         // Half a cylinder due to phi
         let c = Cylinder3D::new_transformed(r, 0., l, 180., None);
-        assert_eq!(c.area(), full_area/2.);
+        assert_eq!(c.area(), full_area / 2.);
     }
 }

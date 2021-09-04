@@ -1,34 +1,56 @@
+/*
+MIT License
+
+Copyright (c) 2021 Germán Molina
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 use crate::Float;
 
-fn next_float_up(v: Float) -> Float {
-    let mut v = v;
-
+fn next_float_up(mut v: Float) -> Float {
+    
     // Handle infinity and negative zero for _NextFloatUp()_
     if v.is_infinite() && v > 0. {
         return v;
     }
-    if v == -0.0 as Float {
+    if v.to_bits() == (-0.0 as Float).to_bits() {    
         v = 0. as Float;
     }
+    let mut ui = v.to_bits();
 
     // Advance _v_ to next higher float
-    let mut ui = v.to_bits();
     if v >= 0. {
         ui += 1;
     } else {
         ui -= 1;
     }
-    return Float::from_bits(ui);
+    Float::from_bits(ui)
 }
 
-fn next_float_down(v: Float) -> Float {
-    let mut v = v;
-
-    // Handle infinity and positive zero for _NextFloatDown()_
+fn next_float_down(mut v: Float) -> Float {
+    
+    
     if v.is_infinite() && v < 0. {
         return v;
     }
-    if v == 0.0 as Float {
+    if v.to_bits() == (0.0 as Float).to_bits() {
         v = -0.0 as Float;
     }
     let mut ui = v.to_bits();
@@ -37,7 +59,7 @@ fn next_float_down(v: Float) -> Float {
     } else {
         ui += 1;
     }
-    return Float::from_bits(ui);
+    Float::from_bits(ui)
 }
 
 #[macro_export]
@@ -137,7 +159,7 @@ impl ApproxFloat {
             return None;
         }
         let discr_sqrt = disc.sqrt();
-        
+
         // Use Muller's method for making this faster...
         let q: ApproxFloat;
         if b.as_float() < 0. {
@@ -209,11 +231,11 @@ impl std::ops::Sub<Float> for ApproxFloat {
 fn max_min(aux: &[Float; 4]) -> (Float, Float) {
     let mut min = aux[0];
     let mut max = aux[0];
-    for i in 1..4 {
-        if aux[i] < min {
-            min = aux[i];
-        } else if aux[i] > max {
-            max = aux[i];
+    for val in aux.iter() {
+        if *val < min {
+            min = *val;
+        } else if *val > max {
+            max = *val;
         }
     }
     (max, min)
@@ -427,13 +449,7 @@ mod testing {
                 return Err(format!("'adown' ({}) is larger than 'a' ({})", adown, a));
             }
 
-            // if (aup - a) > 100.*Float::EPSILON{
-            //     return Err(format!("Difference between 'aup' and 'a' ({}) is larger than Epsilon ({})", aup - a, Float::EPSILON))
-            // }
-
-            // if (a - adown) > 100.*Float::EPSILON{
-            //     return Err(format!("Difference between 'a' and 'adown' ({}) is larger than Epsilon ({})", a - adown, Float::EPSILON))
-            // }
+            
 
             Ok(())
         }

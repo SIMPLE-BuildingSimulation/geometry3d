@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) 2021 Germán Molina
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 use crate::point3d::Point3D;
 use crate::ray3d::Ray3D;
 use crate::transform::Transform;
@@ -25,7 +49,12 @@ impl SurfaceSide {
         } else if dot > 0. {
             (normal * -1., Self::Back)
         } else {
-            println!("overtrying get_normal... side... Normal = {}, raydir = {} | N*ray_dir = {}", normal, ray_dir, normal * ray_dir);
+            println!(
+                "overtrying get_normal... side... Normal = {}, raydir = {} | N*ray_dir = {}",
+                normal,
+                ray_dir,
+                normal * ray_dir
+            );
             // It is perpendicular, meaning that the dot product
             // gives us no information. We need a small hack: Deviate
             // the direction a bit, and try again
@@ -56,7 +85,6 @@ pub struct IntersectionInfo {
     pub p: Point3D,
 
     // pub perror: Point3D,
-
     /// The normal [`Vector3D`] at the interaction.
     /// Must have the value of (dpdu x dpdv).normalize() ... use
     /// ShadingInfo::new(..) and this is done automatically
@@ -82,8 +110,6 @@ pub struct IntersectionInfo {
 
     /// The position `v` of the intersection point
     pub v: Float,
-
-    
 }
 
 impl IntersectionInfo {
@@ -104,7 +130,7 @@ impl IntersectionInfo {
         let big_g = dpdv * dpdv;
         let normal = dpdv.cross(dpdu).get_normalized();
         let (normal, side) = SurfaceSide::get_side(normal, ray.direction);
-        
+
         let e = normal * d2p_duu;
         let f = normal * d2p_duv;
         let g = normal * d2p_dvv;
@@ -118,14 +144,14 @@ impl IntersectionInfo {
         // return
         Self {
             p,
-            u,
-            v,
+            normal,
+            side,
             dpdu,
             dpdv,
             dndu,
             dndv,
-            normal,
-            side,
+            u,
+            v,
         }
     }
 

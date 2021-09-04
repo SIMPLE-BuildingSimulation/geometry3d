@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) 2021 Germán Molina
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 use crate::{Float, PI};
 use std::rc::Rc;
 
@@ -35,7 +59,6 @@ pub struct Sphere3D {
 
     /// A pointer to the [`Transform`] associated with this [`Sphere3D`]
     transform: Option<Rc<Transform>>,
-
     // Does the transform change the hand-ness of the coordinate system?
     // transform_reverses: bool,
 }
@@ -54,11 +77,11 @@ impl Sphere3D {
 
     /// Gets the [`Point3D`] of the [`Sphere3D`] that represents its
     /// centre, after transformation.
-    pub fn centre(&self)-> Point3D {
-        let o = Point3D::new(0.,0.,0.);
-        match &self.transform{
-            None=>o,
-            Some(t)=>t.transform_pt(o)
+    pub fn centre(&self) -> Point3D {
+        let o = Point3D::new(0., 0., 0.);
+        match &self.transform {
+            None => o,
+            Some(t) => t.transform_pt(o),
         }
     }
 
@@ -123,7 +146,7 @@ impl Sphere3D {
             std::mem::swap(&mut theta_min, &mut theta_max);
         }
         let mut phi_max = phi_max;
-        if phi_max < -Float::EPSILON || phi_max > 360. + Float::EPSILON {
+        if !(-Float::EPSILON..=360. + Float::EPSILON).contains(&phi_max){
             panic!("when creating a 'sphere': given phi_max is not between 0 and 360 degrees (it was {})", phi_max);
         }
         phi_max = phi_max.clamp(0., 360.).to_radians();
@@ -140,8 +163,8 @@ impl Sphere3D {
             phi_max,
             theta_min,
             delta_theta: theta_max - theta_min,
+            transform,
             // transform_reverses,
-            transform: transform,
         }
     }
 
@@ -151,7 +174,7 @@ impl Sphere3D {
     //     _o_error: Point3D,
     //     _d_error: Point3D,
     // ) -> Option<(Point3D, Float)> {
-        
+
     //     let a = ray.direction * ray.direction;
     //     let b = 2.*(ray.origin * ray.direction);
     //     let c = ray.origin * ray.origin - self.radius*self.radius;
@@ -245,16 +268,19 @@ impl Sphere3D {
         let oy = ApproxFloat::from_value_and_error(ray.origin.y, o_error.y);
         let oz = ApproxFloat::from_value_and_error(ray.origin.z, o_error.z);
 
-        
         let a = dx * dx + dy * dy + dz * dz;
         let b = (ox * dx + oy * dy + oz * dz) * 2.;
         let c = ox * ox + oy * oy + oz * oz - self.radius * self.radius;
-        
+
         let (t0, t1) = ApproxFloat::solve_quadratic(a, b, c)?;
         #[cfg(debug_assertions)]
-        if t0.as_float().is_nan() || t1.as_float().is_nan() || t0.as_float().is_infinite() || t1.as_float().is_infinite(){
+        if t0.as_float().is_nan()
+            || t1.as_float().is_nan()
+            || t0.as_float().is_infinite()
+            || t1.as_float().is_infinite()
+        {
             panic!("After solve_quadratic in Sphere intersection: t0.as_float() = {}, t1.as_float() = {}", t0.as_float(), t1.as_float());
-        }        
+        }
         debug_assert!(t1.as_float() >= t0.as_float());
         // t0 < t1... so, check if they are possitive
         if t1.low <= 0.0 {
@@ -332,32 +358,32 @@ impl Sphere3D {
         phi: Float,
     ) -> Option<IntersectionInfo> {
         // auxiliar data
-        let x = phit.x;
-        let y = phit.y;
-        let z = phit.z;
+        let hit_x = phit.x;
+        let hit_y = phit.y;
+        let hit_z = phit.z;
         // let zrad = (phit.x*phit.x + phit.y*phit.y).sqrt();
         // let inv_zrad = 1./zrad;
 
-        let cos_theta = (z / self.radius).clamp(-1., 1.);
+        let cos_theta = (hit_z / self.radius).clamp(-1., 1.);
         let theta = cos_theta.acos();
         let sin_theta = theta.sin();
         let one_over_r_sin_theta = 1. / self.radius / sin_theta;
-        let cos_phi = x * one_over_r_sin_theta;
-        let sin_phi = y * one_over_r_sin_theta;
+        let cos_phi = hit_x * one_over_r_sin_theta;
+        let sin_phi = hit_y * one_over_r_sin_theta;
 
         // Calculate (u,v)
         let u = phi / self.phi_max;
         let v = (theta - self.theta_min) / self.delta_theta;
 
         // Calcuate first derivatives
-        let dpdu = Vector3D::new(-self.phi_max * y, self.phi_max * x, 0.);
+        let dpdu = Vector3D::new(-self.phi_max * hit_y, self.phi_max * hit_x, 0.);
         let dpdv =
-            Vector3D::new(z * cos_phi, z * sin_phi, -self.radius * sin_theta) * self.delta_theta;
+            Vector3D::new(hit_z * cos_phi, hit_z * sin_phi, -self.radius * sin_theta) * self.delta_theta;
 
         // Calculate second derivatives
-        let d2p_duu = Vector3D::new(x, y, 0.) * (-self.phi_max * self.phi_max);
-        let d2p_duv = Vector3D::new(-sin_phi, cos_phi, 0.) * (self.delta_theta * z * self.phi_max);
-        let d2p_dvv = Vector3D::new(x, y, z) * (-self.delta_theta * self.delta_theta);
+        let d2p_duu = Vector3D::new(hit_x, hit_y, 0.) * (-self.phi_max * self.phi_max);
+        let d2p_duv = Vector3D::new(-sin_phi, cos_phi, 0.) * (self.delta_theta * hit_z * self.phi_max);
+        let d2p_dvv = Vector3D::new(hit_x, hit_y, hit_z) * (-self.delta_theta * self.delta_theta);
 
         // return
         Some(IntersectionInfo::new(
@@ -430,20 +456,16 @@ mod testing {
         let centre = Point3D::new(2.1, 1.2, -2.);
         let s = Sphere3D::new(PI, centre);
         assert_eq!(centre, s.centre());
-        
     }
-
 
     #[test]
     fn test_sphere_area() {
-        
         let r = 123.512;
-        let full_area = 4.*PI*r*r;
+        let full_area = 4. * PI * r * r;
 
         // Full sphere
         let s = Sphere3D::new_partial(r, Point3D::new(0., 0., 0.), -r, r, 360.);
         assert_eq!(s.area(), full_area);
-
 
         // Half sphere, due to Z
         let s = Sphere3D::new_partial(r, Point3D::new(0., 0., 0.), 0., r, 360.);
@@ -458,11 +480,7 @@ mod testing {
         // Quarter sphere due to Phi
         let s = Sphere3D::new_partial(r, Point3D::new(0., 0., 0.), -r, r, 90.);
         assert_eq!(s.area(), full_area / 4.);
-        
-
     }
-
-    
 
     #[test]
     fn test_sphere_intersect() {
@@ -506,7 +524,6 @@ mod testing {
             }
             Ok(())
         }
-        
 
         fn vectors_are_close(p1: Vector3D, p2: Vector3D) -> Result<(), String> {
             let d = (p1 - p2).length();
@@ -617,7 +634,7 @@ mod testing {
             origin,
             direction: Vector3D::new(0., 1., 0.),
         };
-        if let Some(info) = sphere.intersect(&ray) {            
+        if let Some(info) = sphere.intersect(&ray) {
             points_are_close(exp.unwrap(), info.p).unwrap();
             assert!(matches![info.side, SurfaceSide::Front]);
             assert!(info.normal.z > 0.);
@@ -637,7 +654,7 @@ mod testing {
         };
         if let Some(info) = sphere.intersect(&ray) {
             points_are_close(exp.unwrap(), info.p).unwrap();
-            assert!(matches![info.side, SurfaceSide::Back]);            
+            assert!(matches![info.side, SurfaceSide::Back]);
             assert!(info.normal.z < 0.);
         } else {
             panic!("Wrong intersection!!")
