@@ -49,7 +49,7 @@ pub struct Cylinder3D {
     /// The range of longitudes allowed (2*PI radians in a full [`Cylinder3D`], less in a partial one)
     phi_max: Float,
 
-    /// A pointer to the [`Transform`] associated with this [`Sphere3D`]
+    /// A pointer to the [`Transform`] associated with this [`Cylinder3D`]
     transform: Option<Rc<Transform>>,
     // Does the transform change the hand-ness of the coordinate system?
     // transform_reverses: bool,

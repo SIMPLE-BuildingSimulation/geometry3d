@@ -50,7 +50,7 @@ pub struct DistantSource3D {
     /// Tan of half angle
     tan_half_alpha: Float,
 
-    /// A pointer to the [`Transform`] associated with this [`Sphere3D`]
+    /// A pointer to the [`Transform`] associated with this [`DistantSource3D`]
     transform: Option<Rc<Transform>>,
     // Does the transform change the hand-ness of the coordinate system?
     // transform_reverses: bool,

@@ -246,7 +246,7 @@ impl Transform {
         ret
     }
 
-    /// Checks whether a [`Transformation`] modifies the hand-ness of the coordinate system
+    /// Checks whether a [`Transform`] modifies the hand-ness of the coordinate system
     pub fn changes_hands(&self) -> bool {
         let m = &self.elements;
         let determinant = m[elem!(0, 0)]

@@ -72,7 +72,7 @@ macro_rules! gamma {
     }};
 }
 
-/// Contains a [`Float`] value as well as an error
+/// Contains a `Float` value as well as an error
 /// interval.
 #[derive(Clone, Copy)]
 pub struct ApproxFloat {

@@ -213,7 +213,7 @@ pub trait Intersect {
         d_error: Point3D,
     ) -> Option<IntersectionInfo>;
 
-    /// Like [`intersect_local_ray`] but simplified because there is not need
+    /// Like `intersect_local_ray` but simplified because there is not need
     /// for calcuating the paramtrisized elements
     fn simple_intersect_local_ray(
         &self,
