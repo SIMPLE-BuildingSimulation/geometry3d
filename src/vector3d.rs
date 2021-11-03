@@ -24,7 +24,7 @@ SOFTWARE.
 
 use crate::Float;
 
-use crate::point3d::Point3D;
+use crate::Point3D;
 use std::fmt;
 
 #[derive(Debug, Copy, Clone, PartialEq)]

@@ -24,7 +24,7 @@ SOFTWARE.
 
 use crate::Float;
 
-use crate::vector3d::*;
+use crate::Vector3D;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Point3D {

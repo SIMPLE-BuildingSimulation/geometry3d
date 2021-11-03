@@ -22,8 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::point3d::*;
-use crate::vector3d::Vector3D;
+use crate::{
+    Point3D,
+    Vector3D
+};
 use crate::Float;
 
 /// An imaginary line starting at one [`Point3D`] and ending
@@ -149,8 +151,8 @@ impl Segment3D {
     /// # Examples
     ///
     /// ```
-    /// use geometry3d::point3d::Point3D;
-    /// use geometry3d::segment3d::Segment3D;
+    /// use geometry3d::Point3D;
+    /// use geometry3d::Segment3D;
     ///
     /// let vertical = Segment3D::new(Point3D::new(0., 0., -1.), Point3D::new(0., 0., 1.));
     /// let horizontal = Segment3D::new(Point3D::new(-1., 0., 0.), Point3D::new(1., 0., 0.));

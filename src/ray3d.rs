@@ -22,8 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::point3d::Point3D;
-use crate::vector3d::Vector3D;
+use crate::{
+    Point3D,
+    Vector3D
+};
+
 use crate::Float;
 
 pub struct Ray3D {

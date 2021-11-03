@@ -25,11 +25,13 @@ SOFTWARE.
 use std::rc::Rc;
 
 use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
-use crate::point3d::*;
-use crate::ray3d::Ray3D;
-use crate::segment3d::*;
-use crate::transform::Transform;
-use crate::vector3d::Vector3D;
+use crate::{
+    Point3D,
+    Ray3D,
+    Segment3D,
+    Transform,
+    Vector3D
+};
 use crate::Float;
 
 /// Intersects a [`Ray3D`] in local coordinates with Triangle described by the

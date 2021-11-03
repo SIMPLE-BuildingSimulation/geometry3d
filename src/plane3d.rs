@@ -23,10 +23,12 @@ SOFTWARE.
 */
 
 use crate::Float;
-// use crate::intersect_trait::{Intersect, SurfaceSide};
-use crate::point3d::Point3D;
-use crate::ray3d::Ray3D;
-use crate::vector3d::Vector3D;
+
+use crate::{
+    Point3D,
+    Ray3D,
+    Vector3D
+};
 
 /// Describes a plane based on a [`Point3D`] (`P`) contained in the plane and
 /// a [`Vector3D`] (`N`) normal to the plane.

@@ -26,11 +26,13 @@ use crate::{Float, PI};
 use std::rc::Rc;
 
 use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
-use crate::plane3d::Plane3D;
-use crate::point3d::Point3D;
-use crate::ray3d::Ray3D;
-use crate::transform::Transform;
-use crate::vector3d::Vector3D;
+use crate::{
+    Plane3D,
+    Ray3D,
+    Point3D,
+    Transform,
+    Vector3D
+};
 
 /// A disk of radius `radius` whose normal points in the
 /// `normal` direction, located at a height `height`. Can have a

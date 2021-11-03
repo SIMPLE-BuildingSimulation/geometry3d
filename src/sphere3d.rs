@@ -26,12 +26,13 @@ use crate::{Float, PI};
 use std::rc::Rc;
 
 use crate::intersect_trait::{Intersect, IntersectionInfo};
-use crate::point3d::Point3D;
-use crate::ray3d::Ray3D;
+use crate::{
+    Point3D,
+    Ray3D,
+    Transform,
+    Vector3D
+};
 use crate::round_error::ApproxFloat;
-use crate::transform::Transform;
-use crate::vector3d::Vector3D;
-// use crate::utils::solve_quadratic;
 
 /// A Full or Partial sphere in three dimensions, centered at the origin
 ///

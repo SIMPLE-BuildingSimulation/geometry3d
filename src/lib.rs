@@ -38,20 +38,51 @@ type Float = f64;
 #[cfg(not(feature = "float"))]
 const PI: Float = std::f64::consts::PI;
 
-pub mod cylinder3d;
-pub mod disk3d;
-pub mod distant_source3d;
-pub mod intersect_trait;
-pub mod loop3d;
-pub mod plane3d;
-pub mod point3d;
-pub mod polygon3d;
-pub mod ray3d;
-pub mod round_error;
-pub mod segment3d;
-pub mod sphere3d;
-pub mod transform;
-pub mod triangle3d;
-pub mod triangulation3d;
+
 mod utils;
-pub mod vector3d;
+pub mod intersect_trait;
+pub mod round_error;
+
+
+// Objects
+mod cylinder3d;
+pub use cylinder3d::Cylinder3D;
+
+mod disk3d;
+pub use disk3d::Disk3D;
+
+mod distant_source3d;
+pub use distant_source3d::DistantSource3D;
+
+mod loop3d;
+pub use loop3d::Loop3D;
+
+mod plane3d;
+pub use plane3d::Plane3D;
+
+mod point3d;
+pub use point3d::Point3D;
+
+mod polygon3d;
+pub use polygon3d::Polygon3D;
+
+mod ray3d;
+pub use ray3d::Ray3D;
+
+mod segment3d;
+pub use segment3d::Segment3D;
+
+mod sphere3d;
+pub use sphere3d::Sphere3D;
+
+mod transform;
+pub use transform::Transform;
+
+mod triangle3d;
+pub use triangle3d::{Triangle3D, PointInTriangle};
+
+mod triangulation3d;
+pub use triangulation3d::Triangulation3D;
+
+mod vector3d;
+pub use vector3d::Vector3D;

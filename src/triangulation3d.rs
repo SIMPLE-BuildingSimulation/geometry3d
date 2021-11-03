@@ -31,10 +31,12 @@ use crate::Float;
 
 */
 
-use crate::point3d::*;
-use crate::polygon3d::*;
-use crate::segment3d::*;
-use crate::triangle3d::*;
+use crate::{
+    Point3D,
+    Polygon3D,
+    Segment3D,
+    Triangle3D,PointInTriangle
+};
 
 #[derive(Clone, Copy, Eq, PartialEq, Debug)]
 #[repr(u8)]
@@ -1123,7 +1125,7 @@ pub fn is_convex(a: Point3D, b: Point3D, c: Point3D, d: Point3D) -> bool {
 #[cfg(test)]
 mod testing {
     use super::*;
-    use crate::loop3d::*;
+    use crate::Loop3D;
 
     fn test_triangulation_results(
         t: &Triangulation3D,
@@ -1266,7 +1268,6 @@ mod testing {
 
     use std::fs::File;
     use std::io::prelude::*;
-    // use crate::vector3d::Vector3D;
 
     fn draw_triangulation(filename: &str, cases: Vec<(&str, String)>) {
         return;

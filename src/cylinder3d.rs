@@ -26,10 +26,12 @@ use crate::round_error::ApproxFloat;
 use crate::{Float, PI};
 
 use crate::intersect_trait::{Intersect, IntersectionInfo};
-use crate::point3d::Point3D;
-use crate::ray3d::Ray3D;
-use crate::transform::Transform;
-use crate::vector3d::Vector3D;
+use crate::{
+    Point3D,
+    Ray3D,
+    Transform,
+    Vector3D
+};
 use std::rc::Rc;
 
 /// A Cylinder of radius `radius` aligned witht the Z axis, starting at a

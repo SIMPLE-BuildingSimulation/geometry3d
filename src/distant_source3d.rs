@@ -22,12 +22,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::disk3d::Disk3D;
 use crate::intersect_trait::{Intersect, IntersectionInfo};
-use crate::point3d::Point3D;
-use crate::ray3d::Ray3D;
-use crate::transform::Transform;
-use crate::vector3d::Vector3D;
+
+use crate::{
+    Disk3D,
+    Point3D,
+    Ray3D,
+    Transform,
+    Vector3D
+};
+
 use crate::{Float, PI};
 use std::rc::Rc;
 

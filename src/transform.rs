@@ -23,9 +23,11 @@ SOFTWARE.
 */
 
 use crate::gamma;
-use crate::point3d::Point3D;
-use crate::ray3d::Ray3D;
-use crate::vector3d::Vector3D;
+use crate::{
+    Point3D,
+    Ray3D,
+    Vector3D
+};
 use crate::Float;
 
 macro_rules! elem {

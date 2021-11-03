@@ -22,10 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::loop3d::Loop3D;
-use crate::point3d::Point3D;
-use crate::segment3d::Segment3D;
-use crate::vector3d::Vector3D;
+use crate::{
+    Loop3D,
+    Point3D,
+    Segment3D,
+    Vector3D
+};
 use crate::Float;
 
 #[derive(Clone)]
