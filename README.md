@@ -1,5 +1,10 @@
 # Geometry 3D Library
 
+![build badge](https://github.com/SIMPLE-BuildingSimulation/geometry3d/actions/workflows/build.yaml/badge.svg)
+![docs badge](https://github.com/SIMPLE-BuildingSimulation/geometry3d/actions/workflows/docs.yaml/badge.svg)
+![tests badge](https://github.com/SIMPLE-BuildingSimulation/geometry3d/actions/workflows/tests.yaml/badge.svg)
+
+
 This library has several 3D Geometry functionalities. E.g.,
 
 * Points
