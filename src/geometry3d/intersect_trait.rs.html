@@ -348,12 +348,6 @@
 <span id="314">314</span>
 <span id="315">315</span>
 <span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -407,13 +401,7 @@ SOFTWARE.
             (<span class="ident">normal</span>, <span class="ident"><span class="self">Self</span>::Front</span>)
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">dot</span> <span class="op">&gt;</span> <span class="number">0.</span> {
             (<span class="ident">normal</span> <span class="op">*</span> <span class="op">-</span><span class="number">1.</span>, <span class="ident"><span class="self">Self</span>::Back</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">println!</span>(
-                <span class="string">&quot;overtrying get_normal... side... Normal = {}, raydir = {} | N*ray_dir = {}&quot;</span>,
-                <span class="ident">normal</span>,
-                <span class="ident">ray_dir</span>,
-                <span class="ident">normal</span> <span class="op">*</span> <span class="ident">ray_dir</span>
-            );
+        } <span class="kw">else</span> {            
             <span class="comment">// It is perpendicular, meaning that the dot product</span>
             <span class="comment">// gives us no information. We need a small hack: Deviate</span>
             <span class="comment">// the direction a bit, and try again</span>
