@@ -51,13 +51,7 @@ impl SurfaceSide {
             (normal, Self::Front)
         } else if dot > 0. {
             (normal * -1., Self::Back)
-        } else {
-            println!(
-                "overtrying get_normal... side... Normal = {}, raydir = {} | N*ray_dir = {}",
-                normal,
-                ray_dir,
-                normal * ray_dir
-            );
+        } else {            
             // It is perpendicular, meaning that the dot product
             // gives us no information. We need a small hack: Deviate
             // the direction a bit, and try again
