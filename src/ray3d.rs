@@ -29,6 +29,7 @@ use crate::{
 
 use crate::Float;
 
+#[derive(Debug, Copy, Clone)]
 pub struct Ray3D {
     pub origin: Point3D,
     pub direction: Vector3D,
