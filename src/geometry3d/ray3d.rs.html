@@ -81,6 +81,7 @@
 <span id="47">47</span>
 <span id="48">48</span>
 <span id="49">49</span>
+<span id="50">50</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -112,6 +113,7 @@ SOFTWARE.
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ray3D</span> {
     <span class="kw">pub</span> <span class="ident">origin</span>: <span class="ident">Point3D</span>,
     <span class="kw">pub</span> <span class="ident">direction</span>: <span class="ident">Vector3D</span>,
