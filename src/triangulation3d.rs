@@ -1657,7 +1657,7 @@ mod testing {
         t.push(b, c, d, last_added).unwrap();
 
         // Borrow the first one.
-        &t.triangles[0];
+        let _a = &t.triangles[0];
     }
 
     #[test]
