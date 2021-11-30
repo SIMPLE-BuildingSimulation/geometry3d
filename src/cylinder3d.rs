@@ -14,7 +14,7 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERefCountHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
@@ -32,7 +32,7 @@ use crate::{
     Transform,
     Vector3D
 };
-use std::rc::Rc;
+use crate::RefCount;
 
 /// A Cylinder of radius `radius` aligned witht the Z axis, starting at a
 /// Z value of `zmin` and ending at `zmax`.
@@ -52,7 +52,7 @@ pub struct Cylinder3D {
     phi_max: Float,
 
     /// A pointer to the [`Transform`] associated with this [`Cylinder3D`]
-    transform: Option<Rc<Transform>>,
+    transform: Option<RefCount<Transform>>,
     // Does the transform change the hand-ness of the coordinate system?
     // transform_reverses: bool,
 }
@@ -75,7 +75,7 @@ impl Cylinder3D {
         transform *= Transform::rotate_y(rot_y_degrees);
         transform *= Transform::rotate_z(rot_z_degrees);
 
-        Self::new_transformed(radius, 0., l.length(), phi_max, Some(Rc::new(transform)))
+        Self::new_transformed(radius, 0., l.length(), phi_max, Some(RefCount::new(transform)))
     }
 
     /// The angle `phi_max` is in degrees
@@ -84,7 +84,7 @@ impl Cylinder3D {
         zmin: Float,
         zmax: Float,
         phi_max: Float,
-        transform: Option<Rc<Transform>>,
+        transform: Option<RefCount<Transform>>,
     ) -> Self {
         if zmin > zmax {
             panic!(
@@ -235,7 +235,7 @@ impl Intersect for Cylinder3D {
         (self.zmax - self.zmin) * self.radius * self.phi_max
     }
 
-    fn transform(&self) -> &Option<Rc<Transform>> {
+    fn transform(&self) -> &Option<RefCount<Transform>> {
         &self.transform
     }
 

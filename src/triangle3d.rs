@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use std::rc::Rc;
+use crate::RefCount;
 
 use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
 use crate::{
@@ -455,7 +455,7 @@ impl Intersect for Triangle3D {
         "triangle"
     }
 
-    fn transform(&self) -> &Option<Rc<Transform>> {
+    fn transform(&self) -> &Option<RefCount<Transform>> {
         &None
     }
 

@@ -38,6 +38,10 @@ type Float = f64;
 #[cfg(not(feature = "float"))]
 const PI: Float = std::f64::consts::PI;
 
+#[cfg(feature = "parallel")]
+type RefCount<T> = std::sync::Arc<T>;
+#[cfg(not(feature = "parallel"))]
+type RefCount<T> = std::rc::Rc<T>;
 
 mod utils;
 pub mod intersect_trait;

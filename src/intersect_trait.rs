@@ -14,7 +14,7 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERefCountHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
@@ -30,7 +30,7 @@ use crate::{
 };
 
 use crate::Float;
-use std::rc::Rc;
+use crate::RefCount;
 
 /// Is the [`Ray3D`] intersecting from the Front or Back side?
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -189,7 +189,7 @@ pub trait Intersect {
     fn area(&self) -> Float;
 
     /// Borrows the [`Transform`]
-    fn transform(&self) -> &Option<Rc<Transform>>;
+    fn transform(&self) -> &Option<RefCount<Transform>>;
 
     /// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance
     /// `t` and the normal [`Vector3D`] at that point. If the distance

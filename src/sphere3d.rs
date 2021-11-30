@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 use crate::{Float, PI};
-use std::rc::Rc;
+use crate::RefCount;
 
 use crate::intersect_trait::{Intersect, IntersectionInfo};
 use crate::{
@@ -59,7 +59,7 @@ pub struct Sphere3D {
     theta_min: Float,
 
     /// A pointer to the [`Transform`] associated with this [`Sphere3D`]
-    transform: Option<Rc<Transform>>,
+    transform: Option<RefCount<Transform>>,
     // Does the transform change the hand-ness of the coordinate system?
     // transform_reverses: bool,
 }
@@ -88,7 +88,7 @@ impl Sphere3D {
 
     /// Creates a new full [`Sphere3D`] of a certain `radius` and
     /// transformed according to a [`Transform`].         
-    pub fn new_transformed(radius: Float, transform: Option<Rc<Transform>>) -> Self {
+    pub fn new_transformed(radius: Float, transform: Option<RefCount<Transform>>) -> Self {
         Self::new_partial_transformed(radius, -2. * radius, 2. * radius, 360., transform)
     }
 
@@ -110,10 +110,10 @@ impl Sphere3D {
         phi_max: Float,
     ) -> Self {
         // Process transformation
-        let mut transform: Option<Rc<Transform>> = None;
+        let mut transform: Option<RefCount<Transform>> = None;
         if !centre.is_zero() {
             let tr = Transform::translate(centre.x, centre.y, centre.z);
-            transform = Some(Rc::new(tr));
+            transform = Some(RefCount::new(tr));
         }
 
         Self::new_partial_transformed(radius, zmin, zmax, phi_max, transform)
@@ -129,7 +129,7 @@ impl Sphere3D {
         zmin: Float,
         zmax: Float,
         phi_max: Float,
-        transform: Option<Rc<Transform>>,
+        transform: Option<RefCount<Transform>>,
     ) -> Self {
         let mut zmin = zmin;
         let mut zmax = zmax;
@@ -402,7 +402,7 @@ impl Intersect for Sphere3D {
         self.phi_max * self.radius * (self.zmax - self.zmin)
     }
 
-    fn transform(&self) -> &Option<Rc<Transform>> {
+    fn transform(&self) -> &Option<RefCount<Transform>> {
         &self.transform
     }
 

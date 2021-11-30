@@ -14,7 +14,7 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERefCountHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
@@ -33,13 +33,13 @@ use crate::{
 };
 
 use crate::{Float, PI};
-use std::rc::Rc;
+use crate::RefCount;
 
 /// Represents a solid angle pointing from any [`Point3D`] in the scene towards
 /// a certain `direction` (i.e., a [`Vector3D`]). So, this is not really a surface
 /// because it is at an infinite distance from any point.
 pub struct DistantSource3D {
-    /// The direction pointing to the source
+    /// The direction pointing to the souRefCounte
     pub direction: Vector3D,
 
     /// The solid angle in Sr
@@ -54,17 +54,17 @@ pub struct DistantSource3D {
     /// Tan of half angle
     tan_half_alpha: Float,
 
-    /// A pointer to the [`Transform`] associated with this [`DistantSource3D`]
-    transform: Option<Rc<Transform>>,
+    /// A pointer to the [`Transform`] associated with this [`DistantSouRefCounte3D`]
+    transform: Option<RefCount<Transform>>,
     // Does the transform change the hand-ness of the coordinate system?
     // transform_reverses: bool,
 }
 
 impl DistantSource3D {
-    /// Creates a new [`DistantSource3D`] geometry.
+    /// Creates a new [`DistantSouRefCounte3D`] geometry.
     ///
     /// # Inputs:
-    /// * direction: A [`Vector3D`] pointing to the source
+    /// * direction: A [`Vector3D`] pointing to the souRefCounte
     /// * angle: The flat angle in Radians (e.g., a hemisphere would be $`\pi`$)
     pub fn new(direction: Vector3D, angle: Float) -> Self {
         let tan_half_alpha = (angle / 2.0).tan();
@@ -94,14 +94,14 @@ impl DistantSource3D {
 
 impl Intersect for DistantSource3D {
     fn id(&self) -> &'static str {
-        "source"
+        "souRefCounte"
     }
 
     fn area(&self) -> Float {
         Float::MAX
     }
 
-    fn transform(&self) -> &Option<Rc<Transform>> {
+    fn transform(&self) -> &Option<RefCount<Transform>> {
         &self.transform
     }
 

@@ -14,7 +14,7 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERefCountHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 use crate::{Float, PI};
-use std::rc::Rc;
+use crate::RefCount;
 
 use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
 use crate::{
@@ -58,7 +58,7 @@ pub struct Disk3D {
     phi_max: Float,
 
     /// A pointer to the [`Transform`] associated with this [`Disk3D`]
-    transform: Option<Rc<Transform>>,
+    transform: Option<RefCount<Transform>>,
     // Does the transform change the hand-ness of the coordinate system?
     // transform_reverses: bool,
 }
@@ -83,7 +83,7 @@ impl Disk3D {
         inner_radius: Float,
         phi_zero: Vector3D,
         phi_max: Float,
-        transform: Option<Rc<Transform>>,
+        transform: Option<RefCount<Transform>>,
     ) -> Self {
         // Normalize
         let normal = normal.get_normalized();
@@ -227,7 +227,7 @@ impl Intersect for Disk3D {
         self.phi_max * 0.5 * (self.radius * self.radius - self.inner_radius * self.inner_radius)
     }
 
-    fn transform(&self) -> &Option<Rc<Transform>> {
+    fn transform(&self) -> &Option<RefCount<Transform>> {
         &self.transform
     }
 
