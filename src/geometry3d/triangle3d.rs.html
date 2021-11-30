@@ -881,7 +881,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */</span>
 
-<span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::intersect_trait</span>::{<span class="ident">Intersect</span>, <span class="ident">IntersectionInfo</span>, <span class="ident">SurfaceSide</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1314,7 +1314,7 @@ SOFTWARE.
         <span class="string">&quot;triangle&quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="prelude-val">None</span>
     }
 

@@ -364,7 +364,7 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERefCountHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
@@ -380,7 +380,7 @@ SOFTWARE.
 };
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
-<span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
 
 <span class="doccomment">/// Is the [`Ray3D`] intersecting from the Front or Back side?</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
@@ -539,7 +539,7 @@ SOFTWARE.
     <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span>;
 
     <span class="doccomment">/// Borrows the [`Transform`]</span>
-    <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance</span>
     <span class="doccomment">/// `t` and the normal [`Vector3D`] at that point. If the distance</span>

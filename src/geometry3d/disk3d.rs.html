@@ -316,7 +316,7 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERefCountHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
@@ -325,7 +325,7 @@ SOFTWARE.
 */</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Float</span>, <span class="ident">PI</span>};
-<span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::intersect_trait</span>::{<span class="ident">Intersect</span>, <span class="ident">IntersectionInfo</span>, <span class="ident">SurfaceSide</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -360,7 +360,7 @@ SOFTWARE.
     <span class="ident">phi_max</span>: <span class="ident">Float</span>,
 
     <span class="doccomment">/// A pointer to the [`Transform`] associated with this [`Disk3D`]</span>
-    <span class="ident">transform</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">transform</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="comment">// Does the transform change the hand-ness of the coordinate system?</span>
     <span class="comment">// transform_reverses: bool,</span>
 }
@@ -385,7 +385,7 @@ SOFTWARE.
         <span class="ident">inner_radius</span>: <span class="ident">Float</span>,
         <span class="ident">phi_zero</span>: <span class="ident">Vector3D</span>,
         <span class="ident">phi_max</span>: <span class="ident">Float</span>,
-        <span class="ident">transform</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">transform</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="comment">// Normalize</span>
         <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="ident">normal</span>.<span class="ident">get_normalized</span>();
@@ -529,7 +529,7 @@ SOFTWARE.
         <span class="self">self</span>.<span class="ident">phi_max</span> <span class="op">*</span> <span class="number">0.5</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">radius</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">radius</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">inner_radius</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">inner_radius</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">transform</span>
     }
 

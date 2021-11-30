@@ -200,7 +200,7 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERefCountHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
@@ -219,13 +219,13 @@ SOFTWARE.
 };
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Float</span>, <span class="ident">PI</span>};
-<span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
 
 <span class="doccomment">/// Represents a solid angle pointing from any [`Point3D`] in the scene towards</span>
 <span class="doccomment">/// a certain `direction` (i.e., a [`Vector3D`]). So, this is not really a surface</span>
 <span class="doccomment">/// because it is at an infinite distance from any point.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DistantSource3D</span> {
-    <span class="doccomment">/// The direction pointing to the source</span>
+    <span class="doccomment">/// The direction pointing to the souRefCounte</span>
     <span class="kw">pub</span> <span class="ident">direction</span>: <span class="ident">Vector3D</span>,
 
     <span class="doccomment">/// The solid angle in Sr</span>
@@ -240,17 +240,17 @@ SOFTWARE.
     <span class="doccomment">/// Tan of half angle</span>
     <span class="ident">tan_half_alpha</span>: <span class="ident">Float</span>,
 
-    <span class="doccomment">/// A pointer to the [`Transform`] associated with this [`DistantSource3D`]</span>
-    <span class="ident">transform</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A pointer to the [`Transform`] associated with this [`DistantSouRefCounte3D`]</span>
+    <span class="ident">transform</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="comment">// Does the transform change the hand-ness of the coordinate system?</span>
     <span class="comment">// transform_reverses: bool,</span>
 }
 
 <span class="kw">impl</span> <span class="ident">DistantSource3D</span> {
-    <span class="doccomment">/// Creates a new [`DistantSource3D`] geometry.</span>
+    <span class="doccomment">/// Creates a new [`DistantSouRefCounte3D`] geometry.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Inputs:</span>
-    <span class="doccomment">/// * direction: A [`Vector3D`] pointing to the source</span>
+    <span class="doccomment">/// * direction: A [`Vector3D`] pointing to the souRefCounte</span>
     <span class="doccomment">/// * angle: The flat angle in Radians (e.g., a hemisphere would be $`\pi`$)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">direction</span>: <span class="ident">Vector3D</span>, <span class="ident">angle</span>: <span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">tan_half_alpha</span> <span class="op">=</span> (<span class="ident">angle</span> <span class="op">/</span> <span class="number">2.0</span>).<span class="ident">tan</span>();
@@ -280,14 +280,14 @@ SOFTWARE.
 
 <span class="kw">impl</span> <span class="ident">Intersect</span> <span class="kw">for</span> <span class="ident">DistantSource3D</span> {
     <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;source&quot;</span>
+        <span class="string">&quot;souRefCounte&quot;</span>
     }
 
     <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span> {
         <span class="ident">Float::MAX</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">transform</span>
     }
 
