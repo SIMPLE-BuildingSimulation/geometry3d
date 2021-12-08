@@ -348,6 +348,10 @@
 <span id="314">314</span>
 <span id="315">315</span>
 <span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -387,6 +391,7 @@ SOFTWARE.
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SurfaceSide</span> {
     <span class="ident">Front</span>,
     <span class="ident">Back</span>,
+    <span class="ident">NonApplicable</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">SurfaceSide</span> {
@@ -395,32 +400,35 @@ SOFTWARE.
     <span class="doccomment">/// of the surface</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_side</span>(<span class="ident">normal</span>: <span class="ident">Vector3D</span>, <span class="ident">ray_dir</span>: <span class="ident">Vector3D</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vector3D</span>, <span class="self">Self</span>) {
         <span class="macro">debug_assert!</span>(<span class="ident">normal</span>.<span class="ident">length</span>().<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="number">0.00000001</span>);
+        <span class="comment">// eprintln!(&quot;raydir = {}&quot;, ray_dir);</span>
         <span class="kw">let</span> <span class="ident">dot</span> <span class="op">=</span> <span class="ident">normal</span> <span class="op">*</span> <span class="ident">ray_dir</span>;
 
         <span class="kw">if</span> <span class="ident">dot</span> <span class="op">&lt;</span> <span class="number">0.</span> {
             (<span class="ident">normal</span>, <span class="ident"><span class="self">Self</span>::Front</span>)
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">dot</span> <span class="op">&gt;</span> <span class="number">0.</span> {
             (<span class="ident">normal</span> <span class="op">*</span> <span class="op">-</span><span class="number">1.</span>, <span class="ident"><span class="self">Self</span>::Back</span>)
-        } <span class="kw">else</span> {            
-            <span class="comment">// It is perpendicular, meaning that the dot product</span>
-            <span class="comment">// gives us no information. We need a small hack: Deviate</span>
-            <span class="comment">// the direction a bit, and try again</span>
+        } <span class="kw">else</span> {   
+            <span class="kw">return</span> (<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>), <span class="ident"><span class="self">Self</span>::NonApplicable</span>)         
+            <span class="comment">// // It is perpendicular, meaning that the dot product</span>
+            <span class="comment">// // gives us no information. We need a small hack: Deviate</span>
+            <span class="comment">// // the direction a bit, and try again</span>
 
-            <span class="comment">// Let&#39;s get a vector that is normal to the direction.</span>
-            <span class="kw">let</span> <span class="ident">normal_dir</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ray_dir</span>.<span class="ident">x</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">Float::EPSILON</span> {
-                <span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="ident">ray_dir</span>.<span class="ident">y</span> <span class="op">/</span> <span class="ident">ray_dir</span>.<span class="ident">x</span>, <span class="number">1.</span>, <span class="number">0.</span>)
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ray_dir</span>.<span class="ident">y</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">Float::EPSILON</span> {
-                <span class="ident">Vector3D::new</span>(<span class="number">1.</span>, <span class="op">-</span><span class="ident">ray_dir</span>.<span class="ident">x</span> <span class="op">/</span> <span class="ident">ray_dir</span>.<span class="ident">y</span>, <span class="number">0.</span>)
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ray_dir</span>.<span class="ident">z</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">Float::EPSILON</span> {
-                <span class="ident">Vector3D::new</span>(<span class="number">1.</span>, <span class="number">0.</span>, <span class="op">-</span><span class="ident">ray_dir</span>.<span class="ident">x</span> <span class="op">/</span> <span class="ident">ray_dir</span>.<span class="ident">z</span>)
-            } <span class="kw">else</span> {
-                <span class="macro">panic!</span>(<span class="string">&quot;Direction of the given Ray3D is a Zero vector&quot;</span>);
-            };
+            <span class="comment">// // Let&#39;s get a vector that is normal to the direction.</span>
+            <span class="comment">// let normal_dir = if ray_dir.x.abs() &gt; 1e-8 {</span>
+            <span class="comment">//     Vector3D::new(-ray_dir.y / ray_dir.x, 1., 0.)</span>
+            <span class="comment">// } else if ray_dir.y.abs() &gt; 1e-8 {</span>
+            <span class="comment">//     Vector3D::new(1., -ray_dir.x / ray_dir.y, 0.)</span>
+            <span class="comment">// } else if ray_dir.z.abs() &gt; 1e-8 {</span>
+            <span class="comment">//     Vector3D::new(1., 0., -ray_dir.x / ray_dir.z)</span>
+            <span class="comment">// } else {</span>
+            <span class="comment">//     panic!(&quot;Direction of the given Ray3D is a Zero vector&quot;);</span>
+            <span class="comment">// };</span>
 
-            <span class="kw">let</span> <span class="ident">proxy_dir</span> <span class="op">=</span> <span class="ident">ray_dir</span> <span class="op">+</span> <span class="ident">normal_dir</span> <span class="op">*</span> <span class="number">0.001</span>;
+            <span class="comment">// let proxy_dir = ray_dir + normal_dir * 0.001;</span>
 
-            <span class="comment">// Try again</span>
-            <span class="ident"><span class="self">Self</span>::get_side</span>(<span class="ident">normal</span>, <span class="ident">proxy_dir</span>)
+            <span class="comment">// // Try again</span>
+            <span class="comment">// eprintln!(&quot;Trying to get side again... normal = {} | ray_dir = {}&quot;, normal, ray_dir);</span>
+            <span class="comment">// Self::get_side(normal, proxy_dir)</span>
         }
     }
 }

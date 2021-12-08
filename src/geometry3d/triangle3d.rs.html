@@ -857,6 +857,10 @@
 <span id="823">823</span>
 <span id="824">824</span>
 <span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -1329,10 +1333,14 @@ SOFTWARE.
         <span class="ident">d_error</span>: <span class="ident">Point3D</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntersectionInfo</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">phit</span>, <span class="ident">u</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">basic_intersection</span>(<span class="ident">ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>)<span class="question-mark">?</span>;
-
+        <span class="comment">// eprintln!(&quot;Ray is {:?}&quot;, ray);</span>
+        <span class="comment">// eprintln!(&quot;Triangle is {}&quot;, self);</span>
+        <span class="comment">// eprintln!(&quot;phit = {} | u = {} | v = {}&quot;, phit, u, v);</span>
         <span class="kw">let</span> <span class="ident">dpdu</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">a</span>();
         <span class="kw">let</span> <span class="ident">dpdv</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">c</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">a</span>();
+        <span class="comment">// eprintln!(&quot;dpdu = {} | dpdv = {}&quot;, dpdu, dpdv);</span>
         <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="ident">dpdu</span>.<span class="ident">cross</span>(<span class="ident">dpdv</span>).<span class="ident">get_normalized</span>();
+        <span class="comment">// eprintln!(&quot;normal = {}&quot;, normal);</span>
         <span class="kw">let</span> (<span class="ident">normal</span>, <span class="ident">side</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">ray</span>.<span class="ident">direction</span>);
 
         <span class="prelude-val">Some</span>(<span class="ident">IntersectionInfo</span> {
