@@ -9,6 +9,11 @@ license = "MIT"
 
 [dependencies]
 
+[profile.release]
+lto = true
+codegen-units = 1
+debug=true
+
 
 [dev-dependencies]
 criterion = "0.3"

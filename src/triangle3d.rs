@@ -470,10 +470,14 @@ impl Intersect for Triangle3D {
         d_error: Point3D,
     ) -> Option<IntersectionInfo> {
         let (phit, u, v) = self.basic_intersection(ray, o_error, d_error)?;
-
+        // eprintln!("Ray is {:?}", ray);
+        // eprintln!("Triangle is {}", self);
+        // eprintln!("phit = {} | u = {} | v = {}", phit, u, v);
         let dpdu = self.b() - self.a();
         let dpdv = self.c() - self.a();
+        // eprintln!("dpdu = {} | dpdv = {}", dpdu, dpdv);
         let normal = dpdu.cross(dpdv).get_normalized();
+        // eprintln!("normal = {}", normal);
         let (normal, side) = SurfaceSide::get_side(normal, ray.direction);
 
         Some(IntersectionInfo {

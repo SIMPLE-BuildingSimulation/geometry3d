@@ -37,6 +37,7 @@ use crate::RefCount;
 pub enum SurfaceSide {
     Front,
     Back,
+    NonApplicable,
 }
 
 impl SurfaceSide {
@@ -45,32 +46,35 @@ impl SurfaceSide {
     /// of the surface
     pub fn get_side(normal: Vector3D, ray_dir: Vector3D) -> (Vector3D, Self) {
         debug_assert!(normal.length().abs() > 0.00000001);
+        // eprintln!("raydir = {}", ray_dir);
         let dot = normal * ray_dir;
 
         if dot < 0. {
             (normal, Self::Front)
         } else if dot > 0. {
             (normal * -1., Self::Back)
-        } else {            
-            // It is perpendicular, meaning that the dot product
-            // gives us no information. We need a small hack: Deviate
-            // the direction a bit, and try again
+        } else {   
+            return (Vector3D::new(0., 0., 0.), Self::NonApplicable)         
+            // // It is perpendicular, meaning that the dot product
+            // // gives us no information. We need a small hack: Deviate
+            // // the direction a bit, and try again
 
-            // Let's get a vector that is normal to the direction.
-            let normal_dir = if ray_dir.x.abs() > Float::EPSILON {
-                Vector3D::new(-ray_dir.y / ray_dir.x, 1., 0.)
-            } else if ray_dir.y.abs() > Float::EPSILON {
-                Vector3D::new(1., -ray_dir.x / ray_dir.y, 0.)
-            } else if ray_dir.z.abs() > Float::EPSILON {
-                Vector3D::new(1., 0., -ray_dir.x / ray_dir.z)
-            } else {
-                panic!("Direction of the given Ray3D is a Zero vector");
-            };
+            // // Let's get a vector that is normal to the direction.
+            // let normal_dir = if ray_dir.x.abs() > 1e-8 {
+            //     Vector3D::new(-ray_dir.y / ray_dir.x, 1., 0.)
+            // } else if ray_dir.y.abs() > 1e-8 {
+            //     Vector3D::new(1., -ray_dir.x / ray_dir.y, 0.)
+            // } else if ray_dir.z.abs() > 1e-8 {
+            //     Vector3D::new(1., 0., -ray_dir.x / ray_dir.z)
+            // } else {
+            //     panic!("Direction of the given Ray3D is a Zero vector");
+            // };
 
-            let proxy_dir = ray_dir + normal_dir * 0.001;
+            // let proxy_dir = ray_dir + normal_dir * 0.001;
 
-            // Try again
-            Self::get_side(normal, proxy_dir)
+            // // Try again
+            // eprintln!("Trying to get side again... normal = {} | ray_dir = {}", normal, ray_dir);
+            // Self::get_side(normal, proxy_dir)
         }
     }
 }
