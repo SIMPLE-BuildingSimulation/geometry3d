@@ -316,6 +316,18 @@
 <span id="282">282</span>
 <span id="283">283</span>
 <span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -342,13 +354,15 @@ SOFTWARE.
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::round_error::ApproxFloat</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Float</span>, <span class="ident">PI</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::bound_trait::Bounded</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::intersect_trait</span>::{<span class="ident">Intersect</span>, <span class="ident">IntersectionInfo</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">Point3D</span>,
     <span class="ident">Ray3D</span>,
     <span class="ident">Transform</span>,
-    <span class="ident">Vector3D</span>
+    <span class="ident">Vector3D</span>,
+    <span class="ident">BBox3D</span>
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
 
@@ -543,10 +557,20 @@ SOFTWARE.
     }
 }
 
+<span class="kw">impl</span> <span class="ident">Bounded</span> <span class="kw">for</span> <span class="ident">Cylinder3D</span> {
+    <span class="kw">fn</span> <span class="ident">bounds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)<span class="op">-</span><span class="op">&gt;</span><span class="ident">BBox3D</span>{
+        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="self">self</span>.<span class="ident">radius</span>, <span class="op">-</span><span class="self">self</span>.<span class="ident">radius</span>, <span class="self">self</span>.<span class="ident">zmin</span>);
+        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>( <span class="self">self</span>.<span class="ident">radius</span>,  <span class="self">self</span>.<span class="ident">radius</span>, <span class="self">self</span>.<span class="ident">zmax</span>);
+        <span class="ident">BBox3D::new</span>(<span class="ident">min</span>, <span class="ident">max</span>)
+    }
+}
+
 <span class="kw">impl</span> <span class="ident">Intersect</span> <span class="kw">for</span> <span class="ident">Cylinder3D</span> {
     <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;cylinder&quot;</span>
     }
+
+    
 
     <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span> {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">zmax</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">zmin</span>);

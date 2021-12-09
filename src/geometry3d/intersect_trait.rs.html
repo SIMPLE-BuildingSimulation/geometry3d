@@ -332,26 +332,6 @@
 <span id="298">298</span>
 <span id="299">299</span>
 <span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -408,27 +388,7 @@ SOFTWARE.
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">dot</span> <span class="op">&gt;</span> <span class="number">0.</span> {
             (<span class="ident">normal</span> <span class="op">*</span> <span class="op">-</span><span class="number">1.</span>, <span class="ident"><span class="self">Self</span>::Back</span>)
         } <span class="kw">else</span> {   
-            <span class="kw">return</span> (<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>), <span class="ident"><span class="self">Self</span>::NonApplicable</span>)         
-            <span class="comment">// // It is perpendicular, meaning that the dot product</span>
-            <span class="comment">// // gives us no information. We need a small hack: Deviate</span>
-            <span class="comment">// // the direction a bit, and try again</span>
-
-            <span class="comment">// // Let&#39;s get a vector that is normal to the direction.</span>
-            <span class="comment">// let normal_dir = if ray_dir.x.abs() &gt; 1e-8 {</span>
-            <span class="comment">//     Vector3D::new(-ray_dir.y / ray_dir.x, 1., 0.)</span>
-            <span class="comment">// } else if ray_dir.y.abs() &gt; 1e-8 {</span>
-            <span class="comment">//     Vector3D::new(1., -ray_dir.x / ray_dir.y, 0.)</span>
-            <span class="comment">// } else if ray_dir.z.abs() &gt; 1e-8 {</span>
-            <span class="comment">//     Vector3D::new(1., 0., -ray_dir.x / ray_dir.z)</span>
-            <span class="comment">// } else {</span>
-            <span class="comment">//     panic!(&quot;Direction of the given Ray3D is a Zero vector&quot;);</span>
-            <span class="comment">// };</span>
-
-            <span class="comment">// let proxy_dir = ray_dir + normal_dir * 0.001;</span>
-
-            <span class="comment">// // Try again</span>
-            <span class="comment">// eprintln!(&quot;Trying to get side again... normal = {} | ray_dir = {}&quot;, normal, ray_dir);</span>
-            <span class="comment">// Self::get_side(normal, proxy_dir)</span>
+            <span class="kw">return</span> (<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>), <span class="ident"><span class="self">Self</span>::NonApplicable</span>)                     
         }
     }
 }
@@ -542,7 +502,7 @@ SOFTWARE.
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Intersect</span> {
     <span class="doccomment">/// The name of the figure. Useful for debugging.</span>
     <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
-
+    
     <span class="doccomment">/// Gets the area of the object</span>
     <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span>;
 
