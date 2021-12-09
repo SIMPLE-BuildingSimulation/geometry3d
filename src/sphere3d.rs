@@ -24,13 +24,15 @@ SOFTWARE.
 
 use crate::{Float, PI};
 use crate::RefCount;
+use crate::bound_trait::Bounded;
 
 use crate::intersect_trait::{Intersect, IntersectionInfo};
 use crate::{
     Point3D,
     Ray3D,
     Transform,
-    Vector3D
+    Vector3D,
+    BBox3D
 };
 use crate::round_error::ApproxFloat;
 
@@ -393,10 +395,20 @@ impl Sphere3D {
     }
 }
 
+impl Bounded for Sphere3D{
+    fn bounds(&self)->BBox3D{
+        let min = Point3D::new(-self.radius, -self.radius, self.zmin);
+        let max = Point3D::new( self.radius,  self.radius, self.zmax);
+        BBox3D::new(min, max)
+    }
+
+}
+
 impl Intersect for Sphere3D {
     fn id(&self) -> &'static str {
         "sphere"
     }
+
 
     fn area(&self) -> Float {
         self.phi_max * self.radius * (self.zmax - self.zmin)

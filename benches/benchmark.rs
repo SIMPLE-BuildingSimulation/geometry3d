@@ -1,10 +1,8 @@
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use geometry3d::Vector3D;
 
-fn get_perpendicular(v: Vector3D){
-    v.get_perpendicular().unwrap();
-}
+
+
 
 fn test_trigonometry(a: f64, b: f64, c: f64)->f64{    
     // a.cos() + a.sin() + a.tan()

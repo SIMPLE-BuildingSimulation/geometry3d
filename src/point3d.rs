@@ -137,10 +137,10 @@ impl std::ops::Sub<Point3D> for Point3D {
     }
 }
 
-impl std::ops::Sub<&Vector3D> for &Point3D {
+impl std::ops::Sub<Vector3D> for Point3D {
     type Output = Point3D;
 
-    fn sub(self, other: &Vector3D) -> Point3D {
+    fn sub(self, other: Vector3D) -> Point3D {
         Point3D {
             x: self.x - other.x,
             y: self.y - other.y,
@@ -358,24 +358,24 @@ mod testing {
         let z = 9.123;
         let ini = Point3D::new(2.0 * x, 2.0 * y, 2.0 * z);
         let v = Vector3D::new(x, y, z);
-        let fin = &ini - &v;
+        let fin = ini - v;
 
         assert_eq!(x, fin.x);
         assert_eq!(y, fin.y);
         assert_eq!(z, fin.z);
 
-        let fin = &fin - &v;
+        let fin = fin - v;
         assert_eq!(0.0 * x, fin.x);
         assert_eq!(0.0 * y, fin.y);
         assert_eq!(0.0 * z, fin.z);
 
         let v = Vector3D::new(-x, -y, -z);
-        let fin = &fin - &v;
+        let fin = fin - v;
         assert_eq!(x, fin.x);
         assert_eq!(y, fin.y);
         assert_eq!(z, fin.z);
 
-        let fin = &fin - &v;
+        let fin = fin - v;
         assert_eq!(2.0 * x, fin.x);
         assert_eq!(2.0 * y, fin.y);
         assert_eq!(2.0 * z, fin.z);

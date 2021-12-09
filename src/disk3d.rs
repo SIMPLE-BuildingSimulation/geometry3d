@@ -24,6 +24,7 @@ SOFTWARE.
 
 use crate::{Float, PI};
 use crate::RefCount;
+use crate::bound_trait::Bounded;
 
 use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
 use crate::{
@@ -31,7 +32,8 @@ use crate::{
     Ray3D,
     Point3D,
     Transform,
-    Vector3D
+    Vector3D,
+    BBox3D
 };
 
 /// A disk of radius `radius` whose normal points in the
@@ -214,14 +216,16 @@ impl Disk3D {
     }
 }
 
+impl Bounded for Disk3D {
+    fn bounds(&self)->BBox3D{
+        unimplemented!();
+    }
+}
+
 impl Intersect for Disk3D {
     fn id(&self) -> &'static str {
         "disk"
     }
-
-    // fn normal_at_intersection(&self, ray: &Ray3D, t: Float) -> (Vector3D, SurfaceSide) {
-    //     SurfaceSide::get_side(self.normal, ray.direction)
-    // }
 
     fn area(&self) -> Float {
         self.phi_max * 0.5 * (self.radius * self.radius - self.inner_radius * self.inner_radius)
