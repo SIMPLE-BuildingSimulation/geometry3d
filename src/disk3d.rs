@@ -24,7 +24,6 @@ SOFTWARE.
 
 use crate::{Float, PI};
 use crate::RefCount;
-use crate::bound_trait::Bounded;
 
 use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
 use crate::{
@@ -216,13 +215,14 @@ impl Disk3D {
     }
 }
 
-impl Bounded for Disk3D {
+
+
+impl Intersect for Disk3D {
+    
     fn bounds(&self)->BBox3D{
         unimplemented!();
     }
-}
 
-impl Intersect for Disk3D {
     fn id(&self) -> &'static str {
         "disk"
     }

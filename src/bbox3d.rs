@@ -22,11 +22,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+
+
 use crate::Float;
 use crate::Point3D;
+use crate::Vector3D;
+use crate::Ray3D;
+use crate::gamma;
+
+// use crate::round_error::gamma;
+
+/// Represents one dimension of the `BBox3D`
+#[repr(u8)]
+#[derive(Clone, Copy, Debug)]
+pub enum BBoxAxis{
+    X,Y,Z
+}
+
+
 
 /// An Axis-aligned Bounding Box, represented by 
 /// two corners (i.e., by two `Point3D` objects)
+#[derive(Copy, Clone)]
 pub struct BBox3D {
     /// The lower corner
     pub min: Point3D, 
@@ -142,7 +159,132 @@ impl BBox3D {
         pt.y >= self.min.y && pt.y < self.max.y &&
         pt.z >= self.min.z && pt.z < self.max.z
     }
-}
+
+    /// Returns the dimension in which the `BBox3D` is longest
+    pub fn max_extent(&self)->BBoxAxis{
+        let d = self.max - self.min;
+        if d.x > d.y && d.x > d.z{
+            BBoxAxis::X
+        }else if d.y > d.z{
+            BBoxAxis::Y
+        }else{
+            BBoxAxis::Z
+        }            
+    }
+
+    /// Returns the total surface area of all the walls in this `BBox3D`
+    pub fn surface_area(&self)->Float{
+        let d = self.max - self.min;
+        2. * (d.x * d.y + d.x * d.z + d.y * d.z)
+    }
+
+    /// Checks if a ray intersects a BBox3D
+    /// 
+    /// This function intersects the ray with 6 axis-aligned planes:
+    /// 2 whose normal is `Vector3D(1., 0., 0.)`, 2 whose normal is `Vector3D(0., 1., 0.)`
+    /// and 2 whose normal is `Vector3D(0., 0., 1.)`. That is to way, we calculate
+    /// the time that the ray spends within the boundaries of the `BBox3D` in each 
+    /// dimension, and then find the intersection of those times. If there is no
+    /// intersection, then the ray was never inside of the box.
+    /// 
+    /// For example, lets say that we realize that a ray spends `t=[0., 3.]` inside 
+    /// of the boundaries of the `BBox3D` in the `X` dimension; `t=[0.2, 5.]` in the `Y`
+    /// dimension; and `t=[-20., 1.]` in the `Z` dimension. The intersection of these 
+    /// ranges is `t=[0.2, 1.]`, which works and thus the ray went through the box.
+    ///
+    /// Now let's take an example in which the ray does not go through the `BBox3D`.
+    /// For example, one in which a ray spends `t=[0., 3.]` inside 
+    /// of the boundaries of the `BBox3D` in the `X` dimension; `t=[0.2, 5.]` in the `Y`
+    /// dimension; and `t=[6., 12.]` in the `Z` dimension. The intersection of these 
+    /// ranges is `t=[6, 3.]`, which does not make any sense and thus the ray never went 
+    /// inside of the `BBox3D`.    
+    /// 
+    /// # Example
+    /// 
+    /// ```
+    /// use geometry3d::{BBox3D, Vector3D, Point3D, Ray3D};
+    /// let min = Point3D::new(0., 0., 0.);
+    /// let max = Point3D::new(1., 1., 1.);
+    /// let bbox = BBox3D::new(min, max);
+    /// let ray = Ray3D {
+    ///     origin: Point3D::new(0.5, 0.5, 0.5),
+    ///     direction: Vector3D::new(0., 0., 1.)
+    /// };
+    /// let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+    /// assert!(bbox.intersect(&ray, inv_dir));
+    /// ```
+    pub fn intersect(&self, ray: &Ray3D, inv_dir: Vector3D)->bool{
+        
+        let mut t_min = (self.min.x - ray.origin.x) * inv_dir.x;
+        let mut t_max = (self.max.x - ray.origin.x) * inv_dir.x;            
+        if t_min > t_max {
+            std::mem::swap(&mut t_min, &mut t_max);
+        }
+        if t_max < 0. {
+            // We are running away from the box in the X component
+            return false;
+        }
+        
+        
+        let mut ty_min = (self.min.y - ray.origin.y) * inv_dir.y;
+        let mut ty_max = (self.max.y - ray.origin.y) * inv_dir.y;
+        if ty_min > ty_max {
+            std::mem::swap(&mut ty_min, &mut ty_max);
+        }
+        if ty_max < 0. {
+            // We are running away from the box in the Y component
+            return false;
+        }
+
+        
+        // Update _tMax_ and _tyMax_ to ensure robust bounds intersection
+        t_max *= 1. + 2. * gamma!(3.);
+        ty_max *= 1. + 2. * gamma!(3.);
+        if t_min > ty_max || ty_min > t_max {
+            // The times do not intersect
+            return false
+        }
+        // Narrow down the intersection... Now t_min and t_max
+        // represent the intersection between the X an Y dimensions.
+        if ty_min > t_min {
+            t_min = ty_min;
+        }
+        if ty_max < t_max {
+            t_max = ty_max;
+        }
+
+        
+        let mut tz_min = (self.min.z - ray.origin.z) * inv_dir.z;
+        let mut tz_max = (self.max.z - ray.origin.z) * inv_dir.z;
+        if tz_min > tz_max {
+            std::mem::swap(&mut tz_min, &mut tz_max);
+        }
+        if tz_max < 0. {
+            // We are running away from the box in the Z component
+            return false;
+        }
+
+
+        // // Update _tzMax_ to ensure robust bounds intersection
+        tz_max *= 1. + 2. * gamma!(3.);
+        if t_min > tz_max || tz_min > t_max {
+            // No intersection
+            return false
+        }
+        // Narrow down intersection                
+        if tz_min > t_min {
+            t_min = tz_min;
+        }
+        if tz_max < t_max {
+            t_max = tz_max;
+        }
+                
+        // return
+        t_max > t_min && t_max > 0.
+        
+
+    }
+}   
 
 
 /***********/
@@ -338,6 +480,223 @@ mod testing {
         assert!(!bbox.point_inside(Point3D::new(-9e9, -9e9, -9e9)));
         assert!(!bbox.point_inside_exclusive(Point3D::new(-9e9,-9e9,-9e9)));
 
+        
+}
+
+    #[test]
+    fn test_surface_area(){
+        let min = Point3D::new(-0.5, -0.5, -0.5);
+        let max = Point3D::new(-0.5, -0.5, -0.5) * -1.;
+        let bbox = BBox3D::new(min, max);
+        let area = bbox.surface_area();
+        assert!( (6. - area).abs() < 1e-7 );
+
+    }
+
+    #[test]
+    fn test_box_intersection(){
+        let min = Point3D::new(0., 0., 0.);
+        let max = Point3D::new(1., 1., 1.);
+        let bbox = BBox3D::new(min, max);
+
+
+        // From inside of the box... they should all intersect
+        for _ in 0..9000 {
+            
+            let ray = Ray3D {
+                origin: Point3D::new(rand::random(), rand::random(), rand::random()),
+                direction: Vector3D::new(rand::random(), rand::random(), rand::random()).get_normalized()
+            };
+            let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);            
+            assert!(bbox.intersect(&ray, inv_dir));
+        }
+
+        // From outside pointing to the center of the box
+        // ... they should all intersect
+        for _ in 0..9000 {
+            let mut x : Float = rand::random();
+            x -= 0.5;
+            let mut y = rand::random();
+            y -= 0.5;
+            let mut z = rand::random();
+            z -= 0.5;
+            let origin = Point3D::new(x, y, z)*10.;
+            let direction = (Point3D::new(0.5, 0.5, 0.5) - origin).get_normalized();
+            let ray = Ray3D {
+                origin,
+                direction,
+            };
+            let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);            
+            assert!(bbox.intersect(&ray, inv_dir));
+        }        
+        
+
+
+        // On top of the Box... should NOT intersect
+        for _ in 0..9000 {
+            let x : Float = rand::random();            
+            let y = rand::random();            
+            let z = 1.5;
+            
+            let origin = Point3D::new(x, y, z);
+            let direction = Vector3D::new(rand::random(), rand::random(), rand::random()).get_normalized();
+            let ray = Ray3D {
+                origin,
+                direction,
+            };
+            let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);                        
+            assert!(!bbox.intersect(&ray, inv_dir));
+        }
+        
+
+        /* PARALLEL TO Z AXIS */
+        // From inside Up        
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, 0.5, 0.5),
+            direction: Vector3D::new(0., 0., 1.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(bbox.intersect(&ray, inv_dir));
+
+        // From inside Down
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, 0.5, 0.5),
+            direction: Vector3D::new(0., 0., -1.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(bbox.intersect(&ray, inv_dir));
+
+        // From Below Up
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, 0.5, -1.5),
+            direction: Vector3D::new(0., 0., 1.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(bbox.intersect(&ray, inv_dir));
+
+        // From Below Down
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, 0.5, -1.5),
+            direction: Vector3D::new(0., 0., -1.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(!bbox.intersect(&ray, inv_dir));
+
+        // From Top Up
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, 0.5, 1.5),
+            direction: Vector3D::new(0., 0., 1.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(!bbox.intersect(&ray, inv_dir));
+
+        // From Top Down
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, 0.5, 1.5),
+            direction: Vector3D::new(0., 0., -1.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(bbox.intersect(&ray, inv_dir));
+
+        /* PARALLEL TO Y AXIS */
+        // From inside Up        
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, 0.5, 0.5),
+            direction: Vector3D::new(0., 1., 0.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(bbox.intersect(&ray, inv_dir));
+
+        // From inside Down
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, 0.5, 0.5),
+            direction: Vector3D::new(0., -1., 0.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(bbox.intersect(&ray, inv_dir));
+
+        // From Below Up
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, -1.5, 0.5),
+            direction: Vector3D::new(0., 1., 0.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(bbox.intersect(&ray, inv_dir));
+
+        // From Below Down
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, -1.5, 0.5),
+            direction: Vector3D::new(0., -1., 0.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(!bbox.intersect(&ray, inv_dir));
+
+        // From Top Up
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, 1.5, 0.5),
+            direction: Vector3D::new(0., 1., 0.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(!bbox.intersect(&ray, inv_dir));
+
+        // From Top Down
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, 1.5, 0.5),
+            direction: Vector3D::new(0., -1., 0.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(bbox.intersect(&ray, inv_dir));
+
+
+        /* PARALLEL TO X AXIS */
+        // From inside Up        
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, 0.5, 0.5),
+            direction: Vector3D::new(1., 0., 0.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(bbox.intersect(&ray, inv_dir));
+
+        // From inside Down
+        let ray = Ray3D {
+            origin: Point3D::new(0.5, 0.5, 0.5),
+            direction: Vector3D::new(-1., 0., 0.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(bbox.intersect(&ray, inv_dir));
+
+        // From Below Up
+        let ray = Ray3D {
+            origin: Point3D::new(-1.5, 0.5, 0.5),
+            direction: Vector3D::new(1., 0., 0.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(bbox.intersect(&ray, inv_dir));
+
+        // From Below Down
+        let ray = Ray3D {
+            origin: Point3D::new(-1.5, 0.5, 0.5),
+            direction: Vector3D::new(-1., 0., 0.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(!bbox.intersect(&ray, inv_dir));
+
+        // From Top Up
+        let ray = Ray3D {
+            origin: Point3D::new(1.5, 0.5, 0.5),
+            direction: Vector3D::new(1., 0., 0.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(!bbox.intersect(&ray, inv_dir));
+
+        // From Top Down
+        let ray = Ray3D {
+            origin: Point3D::new(1.5, 0.5, 0.5),
+            direction: Vector3D::new(-1., 0., 0.)
+        };
+        let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+        assert!(bbox.intersect(&ray, inv_dir));
+        
         
     }
 }

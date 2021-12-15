@@ -29,7 +29,8 @@ use crate::{
     Point3D,
     Ray3D,
     Transform,
-    Vector3D
+    Vector3D,
+    BBox3D,
 };
 
 use crate::{Float, PI};
@@ -94,7 +95,11 @@ impl DistantSource3D {
 
 impl Intersect for DistantSource3D {
     fn id(&self) -> &'static str {
-        "souRefCounte"
+        "source"
+    }
+
+    fn bounds(&self)->BBox3D{
+        panic!("Trying to get the bounds of a {}", self.id())
     }
 
     fn area(&self) -> Float {

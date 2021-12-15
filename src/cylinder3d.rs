@@ -24,7 +24,6 @@ SOFTWARE.
 
 use crate::round_error::ApproxFloat;
 use crate::{Float, PI};
-use crate::bound_trait::Bounded;
 
 use crate::intersect_trait::{Intersect, IntersectionInfo};
 use crate::{
@@ -227,15 +226,13 @@ impl Cylinder3D {
     }
 }
 
-impl Bounded for Cylinder3D {
+
+impl Intersect for Cylinder3D {
     fn bounds(&self)->BBox3D{
         let min = Point3D::new(-self.radius, -self.radius, self.zmin);
         let max = Point3D::new( self.radius,  self.radius, self.zmax);
         BBox3D::new(min, max)
     }
-}
-
-impl Intersect for Cylinder3D {
     fn id(&self) -> &'static str {
         "cylinder"
     }

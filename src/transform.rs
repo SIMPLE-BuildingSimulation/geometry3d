@@ -26,7 +26,8 @@ use crate::gamma;
 use crate::{
     Point3D,
     Ray3D,
-    Vector3D
+    Vector3D,
+    BBox3D
 };
 use crate::Float;
 
@@ -497,6 +498,32 @@ impl Transform {
 
         let r = Ray3D { origin, direction };
         (r, o_error, d_error)
+    }
+
+    pub fn transform_bbox(&self, bbox: BBox3D)->BBox3D{
+        let p0 = self.transform_pt(Point3D::new(bbox.min.x, bbox.min.y, bbox.min.z));
+        let mut ret = BBox3D::from_point(p0);    
+        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.max.x, bbox.min.y, bbox.min.z)));
+        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.min.x, bbox.max.y, bbox.min.z)));
+        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.min.x, bbox.min.y, bbox.max.z)));
+        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.min.x, bbox.max.y, bbox.max.z)));
+        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.max.x, bbox.max.y, bbox.min.z)));
+        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.max.x, bbox.min.y, bbox.max.z)));
+        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.max.x, bbox.max.y, bbox.max.z)));
+        ret
+    }
+
+    pub fn inv_transform_bbox(&self, bbox: BBox3D)->BBox3D{
+        let p0 = self.inv_transform_pt(Point3D::new(bbox.min.x, bbox.min.y, bbox.min.z));
+        let mut ret = BBox3D::from_point(p0);    
+        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.max.x, bbox.min.y, bbox.min.z)));
+        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.min.x, bbox.max.y, bbox.min.z)));
+        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.min.x, bbox.min.y, bbox.max.z)));
+        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.min.x, bbox.max.y, bbox.max.z)));
+        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.max.x, bbox.max.y, bbox.min.z)));
+        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.max.x, bbox.min.y, bbox.max.z)));
+        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.max.x, bbox.max.y, bbox.max.z)));
+        ret
     }
 } // end of Impl Transform
 

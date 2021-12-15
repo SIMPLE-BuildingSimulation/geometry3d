@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 use crate::RefCount;
-use crate::bound_trait::Bounded;
+
 use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
 use crate::{
     Point3D,
@@ -451,13 +451,7 @@ fn det_3x3(col0: &Vector3D, col1: &Vector3D, col2: &Vector3D) -> Float {
         + col2.x * (col0.y * col1.z - col1.y * col0.z)
 }
 
-impl Bounded for Triangle3D{
-    fn bounds(&self)->BBox3D{
-        let bbox = BBox3D::from_point(self.a);
-        let bbox = BBox3D::from_union_point(&bbox, self.b);
-        BBox3D::from_union_point(&bbox, self.c)
-    }
-}
+
 
 impl Intersect for Triangle3D {
     fn id(&self) -> &'static str {
@@ -468,6 +462,11 @@ impl Intersect for Triangle3D {
         &None
     }
 
+    fn bounds(&self)->BBox3D{
+        let bbox = BBox3D::from_point(self.a);
+        let bbox = BBox3D::from_union_point(&bbox, self.b);
+        BBox3D::from_union_point(&bbox, self.c)
+    }
     
 
     fn area(&self) -> Float {

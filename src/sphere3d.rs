@@ -24,7 +24,6 @@ SOFTWARE.
 
 use crate::{Float, PI};
 use crate::RefCount;
-use crate::bound_trait::Bounded;
 
 use crate::intersect_trait::{Intersect, IntersectionInfo};
 use crate::{
@@ -395,20 +394,18 @@ impl Sphere3D {
     }
 }
 
-impl Bounded for Sphere3D{
-    fn bounds(&self)->BBox3D{
-        let min = Point3D::new(-self.radius, -self.radius, self.zmin);
-        let max = Point3D::new( self.radius,  self.radius, self.zmax);
-        BBox3D::new(min, max)
-    }
 
-}
 
 impl Intersect for Sphere3D {
     fn id(&self) -> &'static str {
         "sphere"
     }
 
+    fn bounds(&self)->BBox3D{
+        let min = Point3D::new(-self.radius, -self.radius, self.zmin);
+        let max = Point3D::new( self.radius,  self.radius, self.zmax);
+        BBox3D::new(min, max)
+    }
 
     fn area(&self) -> Float {
         self.phi_max * self.radius * (self.zmax - self.zmin)

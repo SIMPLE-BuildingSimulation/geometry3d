@@ -92,6 +92,5 @@ mod vector3d;
 pub use vector3d::Vector3D;
 
 
-pub mod bound_trait;
 mod bbox3d;
-pub use bbox3d::BBox3D;
+pub use bbox3d::{BBox3D, BBoxAxis};

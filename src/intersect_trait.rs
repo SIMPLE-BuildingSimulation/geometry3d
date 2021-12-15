@@ -26,7 +26,8 @@ use crate::{
     Point3D,
     Ray3D,
     Transform,
-    Vector3D
+    Vector3D,
+    BBox3D,
 };
 
 use crate::Float;
@@ -254,6 +255,20 @@ pub trait Intersect {
             }
         }
     }
+
+     /// Gets a `BBox3D` bounding the object, in local coordinates
+     fn bounds(&self)->BBox3D;
+
+     /// Gets a `BBox3D` bounding the object, in world's coordinates.
+     fn world_bounds(&self)->BBox3D{
+         let local_b = self.bounds();
+         match self.transform() {
+             Some(t)=>{
+                 t.transform_bbox(local_b)
+             },
+             None => local_b
+         }
+     }
 }
 
 #[cfg(test)]
