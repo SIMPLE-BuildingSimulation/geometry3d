@@ -182,10 +182,10 @@ SOFTWARE.
 <span class="doccomment">///</span>
 <span class="doccomment">/// Source: PBRT-v3 source code.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">solve_quadratic</span>(<span class="ident">a</span>: <span class="ident">Float</span>, <span class="ident">b</span>: <span class="ident">Float</span>, <span class="ident">c</span>: <span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Float</span>, <span class="ident">Float</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">solve_quadratic</span>(<span class="ident">a</span>: <span class="ident">Float</span>, <span class="ident">b</span>: <span class="ident">Float</span>, <span class="ident">c</span>: <span class="ident">Float</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Float</span>, <span class="ident">Float</span>)<span class="op">&gt;</span> {
     <span class="comment">// if a is Zero, then this is a line with slope b</span>
-    <span class="kw">if</span> <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.</span> {
-        <span class="kw">if</span> <span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.</span> {
+    <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0.</span> {
+        <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="number">0.</span> {
             <span class="comment">// If b is zero, then this line is horizontal... does not cross</span>
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }

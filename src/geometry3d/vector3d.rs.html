@@ -710,17 +710,17 @@ SOFTWARE.
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Vector3D({:.5},{:.5},{:.5})&quot;</span>, <span class="self">self</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">y</span>, <span class="self">self</span>.<span class="ident">z</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Vector3D</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">Float</span>, <span class="ident">y</span>: <span class="ident">Float</span>, <span class="ident">z</span>: <span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vector3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">Float</span>, <span class="ident">y</span>: <span class="ident">Float</span>, <span class="ident">z</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Vector3D</span> {
         <span class="ident">Vector3D</span> { <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span> }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">x</span>: <span class="self">self</span>.<span class="ident">x</span>.<span class="ident">abs</span>(),
             <span class="ident">y</span>: <span class="self">self</span>.<span class="ident">y</span>.<span class="ident">abs</span>(),
@@ -729,7 +729,7 @@ SOFTWARE.
     }
 
     <span class="doccomment">/// Transforms a [`Vector3D`] into a [`Point3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_point3d</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Point3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_point3d</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
         <span class="ident">Point3D</span> {
             <span class="ident">x</span>: <span class="self">self</span>.<span class="ident">x</span>,
             <span class="ident">y</span>: <span class="self">self</span>.<span class="ident">y</span>,
@@ -739,7 +739,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Gets a normalized [`Vector3D`] that is perpendicular</span>
     <span class="doccomment">/// to `self`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_perpendicular</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_perpendicular</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">/* OPTION 1 */</span>
         <span class="comment">// if self.length_squared() &lt; 1e-7{</span>
         <span class="comment">//     return Err(format!(</span>
@@ -823,13 +823,13 @@ SOFTWARE.
         <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Vector3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">bool</span> {
         (<span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>
             <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>
             <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cross</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Vector3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vector3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cross</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">Vector3D</span> {
         <span class="kw">let</span> <span class="ident">dx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">z</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">y</span>;
         <span class="kw">let</span> <span class="ident">dy</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">z</span>;
         <span class="kw">let</span> <span class="ident">dz</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">y</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">x</span>;
@@ -837,11 +837,11 @@ SOFTWARE.
         <span class="ident">Vector3D::new</span>(<span class="ident">dx</span>, <span class="ident">dy</span>, <span class="ident">dz</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
         <span class="self">self</span>.<span class="ident">length_squared</span>().<span class="ident">sqrt</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length_squared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length_squared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
         <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">z</span>
     }
 
@@ -852,7 +852,7 @@ SOFTWARE.
         <span class="self">self</span>.<span class="ident">z</span> <span class="op">/</span><span class="op">=</span> <span class="ident">l</span>;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_normalized</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vector3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_normalized</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vector3D</span> {
         <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">length</span>();
         <span class="ident">Vector3D</span> {
             <span class="ident">x</span>: <span class="self">self</span>.<span class="ident">x</span> <span class="op">/</span> <span class="ident">l</span>,
@@ -861,13 +861,13 @@ SOFTWARE.
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_zero</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_zero</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">const</span> <span class="ident">TINY</span> : <span class="ident">Float</span> <span class="op">=</span> <span class="number">100.</span> <span class="op">*</span> <span class="ident">Float::EPSILON</span>;        
         <span class="self">self</span>.<span class="ident">x</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">y</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">z</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> 
     }
 
     <span class="doccomment">/// Checks if two vectors are parallel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_parallel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Vector3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_parallel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">bool</span> {
         <span class="comment">// If any of them is zero, false</span>
         <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_zero</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_zero</span>() {
             <span class="kw">return</span> <span class="bool-val">false</span>;
@@ -916,7 +916,7 @@ SOFTWARE.
     } <span class="comment">// end of is_parallel</span>
 
     <span class="doccomment">/// Checks if two vectors are parallel and follow the same direction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_same_direction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Vector3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_same_direction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_parallel</span>(<span class="ident">v</span>) {
             <span class="comment">// If they are not parallel, don&#39;t bother</span>
             <span class="bool-val">false</span>
@@ -932,7 +932,7 @@ SOFTWARE.
 <span class="kw">impl</span> <span class="ident">std::ops::Mul</span><span class="op">&lt;</span><span class="ident">Vector3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Float</span>;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Vector3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">Float</span> {
         {
             <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">y</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">z</span>
         }
@@ -942,7 +942,7 @@ SOFTWARE.
 <span class="kw">impl</span> <span class="ident">std::ops::Mul</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vector3D</span>;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vector3D</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Vector3D</span> {
         <span class="ident">Vector3D::new</span>(<span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">s</span>, <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">s</span>, <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">s</span>)
     }
 }
@@ -950,7 +950,7 @@ SOFTWARE.
 <span class="kw">impl</span> <span class="ident">std::ops::Mul</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Float</span>;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Point3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">Float</span> {
         {
             <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">y</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">z</span>
         }
@@ -968,7 +968,7 @@ SOFTWARE.
 <span class="kw">impl</span> <span class="ident">std::ops::Div</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vector3D</span>;
 
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vector3D</span> {
+    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Vector3D</span> {
         <span class="ident">Vector3D::new</span>(<span class="self">self</span>.<span class="ident">x</span> <span class="op">/</span> <span class="ident">s</span>, <span class="self">self</span>.<span class="ident">y</span> <span class="op">/</span> <span class="ident">s</span>, <span class="self">self</span>.<span class="ident">z</span> <span class="op">/</span> <span class="ident">s</span>)
     }
 }
@@ -984,7 +984,7 @@ SOFTWARE.
 <span class="kw">impl</span> <span class="ident">std::ops::Add</span><span class="op">&lt;</span><span class="ident">Vector3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vector3D</span>;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Vector3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vector3D</span> {
+    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">Vector3D</span> {
         <span class="ident">Vector3D::new</span>(<span class="self">self</span>.<span class="ident">x</span> <span class="op">+</span> <span class="ident">other</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">y</span> <span class="op">+</span> <span class="ident">other</span>.<span class="ident">y</span>, <span class="self">self</span>.<span class="ident">z</span> <span class="op">+</span> <span class="ident">other</span>.<span class="ident">z</span>)
     }
 }
@@ -1008,7 +1008,7 @@ SOFTWARE.
 <span class="kw">impl</span> <span class="ident">std::ops::Neg</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vector3D</span>;
 
-    <span class="kw">fn</span> <span class="ident">neg</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vector3D</span> {
+    <span class="kw">fn</span> <span class="ident">neg</span>(<span class="self">self</span>) -&gt; <span class="ident">Vector3D</span> {
         <span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="self">self</span>.<span class="ident">x</span>, <span class="op">-</span><span class="self">self</span>.<span class="ident">y</span>, <span class="op">-</span><span class="self">self</span>.<span class="ident">z</span>)
     }
 }
@@ -1016,7 +1016,7 @@ SOFTWARE.
 <span class="kw">impl</span> <span class="ident">std::ops::Sub</span><span class="op">&lt;</span><span class="ident">Vector3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vector3D</span>;
 
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Vector3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vector3D</span> {
+    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">Vector3D</span> {
         <span class="ident">Vector3D::new</span>(<span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">other</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">other</span>.<span class="ident">y</span>, <span class="self">self</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">other</span>.<span class="ident">z</span>)
     }
 }
@@ -1031,7 +1031,7 @@ SOFTWARE.
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_get_perpendicular</span>() {
-        <span class="kw">fn</span> <span class="ident">check</span>(<span class="ident">v</span>: <span class="ident">Vector3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">check</span>(<span class="ident">v</span>: <span class="ident">Vector3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">perp</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">get_perpendicular</span>()<span class="question-mark">?</span>;
             <span class="kw">if</span> (<span class="ident">v</span> <span class="op">*</span> <span class="ident">perp</span>).<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="number">100.</span> <span class="op">*</span> <span class="ident">Float::EPSILON</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(

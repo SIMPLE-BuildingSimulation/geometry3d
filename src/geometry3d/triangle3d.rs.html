@@ -871,7 +871,6 @@
 <span id="837">837</span>
 <span id="838">838</span>
 <span id="839">839</span>
-<span id="840">840</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -897,7 +896,7 @@ SOFTWARE.
 */</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::bound_trait::Bounded</span>;
+
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::intersect_trait</span>::{<span class="ident">Intersect</span>, <span class="ident">IntersectionInfo</span>, <span class="ident">SurfaceSide</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">Point3D</span>,
@@ -919,7 +918,7 @@ SOFTWARE.
     <span class="ident">vertex_a</span>: <span class="ident">Point3D</span>,
     <span class="ident">vertex_b</span>: <span class="ident">Point3D</span>,
     <span class="ident">vertex_c</span>: <span class="ident">Point3D</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Point3D</span>, <span class="ident">Float</span>, <span class="ident">Float</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Point3D</span>, <span class="ident">Float</span>, <span class="ident">Float</span>)<span class="op">&gt;</span> {
     <span class="comment">// Solve `Rorigin+t*Rdirection = A + u*(B-A) + v*(C-A)`;</span>
     <span class="comment">// Meaning:</span>
     <span class="comment">// u(A-B) + v(A-C) + t*Rdirection = (A - Rorigin)</span>
@@ -969,17 +968,17 @@ SOFTWARE.
 }
 
 <span class="kw">impl</span> <span class="ident">PointInTriangle</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::VertexA</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::VertexB</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::VertexC</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_edge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_edge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::EdgeAB</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::EdgeAC</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::EdgeBC</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Triangle3D</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;Triangle3D[\n\t{}\n\t{}\n\t{}\n]\n&quot;</span>,
@@ -989,7 +988,7 @@ SOFTWARE.
 }
 
 <span class="kw">impl</span> <span class="ident">Triangle3D</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vertex_a</span>: <span class="ident">Point3D</span>, <span class="ident">vertex_b</span>: <span class="ident">Point3D</span>, <span class="ident">vertex_c</span>: <span class="ident">Point3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vertex_a</span>: <span class="ident">Point3D</span>, <span class="ident">vertex_b</span>: <span class="ident">Point3D</span>, <span class="ident">vertex_c</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// check that points are not the same</span>
         <span class="kw">if</span> <span class="ident">vertex_a</span>.<span class="ident">compare</span>(<span class="ident">vertex_b</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">vertex_a</span>.<span class="ident">compare</span>(<span class="ident">vertex_c</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">vertex_b</span>.<span class="ident">compare</span>(<span class="ident">vertex_c</span>) {
             <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Trying to build a Triangle3D with two equal points&quot;</span>.<span class="ident">to_string</span>();
@@ -1030,7 +1029,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Gets the normal of the [`Triangle3D`]. This value is</span>
     <span class="doccomment">/// cached, so this should be fast.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vector3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vector3D</span> {
         <span class="self">self</span>.<span class="ident">normal</span>
     }
 
@@ -1050,14 +1049,14 @@ SOFTWARE.
     }
 
     <span class="doccomment">/// Gets the Area of the [`Triangle3D`]... it is cached when creater</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
         <span class="self">self</span>.<span class="ident">area</span>
     }
 
     <span class="doccomment">/// Gets the Circumradus of the [`Triangle3D`]. This value</span>
     <span class="doccomment">/// is not cached, so it might be slow to rely on this</span>
     <span class="doccomment">/// too often.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">circumradius</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">circumradius</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
         <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ab</span>().<span class="ident">length</span>();
         <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bc</span>().<span class="ident">length</span>();
         <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ca</span>().<span class="ident">length</span>();
@@ -1067,7 +1066,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Gets the Aspect Ratio of the [`Triangle3D`]. This is useful</span>
     <span class="doccomment">/// for triangulating polygons.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">aspect_ratio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">aspect_ratio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">min_segment</span> <span class="op">=</span> <span class="number">1E19</span>;
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">3</span> {
             <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">segment</span>(<span class="ident">i</span>).<span class="ident">unwrap</span>();
@@ -1080,7 +1079,7 @@ SOFTWARE.
     }
 
     <span class="doccomment">/// retrieves the Circumcenter</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">circumcenter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Point3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">circumcenter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
         <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">a</span>;
         <span class="kw">let</span> <span class="ident">ac</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">c</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">a</span>;
 
@@ -1100,7 +1099,7 @@ SOFTWARE.
     <span class="doccomment">/// Gets the centroid of the [`Triangle3D`]. This value</span>
     <span class="doccomment">/// is not cached, so it might be slow to rely on this</span>
     <span class="doccomment">/// too often.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">centroid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Point3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">centroid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
         <span class="kw">let</span> <span class="ident">dx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">c</span>.<span class="ident">x</span>;
         <span class="kw">let</span> <span class="ident">dy</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">y</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">y</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">c</span>.<span class="ident">y</span>;
         <span class="kw">let</span> <span class="ident">dz</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">z</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">z</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">c</span>.<span class="ident">z</span>;
@@ -1110,12 +1109,12 @@ SOFTWARE.
 
     <span class="comment">/* Other */</span>
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Point3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Point3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">i</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">a</span>),
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">b</span>),
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">c</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
+            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">a</span>),
+            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">b</span>),
+            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">c</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;Trying to get vertex with index &#39;{}&#39;... it is out of bounds&quot;</span>,
                 <span class="ident">i</span>
             )),
@@ -1123,27 +1122,27 @@ SOFTWARE.
     }
 
     <span class="doccomment">/// Retrieves the first vertex of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">a</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Point3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">a</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
         <span class="self">self</span>.<span class="ident">a</span>
     }
 
     <span class="doccomment">/// Retrieves the second vertex of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">b</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Point3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">b</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
         <span class="self">self</span>.<span class="ident">b</span>
     }
 
     <span class="doccomment">/// Retrieves the third vertex of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">c</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Point3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">c</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
         <span class="self">self</span>.<span class="ident">c</span>
     }
 
     <span class="doccomment">/// Retrieves a segment of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">segment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Segment3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">segment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Segment3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">i</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">ab</span>()),
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">bc</span>()),
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">ca</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
+            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">ab</span>()),
+            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">bc</span>()),
+            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">ca</span>()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;Trying to get Segment with index &#39;{}&#39;... it is out of bounds&quot;</span>,
                 <span class="ident">i</span>
             )),
@@ -1151,17 +1150,17 @@ SOFTWARE.
     }
 
     <span class="doccomment">/// Retrieves the first segment of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ab</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Segment3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ab</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Segment3D</span> {
         <span class="ident">Segment3D::new</span>(<span class="self">self</span>.<span class="ident">a</span>, <span class="self">self</span>.<span class="ident">b</span>)
     }
 
     <span class="doccomment">/// Retrieves the second segment of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Segment3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Segment3D</span> {
         <span class="ident">Segment3D::new</span>(<span class="self">self</span>.<span class="ident">b</span>, <span class="self">self</span>.<span class="ident">c</span>)
     }
 
     <span class="doccomment">/// Retrieves the third segment of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ca</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Segment3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ca</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Segment3D</span> {
         <span class="ident">Segment3D::new</span>(<span class="self">self</span>.<span class="ident">c</span>, <span class="self">self</span>.<span class="ident">a</span>)
     }
 
@@ -1205,7 +1204,7 @@ SOFTWARE.
     <span class="doccomment">///</span>
     <span class="doccomment">/// What is left from here is to interpret the values of $`\alpha`$ and $`\beta`$ from the equations,</span>
     <span class="doccomment">/// which allows us to position the point within the triangle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_point</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Point3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PointInTriangle</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_point</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">PointInTriangle</span> {
         <span class="comment">// get vertices</span>
         <span class="kw">let</span> <span class="ident">vertex_a</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a</span>;
         <span class="kw">let</span> <span class="ident">vertex_b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span>;
@@ -1259,7 +1258,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Gets the edge number corresponding to a [`Segment3D`] in the</span>
     <span class="doccomment">/// Triangle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">Segment3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">Segment3D</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ab</span>()) {
             <span class="prelude-val">Some</span>(<span class="number">0</span>)
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bc</span>()) {
@@ -1271,14 +1270,14 @@ SOFTWARE.
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_edge_index_from_points</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">Point3D</span>, <span class="ident">b</span>: <span class="ident">Point3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_edge_index_from_points</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">Point3D</span>, <span class="ident">b</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">segment</span> <span class="op">=</span> <span class="ident">Segment3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>);
         <span class="self">self</span>.<span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">segment</span>)
     }
 
     <span class="doccomment">/// Checks if a [`Triangle3D`] contains a certain Vertex in</span>
     <span class="doccomment">/// the same position as a [`Point3D`] `p`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Point3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">bool</span> {
 
         <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">compare</span>(<span class="ident">p</span>) <span class="op">|</span><span class="op">|</span>
         <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">compare</span>(<span class="ident">p</span>) <span class="op">|</span><span class="op">|</span>
@@ -1293,7 +1292,7 @@ SOFTWARE.
     <span class="doccomment">/// Vertices do not need to be in the same order,</span>
     <span class="doccomment">/// necessarily... So, check if the three vertices</span>
     <span class="doccomment">/// are in the other triangle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="ident">Triangle3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="ident">Triangle3D</span>) -&gt; <span class="ident">bool</span> {
         <span class="comment">// is this faster than iterate?</span>
         <span class="kw">if</span> <span class="op">!</span><span class="ident">t</span>.<span class="ident">has_vertex</span>(<span class="self">self</span>.<span class="ident">a</span>) {
             <span class="kw">return</span> <span class="bool-val">false</span>;
@@ -1315,36 +1314,35 @@ SOFTWARE.
         <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
         <span class="ident">_o_error</span>: <span class="ident">Point3D</span>,
         <span class="ident">_d_error</span>: <span class="ident">Point3D</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Point3D</span>, <span class="ident">Float</span>, <span class="ident">Float</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Point3D</span>, <span class="ident">Float</span>, <span class="ident">Float</span>)<span class="op">&gt;</span> {
         <span class="ident">intersect_triangle</span>(<span class="ident">ray</span>, <span class="self">self</span>.<span class="ident">a</span>(), <span class="self">self</span>.<span class="ident">b</span>(), <span class="self">self</span>.<span class="ident">c</span>())
     }
 } <span class="comment">// end of impl Triangle3D</span>
 
-<span class="kw">fn</span> <span class="ident">det_3x3</span>(<span class="ident">col0</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>, <span class="ident">col1</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>, <span class="ident">col2</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span> {
+<span class="kw">fn</span> <span class="ident">det_3x3</span>(<span class="ident">col0</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>, <span class="ident">col1</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>, <span class="ident">col2</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>) -&gt; <span class="ident">Float</span> {
     <span class="ident">col0</span>.<span class="ident">x</span> <span class="op">*</span> (<span class="ident">col1</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col2</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">col2</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col1</span>.<span class="ident">z</span>) <span class="op">-</span> <span class="ident">col1</span>.<span class="ident">x</span> <span class="op">*</span> (<span class="ident">col0</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col2</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">col2</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col0</span>.<span class="ident">z</span>)
         <span class="op">+</span> <span class="ident">col2</span>.<span class="ident">x</span> <span class="op">*</span> (<span class="ident">col0</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col1</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">col1</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col0</span>.<span class="ident">z</span>)
 }
 
-<span class="kw">impl</span> <span class="ident">Bounded</span> <span class="kw">for</span> <span class="ident">Triangle3D</span>{
-    <span class="kw">fn</span> <span class="ident">bounds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)<span class="op">-</span><span class="op">&gt;</span><span class="ident">BBox3D</span>{
+
+
+<span class="kw">impl</span> <span class="ident">Intersect</span> <span class="kw">for</span> <span class="ident">Triangle3D</span> {
+    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="string">&quot;triangle&quot;</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw-2">&amp;</span><span class="prelude-val">None</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">bounds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)-&gt;<span class="ident">BBox3D</span>{
         <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::from_point</span>(<span class="self">self</span>.<span class="ident">a</span>);
         <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::from_union_point</span>(<span class="kw-2">&amp;</span><span class="ident">bbox</span>, <span class="self">self</span>.<span class="ident">b</span>);
         <span class="ident">BBox3D::from_union_point</span>(<span class="kw-2">&amp;</span><span class="ident">bbox</span>, <span class="self">self</span>.<span class="ident">c</span>)
     }
-}
-
-<span class="kw">impl</span> <span class="ident">Intersect</span> <span class="kw">for</span> <span class="ident">Triangle3D</span> {
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;triangle&quot;</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="prelude-val">None</span>
-    }
-
     
 
-    <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span> {
+    <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
         <span class="self">self</span>.<span class="ident">area</span>()
     }
 
@@ -1353,7 +1351,7 @@ SOFTWARE.
         <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
         <span class="ident">o_error</span>: <span class="ident">Point3D</span>,
         <span class="ident">d_error</span>: <span class="ident">Point3D</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntersectionInfo</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntersectionInfo</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">phit</span>, <span class="ident">u</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">basic_intersection</span>(<span class="ident">ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>)<span class="question-mark">?</span>;
         <span class="comment">// eprintln!(&quot;Ray is {:?}&quot;, ray);</span>
         <span class="comment">// eprintln!(&quot;Triangle is {}&quot;, self);</span>
@@ -1383,7 +1381,7 @@ SOFTWARE.
         <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
         <span class="ident">o_error</span>: <span class="ident">Point3D</span>,
         <span class="ident">d_error</span>: <span class="ident">Point3D</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">p</span>, <span class="ident">_u</span>, <span class="ident">_v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">basic_intersection</span>(<span class="ident">ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(<span class="ident">p</span>)
     }
@@ -1494,7 +1492,7 @@ SOFTWARE.
 
         <span class="kw">let</span> <span class="ident">triangle</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>).<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">test_hit</span> <span class="op">=</span> <span class="op">|</span><span class="ident">pt</span>: <span class="ident">Point3D</span>, <span class="ident">offset</span>: <span class="ident">Vector3D</span>, <span class="ident">expect_hit</span>: <span class="ident">bool</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">test_hit</span> <span class="op">=</span> <span class="op">|</span><span class="ident">pt</span>: <span class="ident">Point3D</span>, <span class="ident">offset</span>: <span class="ident">Vector3D</span>, <span class="ident">expect_hit</span>: <span class="ident">bool</span><span class="op">|</span> -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">offset</span>.<span class="ident">get_normalized</span>();
             <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
                 <span class="ident">origin</span>: <span class="ident">pt</span> <span class="op">+</span> <span class="ident">offset</span>,

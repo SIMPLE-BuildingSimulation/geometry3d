@@ -2646,22 +2646,22 @@ SOFTWARE.
 }
 
 <span class="kw">impl</span> <span class="ident">Edge</span> {
-    <span class="kw">fn</span> <span class="ident">from_i</span>(<span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from_i</span>(<span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">i</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Ab</span>,
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Bc</span>,
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Ca</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::Ab</span>,
+            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::Bc</span>,
+            <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::Ca</span>,
+            <span class="kw">_</span> =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;Index given for Edge is out of bound (given was {})&quot;</span>, <span class="ident">i</span>)
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">as_i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">as_i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Ab</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident"><span class="self">Self</span>::Bc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident"><span class="self">Self</span>::Ca</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+            <span class="ident"><span class="self">Self</span>::Ab</span> =&gt; <span class="number">0</span>,
+            <span class="ident"><span class="self">Self</span>::Bc</span> =&gt; <span class="number">1</span>,
+            <span class="ident"><span class="self">Self</span>::Ca</span> =&gt; <span class="number">2</span>,
         }
     }
 }
@@ -2669,7 +2669,7 @@ SOFTWARE.
 <span class="kw">impl</span> <span class="ident">std::ops::Add</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Edge</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">as_i</span>() <span class="op">+</span> <span class="ident">other</span>) <span class="op">%</span> <span class="number">3</span>;
         <span class="ident"><span class="self">Self</span>::from_i</span>(<span class="ident">i</span>)
     }
@@ -2728,7 +2728,7 @@ SOFTWARE.
         <span class="ident">vertex_b</span>: <span class="ident">Point3D</span>,
         <span class="ident">vertex_c</span>: <span class="ident">Point3D</span>,
         <span class="ident">i</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// Build the triangle</span>
         <span class="kw">let</span> <span class="ident">triangle</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">vertex_a</span>, <span class="ident">vertex_b</span>, <span class="ident">vertex_c</span>)<span class="question-mark">?</span>;
 
@@ -2763,46 +2763,46 @@ SOFTWARE.
 
     <span class="kw">fn</span> <span class="ident">set_neighbour</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>, <span class="ident">i</span>: <span class="ident">usize</span>) {
         <span class="kw">match</span> <span class="ident">edge</span> {
-            <span class="ident">Edge::Ab</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">n0</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-            <span class="ident">Edge::Bc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">n1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-            <span class="ident">Edge::Ca</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">n2</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+            <span class="ident">Edge::Ab</span> =&gt; <span class="self">self</span>.<span class="ident">n0</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+            <span class="ident">Edge::Bc</span> =&gt; <span class="self">self</span>.<span class="ident">n1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+            <span class="ident">Edge::Ca</span> =&gt; <span class="self">self</span>.<span class="ident">n2</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">neighbour</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">neighbour</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">edge</span> {
-            <span class="ident">Edge::Ab</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">n0</span>,
-            <span class="ident">Edge::Bc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">n1</span>,
-            <span class="ident">Edge::Ca</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">n2</span>,
+            <span class="ident">Edge::Ab</span> =&gt; <span class="self">self</span>.<span class="ident">n0</span>,
+            <span class="ident">Edge::Bc</span> =&gt; <span class="self">self</span>.<span class="ident">n1</span>,
+            <span class="ident">Edge::Ca</span> =&gt; <span class="self">self</span>.<span class="ident">n2</span>,
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constrain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) {
         <span class="kw">match</span> <span class="ident">edge</span> {
-            <span class="ident">Edge::Ab</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">c0</span> <span class="op">=</span> <span class="bool-val">true</span>,
-            <span class="ident">Edge::Bc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">c1</span> <span class="op">=</span> <span class="bool-val">true</span>,
-            <span class="ident">Edge::Ca</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">c2</span> <span class="op">=</span> <span class="bool-val">true</span>,
+            <span class="ident">Edge::Ab</span> =&gt; <span class="self">self</span>.<span class="ident">c0</span> <span class="op">=</span> <span class="bool-val">true</span>,
+            <span class="ident">Edge::Bc</span> =&gt; <span class="self">self</span>.<span class="ident">c1</span> <span class="op">=</span> <span class="bool-val">true</span>,
+            <span class="ident">Edge::Ca</span> =&gt; <span class="self">self</span>.<span class="ident">c2</span> <span class="op">=</span> <span class="bool-val">true</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_constrained</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_constrained</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="ident">edge</span> {
-            <span class="ident">Edge::Ab</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">c0</span>,
-            <span class="ident">Edge::Bc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">c1</span>,
-            <span class="ident">Edge::Ca</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">c2</span>,
+            <span class="ident">Edge::Ab</span> =&gt; <span class="self">self</span>.<span class="ident">c0</span>,
+            <span class="ident">Edge::Bc</span> =&gt; <span class="self">self</span>.<span class="ident">c1</span>,
+            <span class="ident">Edge::Ca</span> =&gt; <span class="self">self</span>.<span class="ident">c2</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Triangulation3D</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Triangulation3D</span> {
     <span class="doccomment">/// Creates  a new empty [`Triangulation3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Triangulation3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Triangulation3D</span> {
         <span class="ident">Triangulation3D</span> {
             <span class="ident">n_valid_triangles</span>: <span class="number">0</span>,
             <span class="ident">triangles</span>: <span class="ident">Vec::new</span>(),
@@ -2810,14 +2810,14 @@ SOFTWARE.
     }
 
     <span class="doccomment">/// Creates  a new empty [`Triangulation3D`] with a certain capacity</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Triangulation3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Triangulation3D</span> {
         <span class="ident">Triangulation3D</span> {
             <span class="ident">n_valid_triangles</span>: <span class="number">0</span>,
             <span class="ident">triangles</span>: <span class="ident">Vec::with_capacity</span>(<span class="ident">i</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_trilist</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Triangle3D</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_trilist</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Triangle3D</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">triangles</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">triangle</span>).<span class="ident">collect</span>()
     }
 
@@ -2828,7 +2828,7 @@ SOFTWARE.
         <span class="ident">poly</span>: <span class="kw-2">&amp;</span><span class="ident">Polygon3D</span>,
         <span class="ident">max_area</span>: <span class="ident">Float</span>,
         <span class="ident">max_aspect_ratio</span>: <span class="ident">Float</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Triangulation3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Triangulation3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_polygon</span>(<span class="ident">poly</span>)<span class="question-mark">?</span>;
         <span class="ident">t</span>.<span class="ident">refine</span>(<span class="ident">max_area</span>, <span class="ident">max_aspect_ratio</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">t</span>)
@@ -2836,7 +2836,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Loops over all [`Triangle3D`], setting the neighbours. THis is</span>
     <span class="doccomment">/// quite slow, but does the job.</span>
-    <span class="kw">fn</span> <span class="ident">mark_neighbourhouds</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">mark_neighbourhouds</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">triangles</span>.<span class="ident">len</span>();
         <span class="kw">for</span> <span class="ident">this_i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
             <span class="kw">for</span> <span class="ident">other_i</span> <span class="kw">in</span> <span class="ident">this_i</span> <span class="op">+</span> <span class="number">1</span>..<span class="ident">n</span> {
@@ -2855,7 +2855,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Triangulates a [`Polygon3D`] without refining it, using the simple ear</span>
     <span class="doccomment">/// clipping algorithm.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_polygon</span>(<span class="ident">poly</span>: <span class="kw-2">&amp;</span><span class="ident">Polygon3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Triangulation3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_polygon</span>(<span class="ident">poly</span>: <span class="kw-2">&amp;</span><span class="ident">Polygon3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Triangulation3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">the_loop</span> <span class="op">=</span> <span class="ident">poly</span>.<span class="ident">get_closed_loop</span>();
         <span class="ident">the_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
         <span class="comment">// This is a theorem, apparently.</span>
@@ -2865,7 +2865,7 @@ SOFTWARE.
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">the_loop</span>.<span class="ident">n_vertices</span>();
             <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">n_triangles</span>();
-            <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">2</span> {
+            <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">2</span> {
                 <span class="comment">// return</span>
                 <span class="ident">t</span>.<span class="ident">mark_neighbourhouds</span>()<span class="question-mark">?</span>;
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">t</span>);
@@ -2909,16 +2909,16 @@ SOFTWARE.
 
     <span class="doccomment">/// Returns the number of [`Triangle3D`] in the [`Triangulation3D`]</span>
     <span class="doccomment">/// including invalid ones.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_triangles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_triangles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">triangles</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// Returns the number of valid [`Triangle3D`] in the [`Triangulation3D`]     </span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_valid_triangles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_valid_triangles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">n_valid_triangles</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">invalidate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">invalidate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">triangles</span>.<span class="ident">len</span>();
         <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">n</span> {
             <span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">i</span>].<span class="ident">invalidate</span>();
@@ -2932,7 +2932,7 @@ SOFTWARE.
         <span class="prelude-val">Err</span>(<span class="ident">msg</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">get_first_invalid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_first_invalid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">triangles</span>.<span class="ident">len</span>();
         <span class="kw">if</span> <span class="ident">start</span> <span class="op">&lt;</span> <span class="ident">n</span> {
             <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">start</span>..<span class="ident">n</span> {
@@ -2945,8 +2945,8 @@ SOFTWARE.
     }
 
     <span class="doccomment">/// Marks two triangles as neighbours</span>
-    <span class="kw">fn</span> <span class="ident">mark_as_neighbours</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i1</span>: <span class="ident">usize</span>, <span class="ident">edge_1</span>: <span class="ident">Edge</span>, <span class="ident">i2</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">i1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">i2</span> {
+    <span class="kw">fn</span> <span class="ident">mark_as_neighbours</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i1</span>: <span class="ident">usize</span>, <span class="ident">edge_1</span>: <span class="ident">Edge</span>, <span class="ident">i2</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span> {
             <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Trying to make a triangle its own neighbour (index {})&quot;</span>, <span class="ident">i1</span>);
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>);
         }
@@ -2965,8 +2965,8 @@ SOFTWARE.
 
         <span class="comment">// Get edge segment from the other triangle... panic if does not work.</span>
         <span class="kw">let</span> <span class="ident">edge_2</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">i2</span>].<span class="ident">triangle</span>.<span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">seg1</span>){
-            <span class="prelude-val">Some</span>(<span class="ident">e</span>)<span class="op">=</span><span class="op">&gt;</span><span class="ident">e</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;The triangles that you are trying to mark as neighbours don&#39;t share a segment.\n Triangle 1 : {}\nTriangle 2: {}&quot;</span>, <span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">i1</span>].<span class="ident">triangle</span>, <span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">i2</span>].<span class="ident">triangle</span>)
+            <span class="prelude-val">Some</span>(<span class="ident">e</span>)=&gt;<span class="ident">e</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;The triangles that you are trying to mark as neighbours don&#39;t share a segment.\n Triangle 1 : {}\nTriangle 2: {}&quot;</span>, <span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">i1</span>].<span class="ident">triangle</span>, <span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">i2</span>].<span class="ident">triangle</span>)
         };
         <span class="kw">let</span> <span class="ident">edge_2</span> <span class="op">=</span> <span class="ident">Edge::from_i</span>(<span class="ident">edge_2</span>);
 
@@ -2983,14 +2983,14 @@ SOFTWARE.
         <span class="ident">vertex_b</span>: <span class="ident">Point3D</span>,
         <span class="ident">vertex_c</span>: <span class="ident">Point3D</span>,
         <span class="ident">last_added</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">extend</span>: <span class="ident">bool</span>;
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_first_invalid</span>(<span class="ident">last_added</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; {
                 <span class="ident">extend</span> <span class="op">=</span> <span class="bool-val">false</span>;
                 <span class="ident">i</span>
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="ident">extend</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="self">self</span>.<span class="ident">triangles</span>.<span class="ident">len</span>()
             }
@@ -2998,7 +2998,7 @@ SOFTWARE.
 
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">TriPiece::new</span>(<span class="ident">vertex_a</span>, <span class="ident">vertex_b</span>, <span class="ident">vertex_c</span>, <span class="ident">n</span>);
         <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">t</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">extend</span> {
                     <span class="self">self</span>.<span class="ident">triangles</span>.<span class="ident">push</span>(<span class="ident">t</span>);
                 } <span class="kw">else</span> {
@@ -3007,7 +3007,7 @@ SOFTWARE.
                 <span class="self">self</span>.<span class="ident">n_valid_triangles</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">n</span>)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
         }
     }
 
@@ -3016,17 +3016,17 @@ SOFTWARE.
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">triangle</span>: <span class="kw-2">&amp;</span><span class="ident">Triangle3D</span>,
         <span class="ident">segment</span>: <span class="ident">Segment3D</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Point3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Point3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">triangle</span>.<span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">segment</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">i</span> {
-                <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">triangle</span>.<span class="ident">vertex</span>(<span class="number">2</span>).<span class="ident">unwrap</span>()),
-                <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">triangle</span>.<span class="ident">vertex</span>(<span class="number">0</span>).<span class="ident">unwrap</span>()),
-                <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">triangle</span>.<span class="ident">vertex</span>(<span class="number">1</span>).<span class="ident">unwrap</span>()),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="kw">match</span> <span class="ident">i</span> {
+                <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">triangle</span>.<span class="ident">vertex</span>(<span class="number">2</span>).<span class="ident">unwrap</span>()),
+                <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">triangle</span>.<span class="ident">vertex</span>(<span class="number">0</span>).<span class="ident">unwrap</span>()),
+                <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">triangle</span>.<span class="ident">vertex</span>(<span class="number">1</span>).<span class="ident">unwrap</span>()),
+                <span class="kw">_</span> =&gt; {
                     <span class="prelude-val">Err</span>(<span class="string">&quot;Something really strange happened when get_opposite_vertex()&quot;</span>.<span class="ident">to_string</span>())
                 }
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span>
                     <span class="string">&quot;Trying to get opposite verted in a triangle that does not have the given edge&quot;</span>
                         .<span class="ident">to_string</span>();
@@ -3037,7 +3037,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Returns the aspect ration that would result after flipping the diagonal of [`Triangle3D`]</span>
     <span class="doccomment">/// (located at `index`)</span>
-    <span class="kw">fn</span> <span class="ident">get_flipped_aspect_ratio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_flipped_aspect_ratio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> {
         <span class="comment">// do not modify constraints</span>
         <span class="kw">let</span> <span class="ident">tripiece</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">index</span>];
         <span class="kw">if</span> <span class="op">!</span><span class="ident">tripiece</span>.<span class="ident">valid</span> {
@@ -3050,8 +3050,8 @@ SOFTWARE.
 
         <span class="comment">// get neighbor</span>
         <span class="kw">let</span> <span class="ident">neighbour_i</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tripiece</span>.<span class="ident">neighbour</span>(<span class="ident">edge</span>) {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
         };
 
         <span class="kw">let</span> <span class="ident">neighbour</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">neighbour_i</span>];
@@ -3059,7 +3059,7 @@ SOFTWARE.
             <span class="macro">panic!</span>(<span class="string">&quot;Found an invalid neighbour when getting flipped aspect ratio&quot;</span>);
         }
 
-        <span class="kw">if</span> <span class="ident">neighbour</span>.<span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="ident">tripiece</span>.<span class="ident">index</span> {
+        <span class="kw">if</span> <span class="ident">neighbour</span>.<span class="ident">index</span> <span class="op">==</span> <span class="ident">tripiece</span>.<span class="ident">index</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;Triangle is its own neighbor!&quot;</span>);
         }
 
@@ -3108,8 +3108,8 @@ SOFTWARE.
         }
         <span class="comment">// get neighbour index... There needs to be one, or panic</span>
         <span class="kw">let</span> <span class="ident">neighbour_index</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">index</span>].<span class="ident">neighbour</span>(<span class="ident">edge</span>) {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Trying to flip diagonal of Triangle with no neighbour&quot;</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Trying to flip diagonal of Triangle with no neighbour&quot;</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
         };
 
         <span class="comment">// check if neighbour is valid</span>
@@ -3143,8 +3143,8 @@ SOFTWARE.
             .<span class="ident">triangle</span>
             .<span class="ident">get_edge_index_from_points</span>(<span class="ident">vertex_a</span>, <span class="ident">vertex_c</span>)
         {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">i</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="kw-2">*</span><span class="ident">i</span>,
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;Segment AC not found on triangle when flipping diagonals.&quot;</span>)
             }
         };
@@ -3157,8 +3157,8 @@ SOFTWARE.
             .<span class="ident">triangle</span>
             .<span class="ident">get_edge_index_from_points</span>(<span class="ident">vertex_c</span>, <span class="ident">vertex_b</span>)
         {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">i</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="kw-2">*</span><span class="ident">i</span>,
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;Segment CB not found on triangle when flipping diagonals.&quot;</span>)
             }
         };
@@ -3171,8 +3171,8 @@ SOFTWARE.
             .<span class="ident">triangle</span>
             .<span class="ident">get_edge_index_from_points</span>(<span class="ident">vertex_b</span>, <span class="ident">opposite</span>)
         {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;Segment B-Opposite not found on triangle when flipping diagonals.&quot;</span>)
             }
         };
@@ -3185,8 +3185,8 @@ SOFTWARE.
             .<span class="ident">triangle</span>
             .<span class="ident">get_edge_index_from_points</span>(<span class="ident">vertex_a</span>, <span class="ident">opposite</span>)
         {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;Segment A-Opposite not found on triangle when flipping diagonals.&quot;</span>)
             }
         };
@@ -3250,7 +3250,7 @@ SOFTWARE.
         <span class="ident">triangle_index</span>: <span class="ident">usize</span>,
         <span class="ident">edge_to_split</span>: <span class="ident">Edge</span>,
         <span class="ident">p</span>: <span class="ident">Point3D</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// We are doing the following:</span>
         <span class="comment">//              C                    C</span>
         <span class="comment">//             /\                   /|\</span>
@@ -3277,7 +3277,7 @@ SOFTWARE.
         <span class="kw">let</span> <span class="ident">nei_i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">triangle_index</span>].<span class="ident">neighbour</span>(<span class="ident">edge_to_split</span>);
 
         <span class="comment">// get points</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">process_hemisphere</span> <span class="op">=</span> <span class="op">|</span><span class="ident">index</span>: <span class="ident">usize</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="ident">usize</span>) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">process_hemisphere</span> <span class="op">=</span> <span class="op">|</span><span class="ident">index</span>: <span class="ident">usize</span><span class="op">|</span> -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>) {
             <span class="kw">let</span> <span class="ident">ab_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">index</span>]
                 .<span class="ident">triangle</span>
                 .<span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">segment_to_split</span>)
@@ -3386,7 +3386,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Adds a point to the interior of a [`Triangle3D`], splitting</span>
     <span class="doccomment">/// it into three</span>
-    <span class="kw">fn</span> <span class="ident">split_triangle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">point</span>: <span class="ident">Point3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">split_triangle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">point</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// The transformation is as follows (puts P in the middle,</span>
         <span class="comment">// and splits the triangle into three triangles):</span>
         <span class="comment">//             A                A</span>
@@ -3540,7 +3540,7 @@ SOFTWARE.
         <span class="ident">index</span>: <span class="ident">usize</span>,
         <span class="ident">point</span>: <span class="ident">Point3D</span>,
         <span class="ident">p_location</span>: <span class="ident">PointInTriangle</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    ) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">index</span>].<span class="ident">valid</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Trying to add point into an obsolete triangle&quot;</span>);
         }
@@ -3550,16 +3550,16 @@ SOFTWARE.
             <span class="bool-val">false</span>
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">p_location</span>.<span class="ident">is_edge</span>() {
             <span class="kw">let</span> <span class="ident">edge</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">p_location</span> {
-                <span class="ident">PointInTriangle::EdgeAB</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Edge::Ab</span>,
-                <span class="ident">PointInTriangle::EdgeBC</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Edge::Bc</span>,
-                <span class="ident">PointInTriangle::EdgeAC</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Edge::Ca</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PointInTriangle::EdgeAB</span> =&gt; <span class="ident">Edge::Ab</span>,
+                <span class="ident">PointInTriangle::EdgeBC</span> =&gt; <span class="ident">Edge::Bc</span>,
+                <span class="ident">PointInTriangle::EdgeAC</span> =&gt; <span class="ident">Edge::Ca</span>,
+                <span class="kw">_</span> =&gt; {
                     <span class="macro">panic!</span>(<span class="string">&quot;Trying to split edge with a point that does not fall on an edge&quot;</span>)
                 }
             };
             <span class="self">self</span>.<span class="ident">split_edge</span>(<span class="ident">index</span>, <span class="ident">edge</span>, <span class="ident">point</span>).<span class="ident">unwrap</span>();
             <span class="bool-val">true</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">p_location</span> <span class="op">=</span><span class="op">=</span> <span class="ident">PointInTriangle::Inside</span> {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">p_location</span> <span class="op">==</span> <span class="ident">PointInTriangle::Inside</span> {
             <span class="self">self</span>.<span class="ident">split_triangle</span>(<span class="ident">index</span>, <span class="ident">point</span>).<span class="ident">unwrap</span>();
             <span class="bool-val">true</span>
         } <span class="kw">else</span> {
@@ -3570,7 +3570,7 @@ SOFTWARE.
     <span class="doccomment">/// Finds the location of a [`Point3D`] within the triangulation</span>
     <span class="doccomment">/// and inserts it. Returns a `bool` indicating if the addition of the new [`Point3D`]</span>
     <span class="doccomment">/// produced any change</span>
-    <span class="kw">fn</span> <span class="ident">add_point</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">point</span>: <span class="ident">Point3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">add_point</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">point</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// Iterate through triangles to check</span>
 
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">tripiece</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">triangles</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
@@ -3593,7 +3593,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Refines a [`Triangulation3D`]. This only works if all then [`Triangle3D`] have their</span>
     <span class="doccomment">/// vertices in the same order, meaning that their `normal` points in the same direction.</span>
-    <span class="kw">fn</span> <span class="ident">refine</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_area</span>: <span class="ident">Float</span>, <span class="ident">max_aspect_ratio</span>: <span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">refine</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_area</span>: <span class="ident">Float</span>, <span class="ident">max_aspect_ratio</span>: <span class="ident">Float</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// let n_triangles = self.n_triangles();</span>
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">any_changes</span> <span class="op">=</span> <span class="bool-val">false</span>;
@@ -3637,13 +3637,13 @@ SOFTWARE.
                 <span class="comment">// Since the circumcenter may be in another triangle, we need</span>
                 <span class="comment">// to search for it.</span>
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">add_point</span>(<span class="ident">c_center</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">did_something</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">did_something</span>) =&gt; {
                         <span class="kw">if</span> <span class="ident">did_something</span> {
                             <span class="ident">any_changes</span> <span class="op">=</span> <span class="bool-val">true</span>;
                             <span class="self">self</span>.<span class="ident">restore_delaunay</span>(<span class="ident">max_aspect_ratio</span>);
                         }
                     }
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                         <span class="comment">// What should I do if the circumcenter is out of the polygon?</span>
                         <span class="comment">// For now just add the centroid of it...</span>
                         <span class="kw">let</span> <span class="ident">centroid</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">i</span>].<span class="ident">centroid</span>;
@@ -3665,7 +3665,7 @@ SOFTWARE.
     }
 } <span class="comment">// end of impl Triangulation3D</span>
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_convex</span>(<span class="ident">a</span>: <span class="ident">Point3D</span>, <span class="ident">b</span>: <span class="ident">Point3D</span>, <span class="ident">c</span>: <span class="ident">Point3D</span>, <span class="ident">d</span>: <span class="ident">Point3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_convex</span>(<span class="ident">a</span>: <span class="ident">Point3D</span>, <span class="ident">b</span>: <span class="ident">Point3D</span>, <span class="ident">c</span>: <span class="ident">Point3D</span>, <span class="ident">d</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">bool</span> {
     <span class="comment">// The points are aligned like this, if it is convex.</span>
     <span class="comment">//         B</span>
     <span class="comment">//        /\</span>
@@ -3731,7 +3731,7 @@ SOFTWARE.
         <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Polygon3D</span>,
         <span class="ident">max_area</span>: <span class="ident">Float</span>,
         <span class="ident">max_aspect_ratio</span>: <span class="ident">Float</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// Test area.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">triangulation_area</span> <span class="op">=</span> <span class="number">0.</span>;
         <span class="kw">let</span> <span class="ident">polygon_normal</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">normal</span>();
@@ -3892,7 +3892,7 @@ SOFTWARE.
         <span class="ident">max_x</span>: <span class="ident">Float</span>,
         <span class="ident">min_y</span>: <span class="ident">Float</span>,
         <span class="ident">max_y</span>: <span class="ident">Float</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    ) -&gt; <span class="ident">String</span> {
         <span class="comment">// Arrange a transformation</span>
         <span class="kw">const</span> <span class="ident">SCALE</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">50.</span>;
         <span class="kw">const</span> <span class="ident">PADDING</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">5.</span>; <span class="comment">// PErcentage of BBOX</span>
@@ -3901,7 +3901,7 @@ SOFTWARE.
         <span class="kw">let</span> <span class="ident">padding_x</span> <span class="op">=</span> <span class="ident">PADDING</span> <span class="op">*</span> <span class="ident">width</span> <span class="op">/</span> <span class="number">100.</span>;
         <span class="kw">let</span> <span class="ident">padding_y</span> <span class="op">=</span> <span class="ident">PADDING</span> <span class="op">*</span> <span class="ident">height</span> <span class="op">/</span> <span class="number">100.</span>;
 
-        <span class="kw">let</span> <span class="ident">into_svg_coordinates</span> <span class="op">=</span> <span class="op">|</span><span class="ident">pt</span>: <span class="ident">Point3D</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Point3D</span> {
+        <span class="kw">let</span> <span class="ident">into_svg_coordinates</span> <span class="op">=</span> <span class="op">|</span><span class="ident">pt</span>: <span class="ident">Point3D</span><span class="op">|</span> -&gt; <span class="ident">Point3D</span> {
             <span class="ident">Point3D::new</span>(<span class="ident">pt</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">min_x</span> <span class="op">+</span> <span class="ident">padding_x</span>, <span class="ident">padding_y</span> <span class="op">+</span> <span class="ident">max_y</span> <span class="op">-</span> <span class="ident">pt</span>.<span class="ident">y</span>, <span class="number">0.0</span>)
         };
 
@@ -3986,7 +3986,7 @@ SOFTWARE.
         <span class="ident">ret</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">get_svg</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="ident">Triangulation3D</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Polygon3D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">get_svg</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="ident">Triangulation3D</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Polygon3D</span>) -&gt; <span class="ident">String</span> {
         <span class="comment">// Get polygon bounding box</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">min_x</span> <span class="op">=</span> <span class="ident">Float::MAX</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_x</span> <span class="op">=</span> <span class="ident">Float::MIN</span>;
@@ -4015,7 +4015,7 @@ SOFTWARE.
         <span class="kw">let</span> <span class="ident">padding_x</span> <span class="op">=</span> <span class="ident">PADDING</span> <span class="op">*</span> <span class="ident">width</span> <span class="op">/</span> <span class="number">100.</span>;
         <span class="kw">let</span> <span class="ident">padding_y</span> <span class="op">=</span> <span class="ident">PADDING</span> <span class="op">*</span> <span class="ident">height</span> <span class="op">/</span> <span class="number">100.</span>;
 
-        <span class="kw">let</span> <span class="ident">into_svg_coordinates</span> <span class="op">=</span> <span class="op">|</span><span class="ident">pt</span>: <span class="ident">Point3D</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Point3D</span> {
+        <span class="kw">let</span> <span class="ident">into_svg_coordinates</span> <span class="op">=</span> <span class="op">|</span><span class="ident">pt</span>: <span class="ident">Point3D</span><span class="op">|</span> -&gt; <span class="ident">Point3D</span> {
             <span class="ident">Point3D::new</span>(<span class="ident">pt</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">min_x</span> <span class="op">+</span> <span class="ident">padding_x</span>, <span class="ident">padding_y</span> <span class="op">+</span> <span class="ident">max_y</span> <span class="op">-</span> <span class="ident">pt</span>.<span class="ident">y</span>, <span class="number">0.0</span>)
         };
 
@@ -4220,25 +4220,25 @@ SOFTWARE.
         <span class="ident">t</span>.<span class="ident">push</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="number">0</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">match</span> <span class="ident">t</span>.<span class="ident">get_first_invalid</span>(<span class="number">0</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">_i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">false</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">true</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">_i</span>) =&gt; <span class="macro">assert!</span>(<span class="bool-val">false</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
         };
 
         <span class="ident">t</span>.<span class="ident">invalidate</span>(<span class="number">1</span>).<span class="ident">unwrap</span>();
         <span class="kw">match</span> <span class="ident">t</span>.<span class="ident">get_first_invalid</span>(<span class="number">0</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">i</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">false</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">i</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="macro">assert!</span>(<span class="bool-val">false</span>),
         };
 
         <span class="ident">t</span>.<span class="ident">invalidate</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
         <span class="kw">match</span> <span class="ident">t</span>.<span class="ident">get_first_invalid</span>(<span class="number">0</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">i</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">false</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">i</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="macro">assert!</span>(<span class="bool-val">false</span>),
         };
 
         <span class="kw">match</span> <span class="ident">t</span>.<span class="ident">get_first_invalid</span>(<span class="number">1</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">i</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">false</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">i</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="macro">assert!</span>(<span class="bool-val">false</span>),
         };
     }
 

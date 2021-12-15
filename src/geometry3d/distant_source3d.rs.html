@@ -184,6 +184,11 @@
 <span id="150">150</span>
 <span id="151">151</span>
 <span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -215,7 +220,8 @@ SOFTWARE.
     <span class="ident">Point3D</span>,
     <span class="ident">Ray3D</span>,
     <span class="ident">Transform</span>,
-    <span class="ident">Vector3D</span>
+    <span class="ident">Vector3D</span>,
+    <span class="ident">BBox3D</span>,
 };
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Float</span>, <span class="ident">PI</span>};
@@ -252,7 +258,7 @@ SOFTWARE.
     <span class="doccomment">/// # Inputs:</span>
     <span class="doccomment">/// * direction: A [`Vector3D`] pointing to the souRefCounte</span>
     <span class="doccomment">/// * angle: The flat angle in Radians (e.g., a hemisphere would be $`\pi`$)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">direction</span>: <span class="ident">Vector3D</span>, <span class="ident">angle</span>: <span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">direction</span>: <span class="ident">Vector3D</span>, <span class="ident">angle</span>: <span class="ident">Float</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">tan_half_alpha</span> <span class="op">=</span> (<span class="ident">angle</span> <span class="op">/</span> <span class="number">2.0</span>).<span class="ident">tan</span>();
         <span class="kw">let</span> <span class="ident">omega</span> <span class="op">=</span> <span class="ident">tan_half_alpha</span> <span class="op">*</span> <span class="ident">tan_half_alpha</span> <span class="op">*</span> <span class="ident">PI</span>;
         <span class="self">Self</span> {
@@ -268,7 +274,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Creates a proxy [`Disk3D`] that can be used for sampling and</span>
     <span class="doccomment">/// other operations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_proxy_disk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">t</span>: <span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Disk3D</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_proxy_disk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">t</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Disk3D</span> {
         <span class="comment">// Simulate a Disk3D and get that value.</span>
         <span class="kw">let</span> <span class="ident">center</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">direction</span> <span class="op">*</span> <span class="ident">t</span>).<span class="ident">as_point3d</span>();
         <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">direction</span>;
@@ -279,15 +285,19 @@ SOFTWARE.
 }
 
 <span class="kw">impl</span> <span class="ident">Intersect</span> <span class="kw">for</span> <span class="ident">DistantSource3D</span> {
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;souRefCounte&quot;</span>
+    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="string">&quot;source&quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span> {
+    <span class="kw">fn</span> <span class="ident">bounds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)-&gt;<span class="ident">BBox3D</span>{
+        <span class="macro">panic!</span>(<span class="string">&quot;Trying to get the bounds of a {}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>())
+    }
+
+    <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
         <span class="ident">Float::MAX</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">transform</span>
     }
 
@@ -296,7 +306,7 @@ SOFTWARE.
         <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
         <span class="ident">o_error</span>: <span class="ident">Point3D</span>,
         <span class="ident">d_error</span>: <span class="ident">Point3D</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntersectionInfo</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntersectionInfo</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">phit</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">simple_intersect_local_ray</span>(<span class="ident">ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">10.</span>;
         <span class="kw">let</span> <span class="ident">phi</span> <span class="op">=</span> <span class="number">0.5</span>; <span class="comment">// I don&#39;t think this value is relevant</span>
@@ -312,7 +322,7 @@ SOFTWARE.
         <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
         <span class="ident">_o_error</span>: <span class="ident">Point3D</span>,
         <span class="ident">_d_error</span>: <span class="ident">Point3D</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> {
         <span class="comment">// intersects as long as it is in the same direction...</span>
         <span class="kw">let</span> <span class="ident">cos_angle</span> <span class="op">=</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">get_normalized</span>() <span class="op">*</span> <span class="self">self</span>.<span class="ident">direction</span>;
         <span class="kw">if</span> <span class="ident">cos_angle</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">cos_half_alpha</span> {
