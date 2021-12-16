@@ -65,55 +65,7 @@ impl Vector3D {
     /// Gets a normalized [`Vector3D`] that is perpendicular
     /// to `self`
     pub fn get_perpendicular(&self) -> Result<Self, String> {
-        /* OPTION 1 */
-        // if self.length_squared() < 1e-7{
-        //     return Err(format!(
-        //         "Trying to get a Vector3D perpendicular to a Zero Vector (self = {})",
-        //         self
-        //     ));
-        // }
         
-        // if self.is_parallel(Vector3D::new(1., 0., 0.)){
-        //     let mut ret = self.cross(Vector3D::new(0., 1., 0.));
-        //     ret.normalize();
-        //     Ok(ret)
-        // }else{
-        //     let mut ret = self.cross(Vector3D::new(1., 0., 0.));
-        //     ret.normalize();
-        //     Ok(ret)
-        // }
-
-        /* OPTION 2 */
-        // const TINY: Float = 100. * Float::EPSILON;
-        // let x: Float;
-        // let y: Float;
-        // let z: Float;
-        // if self.x.abs() > TINY {
-        //     // Choose y and z to be 1.
-        //     y = 1.;
-        //     z = 1.;
-        //     x = (-self.y - self.z) / self.x;
-        // } else if self.y.abs() > TINY {
-        //     // Choosexy and z to be 1.
-        //     x = 1.;
-        //     z = 1.;
-        //     y = (-self.x - self.z) / self.y;
-        // } else if self.z.abs() > TINY {
-        //     // Choosex x and y to be 1.
-        //     x = 1.;
-        //     y = 1.;
-        //     z = (-self.x - self.y) / self.z;
-        // } else {
-        //     return Err(format!(
-        //         "Trying to get a Vector3D perpendicular to a Zero Vector (self = {})",
-        //         self
-        //     ));
-        // }
-        // let mut ret = Self::new(x, y, z);
-        // ret.normalize();
-        // Ok(ret)
-
-        /* OPTION 3 */
         const TINY: Float = 100. * Float::EPSILON;
         let ax: Float;
         let ay: Float;
@@ -178,6 +130,7 @@ impl Vector3D {
     }
 
     pub fn get_normalized(&self) -> Vector3D {
+        debug_assert!(self.length_squared() >= 1e-9);
         let l = self.length();
         Vector3D {
             x: self.x / l,
