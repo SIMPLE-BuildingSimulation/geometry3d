@@ -1270,8 +1270,7 @@ mod testing {
     use std::io::prelude::*;
 
     fn draw_triangulation(filename: &str, cases: Vec<(&str, String)>) {
-        return;
-
+        
         let mut file = File::create(format!("./test_data/{}", filename)).unwrap();
         file.write(b"<html><head></head><body>").unwrap();
 

@@ -4,4 +4,4 @@ Cargo.lock
 .vscode
 clippy.txt
 .DS_Store
-/test_data/*
+/test_data/*.html
