@@ -130,7 +130,7 @@ impl Vector3D {
     }
 
     pub fn get_normalized(&self) -> Vector3D {
-        debug_assert!(self.length_squared() >= 1e-9);
+        debug_assert!(self.length() >= 1e-9, "Length was {}", self.length());
         let l = self.length();
         Vector3D {
             x: self.x / l,
