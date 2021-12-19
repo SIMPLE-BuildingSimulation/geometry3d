@@ -415,6 +415,7 @@
 <span id="381">381</span>
 <span id="382">382</span>
 <span id="383">383</span>
+<span id="384">384</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -458,6 +459,7 @@ SOFTWARE.
 <span class="doccomment">/// Z value of `zmin` and ending at `zmax`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// It can be an &#39;open&#39; cylinder, by setting a `phi_max` less than `2.*PI`</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Cylinder3D</span> {
     <span class="doccomment">/// The radius of the `Cylinder3D`</span>
     <span class="ident">radius</span>: <span class="ident">Float</span>,

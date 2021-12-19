@@ -260,6 +260,7 @@
 <span id="226">226</span>
 <span id="227">227</span>
 <span id="228">228</span>
+<span id="229">229</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -301,6 +302,7 @@ SOFTWARE.
 <span class="doccomment">/// Represents a solid angle pointing from any [`Point3D`] in the scene towards</span>
 <span class="doccomment">/// a certain `direction` (i.e., a [`Vector3D`]). So, this is not really a surface</span>
 <span class="doccomment">/// because it is at an infinite distance from any point.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DistantSource3D</span> {
     <span class="doccomment">/// The direction pointing to the souRefCounte</span>
     <span class="kw">pub</span> <span class="ident">direction</span>: <span class="ident">Vector3D</span>,
