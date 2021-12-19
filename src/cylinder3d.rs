@@ -25,7 +25,9 @@ SOFTWARE.
 use crate::round_error::ApproxFloat;
 use crate::{Float, PI};
 
-use crate::intersect_trait::{Intersect, IntersectionInfo};
+// use crate::intersect_trait::{Intersect, IntersectionInfo};
+use crate::intersection::IntersectionInfo;
+
 use crate::{
     Point3D,
     Ray3D,
@@ -59,10 +61,14 @@ pub struct Cylinder3D {
 }
 
 impl Cylinder3D {
+
+    /// Creates a new full `Cylinder3D`; i.e., it is a revolution of 360 degrees
     pub fn new(p0: Point3D, p1: Point3D, radius: Float) -> Self {
         Self::new_partial(p0, p1, radius, 360.)
     }
 
+    /// Creates a new partial `Cylinder3D`; i.e., it does not have to be closed. For instance, 
+    /// it can only be a 180 degree revolution
     pub fn new_partial(p0: Point3D, p1: Point3D, radius: Float, phi_max: Float) -> Self {
         let l = p1 - p0;
         let (x, y, z) = (l.x, l.y, l.z);
@@ -224,31 +230,34 @@ impl Cylinder3D {
             ray, phit, u, v, dpdu, dpdv, d2p_duu, d2p_dvv, d2p_duv,
         ))
     }
-}
 
-
-impl Intersect for Cylinder3D {
-    fn bounds(&self)->BBox3D{
+    /// Gets a `BBox3D` bounding the object, in local coordinates
+    pub fn bounds(&self)->BBox3D{
         let min = Point3D::new(-self.radius, -self.radius, self.zmin);
         let max = Point3D::new( self.radius,  self.radius, self.zmax);
         BBox3D::new(min, max)
     }
-    fn id(&self) -> &'static str {
+
+    /// The name of the figure. Useful for debugging.
+    pub fn id(&self) -> &'static str {
         "cylinder"
     }
 
     
-
-    fn area(&self) -> Float {
+    /// Gets the area of the object
+    pub fn area(&self) -> Float {
         debug_assert!(self.zmax > self.zmin);
         (self.zmax - self.zmin) * self.radius * self.phi_max
     }
 
-    fn transform(&self) -> &Option<RefCount<Transform>> {
+    /// Borrows the [`Transform`]
+    pub fn transform(&self) -> &Option<RefCount<Transform>> {
         &self.transform
     }
 
-    fn simple_intersect_local_ray(
+    /// Like `intersect_local_ray` but simplified because there is not need
+    /// for calcuating the paramtrisized elements
+    pub fn simple_intersect_local_ray(
         &self,
         ray: &Ray3D,
         o_error: Point3D,
@@ -259,7 +268,20 @@ impl Intersect for Cylinder3D {
         Some(phit)
     }
 
-    fn intersect_local_ray(
+    
+    /// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance
+    /// `t` and the normal [`Vector3D`] at that point. If the distance
+    /// is negative (i.e., the object is behind the plane), it should return
+    /// [`None`].    
+    ///
+    ///  The steps should be:
+    /// * Calculate the point of intersection
+    /// * Calculate normal and side of intersection
+    /// * Calculate (u,v)
+    /// * Calculate first derivative (i.e., dp_du, dp_dv)
+    /// * Calculate second derivative (i.e., d2p_duu, d2p_dvv, d2p_duv)
+    /// * Call `IntersectionInfo::new(ray,p, u, v, dpdu, dpdv, d2p_duu, d2p_dvv, d2p_duv)`
+    pub fn intersect_local_ray(
         &self,
         ray: &Ray3D,
         o_error: Point3D,
@@ -268,7 +290,75 @@ impl Intersect for Cylinder3D {
         let (phit, phi) = self.basic_intersection(ray, o_error, d_error)?;
         self.intersection_info(ray, phit, phi)
     }
+
+
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, returning the distance
+    /// `t` and the normal [`Vector3D`] at that point. If the distance
+    /// is negative (i.e., the object is behind the plane), it should return
+    /// [`None`]. Returns detailed [`IntersectionInfo`] about the intersaction .
+    pub fn intersect(&self, ray: &Ray3D) -> Option<IntersectionInfo> {
+        // Transform ray into object space, if needed
+        let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
+            t.inv_transform_ray(ray)
+        } else {
+            let t = Transform::new();
+            t.inv_transform_ray(ray)
+        };
+
+        // Intersect, and return transformed back... if needed
+        match self.intersect_local_ray(&local_ray, o_error, d_error) {
+            None => None,
+            Some(info) => {
+                if let Some(t) = self.transform() {
+                    Some(info.transform(t))
+                } else {
+                    Some(info)
+                }
+            }
+        }
+    }
+
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, returning the distance
+    /// `t` and the normal [`Vector3D`] at that point. If the distance
+    /// is negative (i.e., the object is behind the plane), it should return
+    /// [`None`]. Returns only the point of intersection.
+    pub fn simple_intersect(&self, ray: &Ray3D) -> Option<Point3D> {
+        // Transform ray into object space, if needed
+        let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
+            t.inv_transform_ray(ray)
+        } else {
+            let t = Transform::new();
+            t.inv_transform_ray(ray)
+        };
+
+        // Intersect, and return transformed back... if needed
+        match self.simple_intersect_local_ray(&local_ray, o_error, d_error) {
+            None => None,
+            Some(phit) => {
+                if let Some(t) = self.transform() {
+                    Some(t.transform_pt(phit))
+                } else {
+                    Some(phit)
+                }
+            }
+        }
+    }
+    
+     /// Gets a `BBox3D` bounding the object, in world's coordinates.
+     pub fn world_bounds(&self)->BBox3D{
+         let local_b = self.bounds();
+         match self.transform() {
+             Some(t)=>{
+                 t.transform_bbox(local_b)
+             },
+             None => local_b
+         }
+     }
+
 }
+
+
+
 
 #[cfg(test)]
 mod testing {

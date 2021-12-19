@@ -25,7 +25,9 @@ SOFTWARE.
 use crate::{Float, PI};
 use crate::RefCount;
 
-use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
+// use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
+use crate::intersection::{IntersectionInfo, SurfaceSide};
+
 use crate::{
     Plane3D,
     Ray3D,
@@ -213,29 +215,31 @@ impl Disk3D {
             side,
         })
     }
-}
 
 
-
-impl Intersect for Disk3D {
-    
-    fn bounds(&self)->BBox3D{
+    /// Gets a `BBox3D` bounding the object, in local coordinates     
+    pub fn bounds(&self)->BBox3D{
         unimplemented!();
     }
 
-    fn id(&self) -> &'static str {
+    /// The name of the figure. Useful for debugging.
+    pub fn id(&self) -> &'static str {
         "disk"
     }
 
-    fn area(&self) -> Float {
+    /// Gets the area of the object
+    pub fn area(&self) -> Float {
         self.phi_max * 0.5 * (self.radius * self.radius - self.inner_radius * self.inner_radius)
     }
 
-    fn transform(&self) -> &Option<RefCount<Transform>> {
+    /// Borrows the [`Transform`]
+    pub fn transform(&self) -> &Option<RefCount<Transform>> {
         &self.transform
     }
 
-    fn simple_intersect_local_ray(
+    /// Like `intersect_local_ray` but simplified because there is not need
+    /// for calcuating the paramtrisized elements
+    pub fn simple_intersect_local_ray(
         &self,
         ray: &Ray3D,
         o_error: Point3D,
@@ -245,7 +249,7 @@ impl Intersect for Disk3D {
         Some(phit)
     }
 
-    fn intersect_local_ray(
+    pub fn intersect_local_ray(
         &self,
         ray: &Ray3D,
         o_error: Point3D,
@@ -255,7 +259,74 @@ impl Intersect for Disk3D {
 
         self.intersection_info(ray, phit, phi)
     }
+
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, returning the distance
+    /// `t` and the normal [`Vector3D`] at that point. If the distance
+    /// is negative (i.e., the object is behind the plane), it should return
+    /// [`None`]. Returns detailed [`IntersectionInfo`] about the intersaction .
+    pub fn intersect(&self, ray: &Ray3D) -> Option<IntersectionInfo> {
+        // Transform ray into object space, if needed
+        let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
+            t.inv_transform_ray(ray)
+        } else {
+            let t = Transform::new();
+            t.inv_transform_ray(ray)
+        };
+
+        // Intersect, and return transformed back... if needed
+        match self.intersect_local_ray(&local_ray, o_error, d_error) {
+            None => None,
+            Some(info) => {
+                if let Some(t) = self.transform() {
+                    Some(info.transform(t))
+                } else {
+                    Some(info)
+                }
+            }
+        }
+    }
+
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, returning the distance
+    /// `t` and the normal [`Vector3D`] at that point. If the distance
+    /// is negative (i.e., the object is behind the plane), it should return
+    /// [`None`]. Returns only the point of intersection.
+    pub fn simple_intersect(&self, ray: &Ray3D) -> Option<Point3D> {
+        // Transform ray into object space, if needed
+        let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
+            t.inv_transform_ray(ray)
+        } else {
+            let t = Transform::new();
+            t.inv_transform_ray(ray)
+        };
+
+        // Intersect, and return transformed back... if needed
+        match self.simple_intersect_local_ray(&local_ray, o_error, d_error) {
+            None => None,
+            Some(phit) => {
+                if let Some(t) = self.transform() {
+                    Some(t.transform_pt(phit))
+                } else {
+                    Some(phit)
+                }
+            }
+        }
+    }
+    
+     /// Gets a `BBox3D` bounding the object, in world's coordinates.
+     pub  fn world_bounds(&self)->BBox3D{
+         let local_b = self.bounds();
+         match self.transform() {
+             Some(t)=>{
+                 t.transform_bbox(local_b)
+             },
+             None => local_b
+         }
+     }
 }
+
+
+
+
 
 #[cfg(test)]
 mod testing {

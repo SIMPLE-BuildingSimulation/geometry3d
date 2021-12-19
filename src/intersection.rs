@@ -14,7 +14,7 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERefCountHANTABILITY,
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
@@ -22,16 +22,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+
 use crate::{
     Point3D,
     Ray3D,
     Transform,
     Vector3D,
-    BBox3D,
+    Float,
 };
 
-use crate::Float;
-use crate::RefCount;
 
 /// Is the [`Ray3D`] intersecting from the Front or Back side?
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -59,6 +58,8 @@ impl SurfaceSide {
         }
     }
 }
+
+
 
 /// Contains more detailed information about the
 /// what is happening at the surface in the intersection point
@@ -166,110 +167,7 @@ impl IntersectionInfo {
     }
 }
 
-pub trait Intersect {
-    /// The name of the figure. Useful for debugging.
-    fn id(&self) -> &'static str;
-    
-    /// Gets the area of the object
-    fn area(&self) -> Float;
 
-    /// Borrows the [`Transform`]
-    fn transform(&self) -> &Option<RefCount<Transform>>;
-
-    /// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance
-    /// `t` and the normal [`Vector3D`] at that point. If the distance
-    /// is negative (i.e., the object is behind the plane), it should return
-    /// [`None`].    
-    ///
-    ///  The steps should be:
-    /// * Calculate the point of intersection
-    /// * Calculate normal and side of intersection
-    /// * Calculate (u,v)
-    /// * Calculate first derivative (i.e., dp_du, dp_dv)
-    /// * Calculate second derivative (i.e., d2p_duu, d2p_dvv, d2p_duv)
-    /// * Call `IntersectionInfo::new(ray,p, u, v, dpdu, dpdv, d2p_duu, d2p_dvv, d2p_duv)`
-    fn intersect_local_ray(
-        &self,
-        ray: &Ray3D,
-        o_error: Point3D,
-        d_error: Point3D,
-    ) -> Option<IntersectionInfo>;
-
-    /// Like `intersect_local_ray` but simplified because there is not need
-    /// for calcuating the paramtrisized elements
-    fn simple_intersect_local_ray(
-        &self,
-        ray: &Ray3D,
-        o_error: Point3D,
-        d_error: Point3D,
-    ) -> Option<Point3D>;
-
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, returning the distance
-    /// `t` and the normal [`Vector3D`] at that point. If the distance
-    /// is negative (i.e., the object is behind the plane), it should return
-    /// [`None`]. Returns detailed [`IntersectionInfo`] about the intersaction .
-    fn intersect(&self, ray: &Ray3D) -> Option<IntersectionInfo> {
-        // Transform ray into object space, if needed
-        let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
-            t.inv_transform_ray(ray)
-        } else {
-            let t = Transform::new();
-            t.inv_transform_ray(ray)
-        };
-
-        // Intersect, and return transformed back... if needed
-        match self.intersect_local_ray(&local_ray, o_error, d_error) {
-            None => None,
-            Some(info) => {
-                if let Some(t) = self.transform() {
-                    Some(info.transform(t))
-                } else {
-                    Some(info)
-                }
-            }
-        }
-    }
-
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, returning the distance
-    /// `t` and the normal [`Vector3D`] at that point. If the distance
-    /// is negative (i.e., the object is behind the plane), it should return
-    /// [`None`]. Returns only the point of intersection.
-    fn simple_intersect(&self, ray: &Ray3D) -> Option<Point3D> {
-        // Transform ray into object space, if needed
-        let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
-            t.inv_transform_ray(ray)
-        } else {
-            let t = Transform::new();
-            t.inv_transform_ray(ray)
-        };
-
-        // Intersect, and return transformed back... if needed
-        match self.simple_intersect_local_ray(&local_ray, o_error, d_error) {
-            None => None,
-            Some(phit) => {
-                if let Some(t) = self.transform() {
-                    Some(t.transform_pt(phit))
-                } else {
-                    Some(phit)
-                }
-            }
-        }
-    }
-
-     /// Gets a `BBox3D` bounding the object, in local coordinates
-     fn bounds(&self)->BBox3D;
-
-     /// Gets a `BBox3D` bounding the object, in world's coordinates.
-     fn world_bounds(&self)->BBox3D{
-         let local_b = self.bounds();
-         match self.transform() {
-             Some(t)=>{
-                 t.transform_bbox(local_b)
-             },
-             None => local_b
-         }
-     }
-}
 
 #[cfg(test)]
 mod testing {

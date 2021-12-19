@@ -44,7 +44,8 @@ type RefCount<T> = std::sync::Arc<T>;
 type RefCount<T> = std::rc::Rc<T>;
 
 mod utils;
-pub mod intersect_trait;
+// pub mod intersect_trait;
+pub mod intersection;
 pub mod round_error;
 
 
