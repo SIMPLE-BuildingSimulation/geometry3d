@@ -576,7 +576,7 @@ SOFTWARE.
         <span class="kw">let</span> <span class="ident">dpdv</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">phi_zero</span> <span class="op">*</span> (<span class="op">-</span><span class="ident">rhit_cos_phi</span>)
             <span class="op">+</span> <span class="ident">zxn</span> <span class="op">*</span> (<span class="ident">rhit_sin_phi</span> <span class="op">/</span> <span class="ident">rhit</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">radius</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">inner_radius</span>));
 
-        <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="ident">dpdv</span>.<span class="ident">cross</span>(<span class="ident">dpdu</span>).<span class="ident">get_normalized</span>();
+        <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">normal</span>;<span class="comment">//dpdv.cross(dpdu).get_normalized();</span>
         <span class="kw">let</span> (<span class="ident">normal</span>, <span class="ident">side</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">ray</span>.<span class="ident">direction</span>);
 
         <span class="comment">// We know some things are Zero... so let&#39;s not call the `IntersectionInfo::new(..)` function.</span>
