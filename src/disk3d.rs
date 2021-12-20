@@ -199,7 +199,7 @@ impl Disk3D {
         let dpdv = self.phi_zero * (-rhit_cos_phi)
             + zxn * (rhit_sin_phi / rhit * (self.radius - self.inner_radius));
 
-        let normal = dpdv.cross(dpdu).get_normalized();
+        let normal = self.normal;//dpdv.cross(dpdu).get_normalized();
         let (normal, side) = SurfaceSide::get_side(normal, ray.direction);
 
         // We know some things are Zero... so let's not call the `IntersectionInfo::new(..)` function.
