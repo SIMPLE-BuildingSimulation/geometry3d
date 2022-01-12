@@ -51,10 +51,10 @@ pub struct DistantSource3D {
     pub angle: Float,
 
     /// Cos half angle
-    cos_half_alpha: Float,
+    pub cos_half_alpha: Float,
 
     /// Tan of half angle
-    tan_half_alpha: Float,
+    pub tan_half_alpha: Float,
 
     /// A pointer to the [`Transform`] associated with this [`DistantSouRefCounte3D`]
     transform: Option<RefCount<Transform>>,
