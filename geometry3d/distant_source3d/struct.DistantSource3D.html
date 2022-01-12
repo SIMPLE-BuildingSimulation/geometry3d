@@ -36,8 +36,8 @@
     pub direction: <a class="struct" href="../vector3d/struct.Vector3D.html" title="struct geometry3d::vector3d::Vector3D">Vector3D</a>,
     pub omega: <a class="primitive" href="https://doc.rust-lang.org/1.57.0/std/primitive.f64.html">f64</a>,
     pub angle: <a class="primitive" href="https://doc.rust-lang.org/1.57.0/std/primitive.f64.html">f64</a>,
-    cos_half_alpha: <a class="primitive" href="https://doc.rust-lang.org/1.57.0/std/primitive.f64.html">f64</a>,
-    tan_half_alpha: <a class="primitive" href="https://doc.rust-lang.org/1.57.0/std/primitive.f64.html">f64</a>,
+    pub cos_half_alpha: <a class="primitive" href="https://doc.rust-lang.org/1.57.0/std/primitive.f64.html">f64</a>,
+    pub tan_half_alpha: <a class="primitive" href="https://doc.rust-lang.org/1.57.0/std/primitive.f64.html">f64</a>,
     transform: <a class="enum" href="https://doc.rust-lang.org/1.57.0/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/1.57.0/alloc/rc/struct.Rc.html" title="struct alloc::rc::Rc">Rc</a>&lt;<a class="struct" href="../transform/struct.Transform.html" title="struct geometry3d::transform::Transform">Transform</a>&gt;&gt;,
 }</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Represents a solid angle pointing from any <a href="../point3d/struct.Point3D.html" title="Point3D"><code>Point3D</code></a> in the scene towards
 a certain <code>direction</code> (i.e., a <a href="../vector3d/struct.Vector3D.html" title="Vector3D"><code>Vector3D</code></a>). So, this is not really a surface
