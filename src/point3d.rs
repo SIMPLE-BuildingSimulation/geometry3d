@@ -129,6 +129,14 @@ impl std::ops::AddAssign<Vector3D> for Point3D {
     }
 }
 
+impl std::ops::SubAssign<Vector3D> for Point3D {
+    fn sub_assign(&mut self, other: Vector3D) {
+        self.x -= other.x;
+        self.y -= other.y;
+        self.z -= other.z;
+    }
+}
+
 impl std::ops::Sub<Point3D> for Point3D {
     type Output = Vector3D;
 
