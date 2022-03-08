@@ -136,15 +136,6 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -244,16 +235,7 @@ SOFTWARE.
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bbox3d</span>::{<span class="ident">BBox3D</span>, <span class="ident">BBoxAxis</span>};
 
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">intersection_texture</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">intersection_texture</span>::{<span class="ident">SurfaceSide</span>, <span class="ident">IntersectionInfo</span>};
-
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>))]</span>
-<span class="kw">mod</span> <span class="ident">intersection_no_texture</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">intersection_no_texture</span>::{<span class="ident">SurfaceSide</span>, <span class="ident">IntersectionInfo</span>};
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">intersection</span>;
 
 
 </code></pre></div>

@@ -950,8 +950,6 @@
 <span id="914">914</span>
 <span id="915">915</span>
 <span id="916">916</span>
-<span id="917">917</span>
-<span id="918">918</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -977,8 +975,8 @@ SOFTWARE.
 */</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::intersection</span>::{<span class="ident">IntersectionInfo</span>, <span class="ident">SurfaceSide</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IntersectionInfo</span>, <span class="ident">SurfaceSide</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">Point3D</span>,
     <span class="ident">Ray3D</span>,
@@ -1449,27 +1447,25 @@ SOFTWARE.
         <span class="comment">// eprintln!(&quot;normal = {}&quot;, normal);</span>
         <span class="kw">let</span> (<span class="ident">normal</span>, <span class="ident">side</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">ray</span>.<span class="ident">direction</span>);
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">IntersectionInfo</span> {
+        
+        <span class="prelude-val">Some</span>(<span class="ident">IntersectionInfo</span> {
             <span class="ident">p</span>: <span class="ident">phit</span>,
-            <span class="ident">_u</span>,
-            <span class="ident">_v</span>,
             <span class="ident">dpdu</span>,
             <span class="ident">dpdv</span>,
-            <span class="ident">dndu</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
-            <span class="ident">dndv</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
             <span class="ident">normal</span>,
             <span class="ident">side</span>,
-        });
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>))]</span>
-        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">IntersectionInfo</span> {
-            <span class="ident">p</span>: <span class="ident">phit</span>,            
-            <span class="ident">dpdu</span>,
-            <span class="ident">dpdv</span>,            
-            <span class="ident">normal</span>,
-            <span class="ident">side</span>,
-        });
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
+            <span class="ident">u</span>: <span class="ident">_u</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
+            <span class="ident">v</span>: <span class="ident">_v</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
+            <span class="ident">dndu</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
+            <span class="ident">dndv</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+        })
+
+        
     }
 
     <span class="doccomment">/// Like `intersect_local_ray` but simplified because there is not need</span>
