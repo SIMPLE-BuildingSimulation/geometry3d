@@ -45,9 +45,9 @@ type RefCount<T> = std::rc::Rc<T>;
 
 mod utils;
 // pub mod intersect_trait;
-pub mod intersection;
-pub mod round_error;
 
+
+pub mod round_error;
 
 // Objects
 mod cylinder3d;
@@ -95,3 +95,17 @@ pub use vector3d::Vector3D;
 
 mod bbox3d;
 pub use bbox3d::{BBox3D, BBoxAxis};
+
+
+#[cfg(feature = "textures")]
+mod intersection_texture;
+#[cfg(feature = "textures")]
+pub use intersection_texture::{SurfaceSide, IntersectionInfo};
+
+
+#[cfg(not(feature = "textures"))]
+mod intersection_no_texture;
+#[cfg(not(feature = "textures"))]
+pub use intersection_no_texture::{SurfaceSide, IntersectionInfo};
+
+

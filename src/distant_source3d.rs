@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 // use crate::intersect_trait::{Intersect, IntersectionInfo};
-use crate::intersection::IntersectionInfo;
+use crate::IntersectionInfo;
 use crate::{
     Disk3D,
     Point3D,

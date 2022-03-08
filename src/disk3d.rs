@@ -26,7 +26,7 @@ use crate::{Float, PI};
 use crate::RefCount;
 
 // use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
-use crate::intersection::{IntersectionInfo, SurfaceSide};
+use crate::{IntersectionInfo, SurfaceSide};
 
 use crate::{
     Plane3D,
@@ -188,8 +188,8 @@ impl Disk3D {
         let r = phit - self.centre;
         let rhit = r.length();
         // Calculate (u,v)
-        let u = phi / self.phi_max;
-        let v = (self.radius - rhit) / (self.radius - self.inner_radius);
+        let _u = phi / self.phi_max;
+        let _v = (self.radius - rhit) / (self.radius - self.inner_radius);
 
         // Calcuate first derivatives
         let zxn = self.phi_zero.cross(self.normal);
@@ -204,17 +204,27 @@ impl Disk3D {
         let (normal, side) = SurfaceSide::get_side(normal, ray.direction);
 
         // We know some things are Zero... so let's not call the `IntersectionInfo::new(..)` function.
-        Some(IntersectionInfo {
+        #[cfg(feature = "textures")]
+        return Some(IntersectionInfo {
             p: phit,
-            u,
-            v,
+            _u,
+            _v,
             dpdu,
             dpdv,
             dndu: Vector3D::new(0., 0., 0.),
             dndv: Vector3D::new(0., 0., 0.),
             normal,
             side,
-        })
+        });
+
+        #[cfg(not(feature = "textures"))]
+        return Some(IntersectionInfo {
+            p: phit,            
+            dpdu,
+            dpdv,            
+            normal,
+            side,
+        });
     }
 
 

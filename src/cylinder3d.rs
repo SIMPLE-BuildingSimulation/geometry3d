@@ -26,7 +26,7 @@ use crate::round_error::ApproxFloat;
 use crate::{Float, PI};
 
 // use crate::intersect_trait::{Intersect, IntersectionInfo};
-use crate::intersection::IntersectionInfo;
+use crate::IntersectionInfo;
 
 use crate::{
     Point3D,
