@@ -942,6 +942,16 @@
 <span id="906">906</span>
 <span id="907">907</span>
 <span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -968,7 +978,7 @@ SOFTWARE.
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::intersection</span>::{<span class="ident">IntersectionInfo</span>, <span class="ident">SurfaceSide</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IntersectionInfo</span>, <span class="ident">SurfaceSide</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">Point3D</span>,
     <span class="ident">Ray3D</span>,
@@ -1428,7 +1438,7 @@ SOFTWARE.
         <span class="ident">o_error</span>: <span class="ident">Point3D</span>,
         <span class="ident">d_error</span>: <span class="ident">Point3D</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntersectionInfo</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">phit</span>, <span class="ident">u</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">basic_intersection</span>(<span class="ident">ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> (<span class="ident">phit</span>, <span class="ident">_u</span>, <span class="ident">_v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">basic_intersection</span>(<span class="ident">ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>)<span class="question-mark">?</span>;
         <span class="comment">// eprintln!(&quot;Ray is {:?}&quot;, ray);</span>
         <span class="comment">// eprintln!(&quot;Triangle is {}&quot;, self);</span>
         <span class="comment">// eprintln!(&quot;phit = {} | u = {} | v = {}&quot;, phit, u, v);</span>
@@ -1439,17 +1449,27 @@ SOFTWARE.
         <span class="comment">// eprintln!(&quot;normal = {}&quot;, normal);</span>
         <span class="kw">let</span> (<span class="ident">normal</span>, <span class="ident">side</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">ray</span>.<span class="ident">direction</span>);
 
-        <span class="prelude-val">Some</span>(<span class="ident">IntersectionInfo</span> {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
+        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">IntersectionInfo</span> {
             <span class="ident">p</span>: <span class="ident">phit</span>,
-            <span class="ident">u</span>,
-            <span class="ident">v</span>,
+            <span class="ident">_u</span>,
+            <span class="ident">_v</span>,
             <span class="ident">dpdu</span>,
             <span class="ident">dpdv</span>,
             <span class="ident">dndu</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
             <span class="ident">dndv</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
             <span class="ident">normal</span>,
             <span class="ident">side</span>,
-        })
+        });
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>))]</span>
+        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">IntersectionInfo</span> {
+            <span class="ident">p</span>: <span class="ident">phit</span>,            
+            <span class="ident">dpdu</span>,
+            <span class="ident">dpdv</span>,            
+            <span class="ident">normal</span>,
+            <span class="ident">side</span>,
+        });
     }
 
     <span class="doccomment">/// Like `intersect_local_ray` but simplified because there is not need</span>

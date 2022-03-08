@@ -374,6 +374,16 @@
 <span id="338">338</span>
 <span id="339">339</span>
 <span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -402,7 +412,7 @@ SOFTWARE.
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
 
 <span class="comment">// use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::intersection</span>::{<span class="ident">IntersectionInfo</span>, <span class="ident">SurfaceSide</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IntersectionInfo</span>, <span class="ident">SurfaceSide</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">Plane3D</span>,
@@ -564,8 +574,8 @@ SOFTWARE.
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">phit</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">centre</span>;
         <span class="kw">let</span> <span class="ident">rhit</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">length</span>();
         <span class="comment">// Calculate (u,v)</span>
-        <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">phi</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">phi_max</span>;
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">radius</span> <span class="op">-</span> <span class="ident">rhit</span>) <span class="op">/</span> (<span class="self">self</span>.<span class="ident">radius</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">inner_radius</span>);
+        <span class="kw">let</span> <span class="ident">_u</span> <span class="op">=</span> <span class="ident">phi</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">phi_max</span>;
+        <span class="kw">let</span> <span class="ident">_v</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">radius</span> <span class="op">-</span> <span class="ident">rhit</span>) <span class="op">/</span> (<span class="self">self</span>.<span class="ident">radius</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">inner_radius</span>);
 
         <span class="comment">// Calcuate first derivatives</span>
         <span class="kw">let</span> <span class="ident">zxn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">phi_zero</span>.<span class="ident">cross</span>(<span class="self">self</span>.<span class="ident">normal</span>);
@@ -580,17 +590,27 @@ SOFTWARE.
         <span class="kw">let</span> (<span class="ident">normal</span>, <span class="ident">side</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">ray</span>.<span class="ident">direction</span>);
 
         <span class="comment">// We know some things are Zero... so let&#39;s not call the `IntersectionInfo::new(..)` function.</span>
-        <span class="prelude-val">Some</span>(<span class="ident">IntersectionInfo</span> {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
+        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">IntersectionInfo</span> {
             <span class="ident">p</span>: <span class="ident">phit</span>,
-            <span class="ident">u</span>,
-            <span class="ident">v</span>,
+            <span class="ident">_u</span>,
+            <span class="ident">_v</span>,
             <span class="ident">dpdu</span>,
             <span class="ident">dpdv</span>,
             <span class="ident">dndu</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
             <span class="ident">dndv</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
             <span class="ident">normal</span>,
             <span class="ident">side</span>,
-        })
+        });
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>))]</span>
+        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">IntersectionInfo</span> {
+            <span class="ident">p</span>: <span class="ident">phit</span>,            
+            <span class="ident">dpdu</span>,
+            <span class="ident">dpdv</span>,            
+            <span class="ident">normal</span>,
+            <span class="ident">side</span>,
+        });
     }
 
 
