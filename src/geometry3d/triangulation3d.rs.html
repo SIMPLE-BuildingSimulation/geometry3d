@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;triangulation3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>triangulation3d.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;triangulation3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>triangulation3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>
 <script>
   "use strict";
@@ -32,7 +33,8 @@
   });
 </script>
 
-<style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../geometry3d/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+</head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../geometry3d/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.png" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../geometry3d/index.html"><img class="rust-logo" src="../../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -2756,11 +2758,11 @@ SOFTWARE.
         <span class="prelude-val">Ok</span>(<span class="ident">t</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">invalidate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">invalidate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">valid</span> <span class="op">=</span> <span class="bool-val">false</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">set_neighbour</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>, <span class="ident">i</span>: <span class="ident">usize</span>) {
+    <span class="kw">fn</span> <span class="ident">set_neighbour</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>, <span class="ident">i</span>: <span class="ident">usize</span>) {
         <span class="kw">match</span> <span class="ident">edge</span> {
             <span class="ident">Edge::Ab</span> =&gt; <span class="self">self</span>.<span class="ident">n0</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
             <span class="ident">Edge::Bc</span> =&gt; <span class="self">self</span>.<span class="ident">n1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
@@ -2776,7 +2778,7 @@ SOFTWARE.
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constrain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constrain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) {
         <span class="kw">match</span> <span class="ident">edge</span> {
             <span class="ident">Edge::Ab</span> =&gt; <span class="self">self</span>.<span class="ident">c0</span> <span class="op">=</span> <span class="bool-val">true</span>,
             <span class="ident">Edge::Bc</span> =&gt; <span class="self">self</span>.<span class="ident">c1</span> <span class="op">=</span> <span class="bool-val">true</span>,
@@ -2835,7 +2837,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Loops over all [`Triangle3D`], setting the neighbours. THis is</span>
     <span class="doccomment">/// quite slow, but does the job.</span>
-    <span class="kw">fn</span> <span class="ident">mark_neighbourhouds</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">mark_neighbourhouds</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">triangles</span>.<span class="ident">len</span>();
         <span class="kw">for</span> <span class="ident">this_i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
             <span class="kw">for</span> <span class="ident">other_i</span> <span class="kw">in</span> <span class="ident">this_i</span> <span class="op">+</span> <span class="number">1</span>..<span class="ident">n</span> {
@@ -2917,7 +2919,7 @@ SOFTWARE.
         <span class="self">self</span>.<span class="ident">n_valid_triangles</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">invalidate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">invalidate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">triangles</span>.<span class="ident">len</span>();
         <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">n</span> {
             <span class="self">self</span>.<span class="ident">triangles</span>[<span class="ident">i</span>].<span class="ident">invalidate</span>();
@@ -2944,7 +2946,7 @@ SOFTWARE.
     }
 
     <span class="doccomment">/// Marks two triangles as neighbours</span>
-    <span class="kw">fn</span> <span class="ident">mark_as_neighbours</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i1</span>: <span class="ident">usize</span>, <span class="ident">edge_1</span>: <span class="ident">Edge</span>, <span class="ident">i2</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">mark_as_neighbours</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">i1</span>: <span class="ident">usize</span>, <span class="ident">edge_1</span>: <span class="ident">Edge</span>, <span class="ident">i2</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span> {
             <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Trying to make a triangle its own neighbour (index {})&quot;</span>, <span class="ident">i1</span>);
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>);
@@ -2977,7 +2979,7 @@ SOFTWARE.
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">vertex_a</span>: <span class="ident">Point3D</span>,
         <span class="ident">vertex_b</span>: <span class="ident">Point3D</span>,
         <span class="ident">vertex_c</span>: <span class="ident">Point3D</span>,
@@ -3090,7 +3092,7 @@ SOFTWARE.
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">flip_diagonal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) {
+    <span class="kw">fn</span> <span class="ident">flip_diagonal</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) {
         <span class="comment">// The transformation is as follows:</span>
         <span class="comment">//         C                C</span>
         <span class="comment">//        /\               /|\</span>
@@ -3245,7 +3247,7 @@ SOFTWARE.
     <span class="doccomment">/// Adds a point to an edge of a [`Triangle3D`], splitting</span>
     <span class="doccomment">/// it and its neighbour</span>
     <span class="kw">fn</span> <span class="ident">split_edge</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">triangle_index</span>: <span class="ident">usize</span>,
         <span class="ident">edge_to_split</span>: <span class="ident">Edge</span>,
         <span class="ident">p</span>: <span class="ident">Point3D</span>,
@@ -3385,7 +3387,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Adds a point to the interior of a [`Triangle3D`], splitting</span>
     <span class="doccomment">/// it into three</span>
-    <span class="kw">fn</span> <span class="ident">split_triangle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">point</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">split_triangle</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">point</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// The transformation is as follows (puts P in the middle,</span>
         <span class="comment">// and splits the triangle into three triangles):</span>
         <span class="comment">//             A                A</span>
@@ -3475,7 +3477,7 @@ SOFTWARE.
     <span class="doccomment">/// Runs through the [`Triangulation3D`] checking if it is worth</span>
     <span class="doccomment">/// flipping diagonals. I.e., if flipping the diagonal would make</span>
     <span class="doccomment">/// the aspect ratios become better</span>
-    <span class="kw">fn</span> <span class="ident">restore_delaunay</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_aspect_ratio</span>: <span class="ident">Float</span>) {
+    <span class="kw">fn</span> <span class="ident">restore_delaunay</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max_aspect_ratio</span>: <span class="ident">Float</span>) {
         <span class="comment">// Flipping diagonals does not change the number of triangles.</span>
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">triangles</span>.<span class="ident">len</span>();
 
@@ -3535,7 +3537,7 @@ SOFTWARE.
     <span class="doccomment">/// Adds a point on a specific [`Triangle3D`]. Returns a `bool`, indicating</span>
     <span class="doccomment">/// whether any change was carried out</span>
     <span class="kw">fn</span> <span class="ident">add_point_to_triangle</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">index</span>: <span class="ident">usize</span>,
         <span class="ident">point</span>: <span class="ident">Point3D</span>,
         <span class="ident">p_location</span>: <span class="ident">PointInTriangle</span>,
@@ -3569,7 +3571,7 @@ SOFTWARE.
     <span class="doccomment">/// Finds the location of a [`Point3D`] within the triangulation</span>
     <span class="doccomment">/// and inserts it. Returns a `bool` indicating if the addition of the new [`Point3D`]</span>
     <span class="doccomment">/// produced any change</span>
-    <span class="kw">fn</span> <span class="ident">add_point</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">point</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">add_point</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">point</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// Iterate through triangles to check</span>
 
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">tripiece</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">triangles</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
@@ -3592,7 +3594,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Refines a [`Triangulation3D`]. This only works if all then [`Triangle3D`] have their</span>
     <span class="doccomment">/// vertices in the same order, meaning that their `normal` points in the same direction.</span>
-    <span class="kw">fn</span> <span class="ident">refine</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_area</span>: <span class="ident">Float</span>, <span class="ident">max_aspect_ratio</span>: <span class="ident">Float</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">refine</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max_area</span>: <span class="ident">Float</span>, <span class="ident">max_aspect_ratio</span>: <span class="ident">Float</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// let n_triangles = self.n_triangles();</span>
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">any_changes</span> <span class="op">=</span> <span class="bool-val">false</span>;
@@ -5161,6 +5163,5 @@ SOFTWARE.
     }
 } <span class="comment">// end of test module</span>
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>
