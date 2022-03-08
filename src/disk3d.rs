@@ -39,6 +39,7 @@ use crate::{
 
 /// A disk of radius `radius` whose normal points in the
 /// `normal` direction, located at a height `height`. Can have a
+#[derive(Clone)]
 pub struct Disk3D {
     /// The location of the center of the [`Disk3D`]
     centre: Point3D,
@@ -260,10 +261,8 @@ impl Disk3D {
         self.intersection_info(ray, phit, phi)
     }
 
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, returning the distance
-    /// `t` and the normal [`Vector3D`] at that point. If the distance
-    /// is negative (i.e., the object is behind the plane), it should return
-    /// [`None`]. Returns detailed [`IntersectionInfo`] about the intersaction .
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
+    /// returning a detailed [`IntersectionInfo`] about the intersaction .
     pub fn intersect(&self, ray: &Ray3D) -> Option<IntersectionInfo> {
         // Transform ray into object space, if needed
         let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
@@ -286,10 +285,8 @@ impl Disk3D {
         }
     }
 
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, returning the distance
-    /// `t` and the normal [`Vector3D`] at that point. If the distance
-    /// is negative (i.e., the object is behind the plane), it should return
-    /// [`None`]. Returns only the point of intersection.
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
+    /// returning the point of intersection, if any. 
     pub fn simple_intersect(&self, ray: &Ray3D) -> Option<Point3D> {
         // Transform ray into object space, if needed
         let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {

@@ -64,6 +64,8 @@ impl Plane3D {
         (self.normal * point - self.d).abs() < Float::EPSILON
     }
 
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
+    /// returning the distance to the plane.
     pub fn intersect(&self, ray: &Ray3D) -> Option<Float> {
         let den = self.normal * ray.direction;
         // They do not intercect
