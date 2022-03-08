@@ -97,15 +97,6 @@ mod bbox3d;
 pub use bbox3d::{BBox3D, BBoxAxis};
 
 
-#[cfg(feature = "textures")]
-mod intersection_texture;
-#[cfg(feature = "textures")]
-pub use intersection_texture::{SurfaceSide, IntersectionInfo};
-
-
-#[cfg(not(feature = "textures"))]
-mod intersection_no_texture;
-#[cfg(not(feature = "textures"))]
-pub use intersection_no_texture::{SurfaceSide, IntersectionInfo};
+pub mod intersection;
 
 

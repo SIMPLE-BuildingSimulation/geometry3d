@@ -23,8 +23,8 @@ SOFTWARE.
 */
 
 use crate::RefCount;
+use crate::intersection::{IntersectionInfo, SurfaceSide};
 
-use crate::{IntersectionInfo, SurfaceSide};
 use crate::{
     Point3D,
     Ray3D,
@@ -495,27 +495,25 @@ impl Triangle3D {
         // eprintln!("normal = {}", normal);
         let (normal, side) = SurfaceSide::get_side(normal, ray.direction);
 
-        #[cfg(feature = "textures")]
-        return Some(IntersectionInfo {
+        
+        Some(IntersectionInfo {
             p: phit,
-            _u,
-            _v,
             dpdu,
             dpdv,
-            dndu: Vector3D::new(0., 0., 0.),
-            dndv: Vector3D::new(0., 0., 0.),
             normal,
             side,
-        });
 
-        #[cfg(not(feature = "textures"))]
-        return Some(IntersectionInfo {
-            p: phit,            
-            dpdu,
-            dpdv,            
-            normal,
-            side,
-        });
+            #[cfg(feature = "textures")]
+            u: _u,
+            #[cfg(feature = "textures")]
+            v: _v,
+            #[cfg(feature = "textures")]
+            dndu: Vector3D::new(0., 0., 0.),
+            #[cfg(feature = "textures")]
+            dndv: Vector3D::new(0., 0., 0.),
+        })
+
+        
     }
 
     /// Like `intersect_local_ray` but simplified because there is not need

@@ -26,7 +26,7 @@ use crate::{Float, PI};
 use crate::RefCount;
 
 // use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
-use crate::{IntersectionInfo, SurfaceSide};
+use crate::intersection::{IntersectionInfo, SurfaceSide};
 
 use crate::{
     Plane3D,
@@ -121,13 +121,7 @@ impl Disk3D {
 
         // Convert phi_max
         let phi_max = phi_max.clamp(0., 360.).to_radians();
-
-        // Check transform
-        // let transform_reverses = match &transform{
-        //     Some(t)=>t.changes_hands(),
-        //     None =>false,
-        // };
-
+        
         Self {
             centre,
             normal,
@@ -204,27 +198,25 @@ impl Disk3D {
         let (normal, side) = SurfaceSide::get_side(normal, ray.direction);
 
         // We know some things are Zero... so let's not call the `IntersectionInfo::new(..)` function.
-        #[cfg(feature = "textures")]
+        
         return Some(IntersectionInfo {
             p: phit,
-            _u,
-            _v,
             dpdu,
             dpdv,
-            dndu: Vector3D::new(0., 0., 0.),
-            dndv: Vector3D::new(0., 0., 0.),
             normal,
             side,
+
+            #[cfg(feature = "textures")]
+            u: _u,
+            #[cfg(feature = "textures")]
+            v: _v,
+            #[cfg(feature = "textures")]
+            dndu: Vector3D::new(0., 0., 0.),
+            #[cfg(feature = "textures")]
+            dndv: Vector3D::new(0., 0., 0.),
         });
 
-        #[cfg(not(feature = "textures"))]
-        return Some(IntersectionInfo {
-            p: phit,            
-            dpdu,
-            dpdv,            
-            normal,
-            side,
-        });
+        
     }
 
 

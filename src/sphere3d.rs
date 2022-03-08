@@ -24,9 +24,7 @@ SOFTWARE.
 
 use crate::{Float, PI};
 use crate::RefCount;
-
-// use crate::intersect_trait::{Intersect, IntersectionInfo};
-use crate::IntersectionInfo;
+use crate::intersection::IntersectionInfo;
 
 use crate::{
     Point3D,
@@ -436,7 +434,7 @@ impl Sphere3D {
 #[cfg(test)]
 mod testing {
     use super::*;
-    use crate::SurfaceSide;
+    use crate::intersection::SurfaceSide;
 
     #[test]
     fn test_new() {

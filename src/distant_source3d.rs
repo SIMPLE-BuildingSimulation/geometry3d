@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// use crate::intersect_trait::{Intersect, IntersectionInfo};
-use crate::IntersectionInfo;
+
+use crate::intersection::IntersectionInfo;
 use crate::{
     Disk3D,
     Point3D,
