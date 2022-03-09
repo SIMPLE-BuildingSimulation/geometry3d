@@ -3822,7 +3822,7 @@ SOFTWARE.
         }
 
         <span class="comment">// Must have the same area.</span>
-        <span class="kw">if</span> (<span class="ident">triangulation_area</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">area</span>()).<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="number">1e-9</span> {
+        <span class="kw">if</span> (<span class="ident">triangulation_area</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">area</span>()).<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="number">1e-4</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;Areas of orginal polygon (A = {}) and triangulation (A = {}) do not match&quot;</span>,
                 <span class="ident">triangulation_area</span>,

@@ -1703,13 +1703,13 @@ SOFTWARE.
     }
 
     <span class="kw">fn</span> <span class="ident">compare_pts</span>(<span class="ident">pt1</span>: <span class="ident">Point3D</span>, <span class="ident">pt2</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> (<span class="ident">pt1</span> <span class="op">-</span> <span class="ident">pt2</span>).<span class="ident">length</span>() <span class="op">&gt;</span> <span class="number">0.00000001</span> {
+        <span class="kw">if</span> (<span class="ident">pt1</span> <span class="op">-</span> <span class="ident">pt2</span>).<span class="ident">length</span>() <span class="op">&gt;</span> <span class="number">1e-6</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Points {} and {} are not equal&quot;</span>, <span class="ident">pt1</span>, <span class="ident">pt2</span>));
         }
         <span class="prelude-val">Ok</span>(())
     }
     <span class="kw">fn</span> <span class="ident">compare_vecs</span>(<span class="ident">vec1</span>: <span class="ident">Vector3D</span>, <span class="ident">vec2</span>: <span class="ident">Vector3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> (<span class="ident">vec1</span> <span class="op">-</span> <span class="ident">vec2</span>).<span class="ident">length</span>() <span class="op">&gt;</span> <span class="number">0.00000001</span> {
+        <span class="kw">if</span> (<span class="ident">vec1</span> <span class="op">-</span> <span class="ident">vec2</span>).<span class="ident">length</span>() <span class="op">&gt;</span> <span class="number">1e-6</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Vectors {} and {} are not equal&quot;</span>, <span class="ident">vec1</span>, <span class="ident">vec2</span>));
         }
         <span class="prelude-val">Ok</span>(())

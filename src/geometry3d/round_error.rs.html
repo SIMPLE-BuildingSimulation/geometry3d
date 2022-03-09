@@ -1041,7 +1041,7 @@ SOFTWARE.
             <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> (<span class="ident">nm</span>) <span class="op">/</span> (<span class="number">1.</span> <span class="op">-</span> <span class="ident">nm</span>);
             <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="macro">gamma!</span>(<span class="ident">n</span>);
             <span class="comment">// println!(&quot;exp  : {} \nfound: {}\n======&quot;, exp,found);</span>
-            <span class="macro">assert!</span>((<span class="ident">exp</span> <span class="op">-</span> <span class="ident">found</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">f64::EPSILON</span>)
+            <span class="macro">assert!</span>((<span class="ident">exp</span> <span class="op">-</span> <span class="ident">found</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>)
         }
     }
 

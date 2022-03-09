@@ -950,6 +950,11 @@
 <span id="914">914</span>
 <span id="915">915</span>
 <span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -1140,7 +1145,12 @@ SOFTWARE.
         <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bc</span>().<span class="ident">length</span>();
         <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ca</span>().<span class="ident">length</span>();
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> (<span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">+</span> <span class="ident">c</span>) <span class="op">*</span> (<span class="ident">b</span> <span class="op">+</span> <span class="ident">c</span> <span class="op">-</span> <span class="ident">a</span>) <span class="op">*</span> (<span class="ident">c</span> <span class="op">+</span> <span class="ident">a</span> <span class="op">-</span> <span class="ident">b</span>) <span class="op">*</span> (<span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">-</span> <span class="ident">c</span>);
-        <span class="ident">a</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">c</span> <span class="op">/</span> <span class="ident">s</span>.<span class="ident">sqrt</span>()
+        
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;quick_inv_sqrt&quot;</span>))]</span>
+        <span class="kw">return</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">c</span> <span class="op">/</span> <span class="ident">s</span>.<span class="ident">sqrt</span>();
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;quick_inv_sqrt&quot;</span>)]</span>
+        <span class="kw">return</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">c</span> <span class="op">*</span> <span class="ident"><span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt</span>(<span class="ident">s</span>);
     }
 
     <span class="doccomment">/// Gets the Aspect Ratio of the [`Triangle3D`]. This is useful</span>
@@ -1628,10 +1638,10 @@ SOFTWARE.
         <span class="macro">assert!</span>((<span class="ident">t</span>.<span class="ident">area</span>() <span class="op">-</span> <span class="number">6.</span> <span class="op">*</span> <span class="number">8.</span> <span class="op">/</span> <span class="number">2.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1E-10</span>);
 
         <span class="comment">// Check circumradius</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">t</span>.<span class="ident">circumradius</span>(), <span class="number">5.</span>);
+        <span class="macro">assert!</span>( (<span class="ident">t</span>.<span class="ident">circumradius</span>() <span class="op">-</span> <span class="number">5.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">0.001</span>);
 
         <span class="comment">// Check aspect ratio; circumradius/smallest side</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">t</span>.<span class="ident">aspect_ratio</span>(), <span class="number">5.</span> <span class="op">/</span> <span class="number">6.</span>);
+        <span class="macro">assert!</span>( (<span class="ident">t</span>.<span class="ident">aspect_ratio</span>() <span class="op">-</span> <span class="number">5.</span><span class="op">/</span><span class="number">6.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">0.001</span>);
 
         <span class="comment">// Check circumcenter</span>
         <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">circumcenter</span>().<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">3.</span>, <span class="number">4.</span>, <span class="number">0.</span>)));
