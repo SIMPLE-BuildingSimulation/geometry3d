@@ -119,8 +119,8 @@ mod testing {
         let mut n = Vector3D::new(1.2, 3.1, 2.3);
         n.normalize();
         let plane = Plane3D::new(p, n);
-        //assert!((plane.d - n*p).abs()<0.00000000001);
-        assert_eq!(plane.d, n * p);
+        assert!((plane.d - n*p).abs()< 1e-4);
+        // assert_eq!(plane.d, n * p);
     }
 
     // #[test]

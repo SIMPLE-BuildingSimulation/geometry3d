@@ -385,7 +385,7 @@ mod testing {
         the_loop.close().unwrap();
 
         let poly = Polygon3D::new(the_loop).unwrap();
-        assert_eq!(2. * l * 2. * l, poly.area);
+        assert!((2. * l * 2. * l- poly.area).abs() < 1e-4);
         assert!(!poly.normal.is_zero());
     }
 
@@ -402,7 +402,7 @@ mod testing {
         outer_loop.close().unwrap();
 
         let mut poly = Polygon3D::new(outer_loop).unwrap();
-        assert_eq!(2. * l * 2. * l, poly.area);
+        assert!( (2. * l * 2. * l- poly.area).abs()< 1e-4);
         assert_eq!(poly.inner.len(), 0);
 
         // Add hole
@@ -416,7 +416,7 @@ mod testing {
 
         poly.cut_hole(hole).unwrap();
 
-        assert_eq!(poly.area, 2. * l * 2. * l - l * l);
+        assert!( (poly.area - (2. * l * 2. * l - l * l) ).abs()<1e-4, "err is {}", (poly.area - 2. * l * 2. * l - l * l).abs() );
         assert_eq!(poly.inner.len(), 1);
 
         /* Add hole in a different plane */

@@ -337,6 +337,6 @@ mod testing {
     fn test_disk_area() {
         let r = 4.212;
         let d = Disk3D::new(Point3D::new(0., 0., 0.), Vector3D::new(0., 0., 1.), r);
-        assert_eq!(d.area(), PI * r * r);
+        assert!( (d.area() - PI * r * r).abs() < 1e-5);
     }
 }

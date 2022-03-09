@@ -66,7 +66,7 @@ impl Point3D {
     }
 
     pub fn compare(&self, p: Point3D) -> bool {
-        const EPS: Float = 100. * Float::EPSILON;
+        const EPS: Float = 1e-5;
         (self.x - p.x).abs() < EPS && (self.y - p.y).abs() < EPS && (self.z - p.z).abs() < EPS
     }
 
@@ -86,7 +86,7 @@ impl Point3D {
         let bc = c - b;
         let cross = ab.cross(bc).length();
 
-        Ok(cross < 1e-6)
+        Ok(cross < 1e-5)
     }
 }
 

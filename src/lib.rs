@@ -99,4 +99,5 @@ pub use bbox3d::{BBox3D, BBoxAxis};
 
 pub mod intersection;
 
-
+#[cfg(feature="quick_inv_sqrt")]
+mod quick_inverse_sqrt;

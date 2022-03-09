@@ -1222,7 +1222,7 @@ mod testing {
         }
 
         // Must have the same area.
-        if (triangulation_area - p.area()).abs() > 1e-9 {
+        if (triangulation_area - p.area()).abs() > 1e-4 {
             return Err(format!(
                 "Areas of orginal polygon (A = {}) and triangulation (A = {}) do not match",
                 triangulation_area,

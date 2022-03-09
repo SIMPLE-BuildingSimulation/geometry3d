@@ -62,8 +62,11 @@ impl Vector3D {
         }
     }
 
+
+
     /// Gets a normalized [`Vector3D`] that is perpendicular
     /// to `self`
+    #[cfg(not(feature="quick_inv_sqrt"))]
     pub fn get_perpendicular(&self) -> Result<Self, String> {
         
         const TINY: Float = 100. * Float::EPSILON;
@@ -73,7 +76,9 @@ impl Vector3D {
         if self.x.abs() > TINY {
             let vx2 = self.x*self.x;
             let vy2 = self.y*self.y;
-            ay = self.x/( vx2 + vy2 ).sqrt();
+
+            
+            ay = self.x/ ( vx2 + vy2 ).sqrt();        
             az = 0.;
             ax = -self.y * ay/self.x; 
         } else if self.y.abs() > TINY {            
@@ -100,10 +105,51 @@ impl Vector3D {
         Ok(ret)
     }
 
+    /// Gets a normalized [`Vector3D`] that is perpendicular
+    /// to `self`
+    #[cfg(feature="quick_inv_sqrt")]
+    pub fn get_perpendicular(&self) -> Result<Self, String> {
+        
+        const TINY: Float = 100. * Float::EPSILON;
+        let ax: Float;
+        let ay: Float;
+        let az: Float;
+        if self.x.abs() > TINY {
+            let vx2 = self.x*self.x;
+            let vy2 = self.y*self.y;
+
+            
+            ay = self.x * crate::quick_inverse_sqrt::quick_inv_sqrt( vx2 + vy2 );        
+            az = 0.;
+            ax = -self.y * ay/self.x; 
+        } else if self.y.abs() > TINY {            
+            let vx2 = self.x*self.x;
+            let vy2 = self.y*self.y;
+            ax = self.y* crate::quick_inverse_sqrt::quick_inv_sqrt(vx2 + vy2);
+            az = 0.;
+            ay = -self.x*ax/self.y;
+        } else if self.z.abs() > TINY {
+            let vx2 = self.x*self.x;
+            let vz2 = self.z*self.z;
+
+            ax = self.z* crate::quick_inverse_sqrt::quick_inv_sqrt(vz2 + vx2);
+            ay = 0.0;
+            az = -self.x * ax / self.z;
+        } else {
+            return Err(format!(
+                "Trying to get a Vector3D perpendicular to a Zero Vector (self = {})",
+                self
+            ));
+        }
+        let ret = Self::new(ax, ay, az);
+        // ret.normalize();
+        Ok(ret)
+    }
+
     pub fn compare(&self, p: Vector3D) -> bool {
-        (self.x - p.x).abs() < Float::EPSILON
-            && (self.y - p.y).abs() < Float::EPSILON
-            && (self.z - p.z).abs() < Float::EPSILON
+        (self.x - p.x).abs() < 1e-5
+            && (self.y - p.y).abs() < 1e-5
+            && (self.z - p.z).abs() < 1e-5
     }
 
     pub fn cross(&self, v: Vector3D) -> Vector3D {
@@ -123,19 +169,30 @@ impl Vector3D {
     }
 
     pub fn normalize(&mut self) {
-        let l = self.length();
-        self.x /= l;
-        self.y /= l;
-        self.z /= l;
+        #[cfg(not(feature="quick_inv_sqrt"))]
+        let l = 1./self.length();
+        #[cfg(feature="quick_inv_sqrt")]
+        let l = crate::quick_inverse_sqrt::quick_inv_sqrt(self.length_squared());
+
+        self.x *= l;
+        self.y *= l;
+        self.z *= l;
     }
+
+    
 
     pub fn get_normalized(&self) -> Vector3D {
         debug_assert!(self.length() >= 1e-9, "Length was {}", self.length());
-        let l = self.length();
+        #[cfg(not(feature="quick_inv_sqrt"))]
+        let l = 1./self.length();
+        #[cfg(feature="quick_inv_sqrt")]
+        let l = crate::quick_inverse_sqrt::quick_inv_sqrt(self.length_squared());
+
+        
         Vector3D {
-            x: self.x / l,
-            y: self.y / l,
-            z: self.z / l,
+            x: self.x * l,
+            y: self.y * l,
+            z: self.z * l,
         }
     }
 
@@ -319,8 +376,8 @@ mod testing {
                     (v * perp).abs()
                 ));
             }
-            if (1. - perp.length()).abs() > Float::EPSILON {
-                return Err(format!("Perpendicular Vector {} is not normalized", perp));
+            if (1. - perp.length()).abs() > 0.00001 {
+                return Err(format!("Perpendicular Vector {} is not normalized... length is {}", perp, perp.length()));
             }
             Ok(())
         }
@@ -519,7 +576,7 @@ mod testing {
 
         let l = x.length();
         let delta = l - (3.0 as Float).sqrt() * a;
-        assert!(delta.abs() < 1E-10);
+        assert!(delta.abs() < 1E-5);
     }
 
     #[test]
@@ -542,7 +599,7 @@ mod testing {
 
         assert!(zero.is_zero());
 
-        let nearly_zero = Vector3D::new(1E-6, 0.0, 0.0);
+        let nearly_zero = Vector3D::new(1E-4, 0.0, 0.0);
         assert!(!nearly_zero.is_zero());
     }
 

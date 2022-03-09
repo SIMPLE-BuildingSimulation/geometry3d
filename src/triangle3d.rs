@@ -188,7 +188,12 @@ impl Triangle3D {
         let b = self.bc().length();
         let c = self.ca().length();
         let s = (a + b + c) * (b + c - a) * (c + a - b) * (a + b - c);
-        a * b * c / s.sqrt()
+        
+        #[cfg(not(feature="quick_inv_sqrt"))]
+        return a * b * c / s.sqrt();
+
+        #[cfg(feature="quick_inv_sqrt")]
+        return a * b * c * crate::quick_inverse_sqrt::quick_inv_sqrt(s);
     }
 
     /// Gets the Aspect Ratio of the [`Triangle3D`]. This is useful
@@ -676,10 +681,10 @@ mod testing {
         assert!((t.area() - 6. * 8. / 2.).abs() < 1E-10);
 
         // Check circumradius
-        assert_eq!(t.circumradius(), 5.);
+        assert!( (t.circumradius() - 5.).abs() < 0.001);
 
         // Check aspect ratio; circumradius/smallest side
-        assert_eq!(t.aspect_ratio(), 5. / 6.);
+        assert!( (t.aspect_ratio() - 5./6.).abs() < 0.001);
 
         // Check circumcenter
         assert!(t.circumcenter().compare(Point3D::new(3., 4., 0.)));

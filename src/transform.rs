@@ -744,13 +744,13 @@ mod testing {
     }
 
     fn compare_pts(pt1: Point3D, pt2: Point3D) -> Result<(), String> {
-        if (pt1 - pt2).length() > 0.00000001 {
+        if (pt1 - pt2).length() > 1e-6 {
             return Err(format!("Points {} and {} are not equal", pt1, pt2));
         }
         Ok(())
     }
     fn compare_vecs(vec1: Vector3D, vec2: Vector3D) -> Result<(), String> {
-        if (vec1 - vec2).length() > 0.00000001 {
+        if (vec1 - vec2).length() > 1e-6 {
             return Err(format!("Vectors {} and {} are not equal", vec1, vec2));
         }
         Ok(())

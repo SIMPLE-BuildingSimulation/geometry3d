@@ -382,7 +382,7 @@ mod testing {
             let exp = (nm) / (1. - nm);
             let found = gamma!(n);
             // println!("exp  : {} \nfound: {}\n======", exp,found);
-            assert!((exp - found).abs() < f64::EPSILON)
+            assert!((exp - found).abs() < Float::EPSILON)
         }
     }
 

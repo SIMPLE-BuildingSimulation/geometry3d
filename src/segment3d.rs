@@ -100,7 +100,7 @@ impl Segment3D {
 
     /// Checks if a [`Segment3D`] contains another [`Segment3D`].
     pub fn contains(&self, input: &Segment3D) -> Result<bool, String> {
-        const TINY: Float = 100. * Float::EPSILON;
+        const TINY: Float = 1e-6;
         if self.length() < TINY {
             let msg = "Trying to check whether a segment is contained in a zero-length segment"
                 .to_string();
@@ -125,13 +125,13 @@ impl Segment3D {
         let beta: Float;
         if a1b1.x.abs() > TINY {
             alpha = (a2.x - a1.x) / a1b1.x;
-            beta = (a2.x - a1.x) / a1b1.x;
+            beta = (b2.x - a1.x) / a1b1.x;
         } else if a1b1.y.abs() > TINY {
             alpha = (a2.y - a1.y) / a1b1.y;
-            beta = (a2.y - a1.y) / a1b1.y;
+            beta =  (b2.y - a1.y) / a1b1.y;
         } else if a1b1.z.abs() > TINY {
             alpha = (a2.z - a1.z) / a1b1.z;
-            beta = (a2.z - a1.z) / a1b1.z;
+            beta = (b2.z - a1.z) / a1b1.z;
         } else {
             // We should never get here.
             let msg = "Trying to check whether a segment is contained in a zero-length segment"
@@ -436,6 +436,12 @@ mod testing {
         };
 
         assert!(check(0.5, 0.55));
+        // let alpha = 0.5;
+        // let beta = 0.55;
+        // let a2 = a + (b - a) * alpha;
+        // let b2 = a + (b - a) * beta;
+        // let s = Segment3D::new(a2, b2);
+        // let a = main_s.contains(&s).unwrap();
         assert!(check(0.9, 0.55));
         assert!(check(0.0, 0.35));
         assert!(check(1.0, 0.15));
@@ -456,7 +462,14 @@ mod testing {
             return main_s.contains(&s).unwrap();
         };
 
-        assert!(check(0.5, 0.55));
+        // assert!(check(0.5, 0.55));
+        let alpha = 0.5;
+        let beta = 0.55;
+        let a2 = a + (b - a) * alpha;
+        let b2 = a + (b - a) * beta;
+        let s = Segment3D::new(a2, b2);
+
+        main_s.contains(&s).unwrap();
         assert!(check(0.9, 0.55));
         assert!(check(0.0, 0.35));
         assert!(check(1.0, 0.15));
