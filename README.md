@@ -19,6 +19,7 @@ This library has several 3D Geometry functionalities. E.g.,
 Check the docs [HERE](https://simple-buildingsimulation.github.io/geometry3d/)
 
 
+
 # License
 
 MIT License
