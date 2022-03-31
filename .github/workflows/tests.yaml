@@ -15,5 +15,13 @@ jobs:
     steps:
     - uses: actions/checkout@v1   
     - name: Run tests
-      run: cargo test --verbose     
+      run: cargo test --verbose    
+    - name: Run tests textures
+      run: cargo test --features textures --verbose     
+    - name: Run tests float
+      run: cargo test --features float --verbose     
+    - name: Run tests parallel
+      run: cargo test --features parallel --verbose     
+    - name: Run tests all
+      run: cargo test --all-features --verbose     
   

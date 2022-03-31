@@ -27,7 +27,7 @@ use crate::Float;
 use crate::Point3D;
 use std::fmt;
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Default)]
 pub struct Vector3D {
     pub x: Float,
     pub y: Float,

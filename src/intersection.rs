@@ -59,10 +59,17 @@ impl SurfaceSide {
     }
 }
 
+impl std::default::Default for SurfaceSide{
+    fn default()->Self{
+        Self::NonApplicable
+    }
+}
+
 
 
 /// Contains more detailed information about the
 /// what is happening at the surface in the intersection point
+#[derive(Default)]
 pub struct IntersectionInfo {
     /// The point of intersection
     pub p: Point3D,
