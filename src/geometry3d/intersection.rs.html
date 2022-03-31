@@ -274,6 +274,13 @@
 <span id="238">238</span>
 <span id="239">239</span>
 <span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -335,10 +342,17 @@ SOFTWARE.
     }
 }
 
+<span class="kw">impl</span> <span class="ident">std::default::Default</span> <span class="kw">for</span> <span class="ident">SurfaceSide</span>{
+    <span class="kw">fn</span> <span class="ident">default</span>()-&gt;<span class="self">Self</span>{
+        <span class="ident"><span class="self">Self</span>::NonApplicable</span>
+    }
+}
+
 
 
 <span class="doccomment">/// Contains more detailed information about the</span>
 <span class="doccomment">/// what is happening at the surface in the intersection point</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntersectionInfo</span> {
     <span class="doccomment">/// The point of intersection</span>
     <span class="kw">pub</span> <span class="ident">p</span>: <span class="ident">Point3D</span>,
