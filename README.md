@@ -3,6 +3,8 @@
 ![build badge](https://github.com/SIMPLE-BuildingSimulation/geometry3d/actions/workflows/build.yaml/badge.svg)
 ![docs badge](https://github.com/SIMPLE-BuildingSimulation/geometry3d/actions/workflows/docs.yaml/badge.svg)
 ![tests badge](https://github.com/SIMPLE-BuildingSimulation/geometry3d/actions/workflows/tests.yaml/badge.svg)
+[![codecov](https://codecov.io/gh/SIMPLE-BuildingSimulation/geometry3d/branch/master/graph/badge.svg?token=2VOPYID9Z2)](https://codecov.io/gh/SIMPLE-BuildingSimulation/geometry3d)
+![style badge](https://github.com/SIMPLE-BuildingSimulation/geometry3d/actions/workflows/style.yaml/badge.svg)
 
 
 This library has several 3D Geometry functionalities. E.g.,
