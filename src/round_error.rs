@@ -225,12 +225,14 @@ impl std::ops::Sub<Float> for ApproxFloat {
 fn max_min(aux: &[Float; 4]) -> (Float, Float) {
     let mut min = aux[0];
     let mut max = aux[0];
-    for val in aux.iter() {
-        if *val < min {
-            min = *val;
-        } else if *val > max {
-            max = *val;
-        }
+    for val in aux.iter().skip(1) {
+        min = val.min(min);
+        max = val.max(max);
+        // if *val < min {
+        //     min = *val;
+        // } else if *val > max {
+        //     max = *val;
+        // }
     }
     (max, min)
 }
@@ -257,7 +259,22 @@ impl std::ops::Mul<Float> for ApproxFloat {
     type Output = Self;
 
     fn mul(self, other: Float) -> Self {
-        self * Self::from(other)
+        // The code in here is basically an optimized version of doing the following:
+        // self * Self::from(other)
+        
+        
+        // assume it is possitive
+        let mut min = next_float_down(self.low * other);
+        let mut max = next_float_up(self.high * other);
+        // Swap if I was wrong.
+        if min > max {
+            std::mem::swap(&mut min, &mut max);
+        }
+
+        Self {
+            low:  next_float_down(min),
+            high: next_float_up(max),
+        }
     }
 }
 
@@ -462,7 +479,7 @@ mod testing {
         let c = ApproxFloat::from(-6.);
         if let Some((x1, x2)) = ApproxFloat::solve_quadratic(a, b, c) {
             println!("x1 = {}, x2 = {}", x1.midpoint(), x2.midpoint());
-            assert!( (x1.midpoint()- -2.).abs() < Float::EPSILON);
+            assert!( (x1.midpoint()- -2.).abs() < 1e-8);
             assert!( (x2.midpoint() - 3.).abs() < Float::EPSILON);
         } else {
             panic!("Expecting results!")
