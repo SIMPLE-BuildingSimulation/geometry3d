@@ -479,7 +479,7 @@ mod testing {
         let c = ApproxFloat::from(-6.);
         if let Some((x1, x2)) = ApproxFloat::solve_quadratic(a, b, c) {
             println!("x1 = {}, x2 = {}", x1.midpoint(), x2.midpoint());
-            assert!( (x1.midpoint()- -2.).abs() < 1e-8);
+            assert!( (x1.midpoint()- -2.).abs() < 1e-6);
             assert!( (x2.midpoint() - 3.).abs() < Float::EPSILON);
         } else {
             panic!("Expecting results!")
