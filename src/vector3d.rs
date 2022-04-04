@@ -211,14 +211,14 @@ impl Vector3D {
 
         // This closure will be useful later.
         let check_other = |k_in: Float, v1: Float, v2: Float| {
-            if v2.abs() > Float::EPSILON {
+            if v2.abs() > 1e-8 {
                 // Can be divided. Check if division
                 // results in K (or close to it).
-                (v1 / v2 - k_in).abs() < Float::EPSILON
+                (v1 / v2 - k_in).abs() < 1e-8
             } else {
                 // Cannot be divided... check if v1 is
                 // also tiny
-                v1.abs() < Float::EPSILON
+                v1.abs() < 1e-8
             }
         };
 
@@ -226,13 +226,13 @@ impl Vector3D {
         // This value (1.0) is never really used I think, but I need to
         // initialize the variable... otherwise I get  warming.
         let k; // = 1.0 as Float;
-        if v.x.abs() > Float::EPSILON {
+        if v.x.abs() > 1e-8 {
             // Let's try anchoring at X
             k = self.x / v.x;
 
             // Check if Y and Z have the same K.
             check_other(k, self.y, v.y) && check_other(k, self.z, v.z)
-        } else if v.y.abs() > Float::EPSILON {
+        } else if v.y.abs() > 1e-8 {
             // Let's try anchoring at Y
             k = self.y / v.y;
 
@@ -259,7 +259,7 @@ impl Vector3D {
             // Dot product must be positive for the
             // vectors to point in the same general
             // direction
-            *self * v > 0.0
+            *self * v > 0.
         }
     }
 }
