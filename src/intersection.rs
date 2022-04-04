@@ -69,7 +69,7 @@ impl std::default::Default for SurfaceSide{
 
 /// Contains more detailed information about the
 /// what is happening at the surface in the intersection point
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Copy)]
 pub struct IntersectionInfo {
     /// The point of intersection
     pub p: Point3D,
