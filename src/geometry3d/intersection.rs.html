@@ -268,19 +268,6 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -305,15 +292,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */</span>
 
-
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">Point3D</span>,
-    <span class="ident">Ray3D</span>,
-    <span class="ident">Transform</span>,
-    <span class="ident">Vector3D</span>,
-    <span class="ident">Float</span>,
-};
-
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Float</span>, <span class="ident">Point3D</span>, <span class="ident">Ray3D</span>, <span class="ident">Transform</span>, <span class="ident">Vector3D</span>};
 
 <span class="doccomment">/// Is the [`Ray3D`] intersecting from the Front or Back side?</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
@@ -336,19 +315,17 @@ SOFTWARE.
             (<span class="ident">normal</span>, <span class="ident"><span class="self">Self</span>::Front</span>)
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">dot</span> <span class="op">&gt;</span> <span class="number">0.</span> {
             (<span class="ident">normal</span> <span class="op">*</span> <span class="op">-</span><span class="number">1.</span>, <span class="ident"><span class="self">Self</span>::Back</span>)
-        } <span class="kw">else</span> {   
-            <span class="kw">return</span> (<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>), <span class="ident"><span class="self">Self</span>::NonApplicable</span>)                     
+        } <span class="kw">else</span> {
+            (<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>), <span class="ident"><span class="self">Self</span>::NonApplicable</span>)
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::default::Default</span> <span class="kw">for</span> <span class="ident">SurfaceSide</span>{
-    <span class="kw">fn</span> <span class="ident">default</span>()-&gt;<span class="self">Self</span>{
+<span class="kw">impl</span> <span class="ident">std::default::Default</span> <span class="kw">for</span> <span class="ident">SurfaceSide</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::NonApplicable</span>
     }
 }
-
-
 
 <span class="doccomment">/// Contains more detailed information about the</span>
 <span class="doccomment">/// what is happening at the surface in the intersection point</span>
@@ -401,31 +378,30 @@ SOFTWARE.
         <span class="ident">_d2p_dvv</span>: <span class="ident">Vector3D</span>,
         <span class="ident">_d2p_duv</span>: <span class="ident">Vector3D</span>,
     ) -&gt; <span class="self">Self</span> {
-
         <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="ident">dpdv</span>.<span class="ident">cross</span>(<span class="ident">dpdu</span>).<span class="ident">get_normalized</span>();
         <span class="kw">let</span> (<span class="ident">normal</span>, <span class="ident">side</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">ray</span>.<span class="ident">direction</span>);
-        
+
         <span class="comment">/* Weingarten equations */</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;textures&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">big_e</span> <span class="op">=</span> <span class="ident">dpdu</span> <span class="op">*</span> <span class="ident">dpdu</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;textures&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">big_f</span> <span class="op">=</span> <span class="ident">dpdu</span> <span class="op">*</span> <span class="ident">dpdv</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;textures&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">big_g</span> <span class="op">=</span> <span class="ident">dpdv</span> <span class="op">*</span> <span class="ident">dpdv</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;textures&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">normal</span> <span class="op">*</span> <span class="ident">_d2p_duu</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;textures&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">normal</span> <span class="op">*</span> <span class="ident">_d2p_duv</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;textures&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">normal</span> <span class="op">*</span> <span class="ident">_d2p_dvv</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;textures&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">inv_big_egf2</span> <span class="op">=</span> <span class="number">1.</span> <span class="op">/</span> (<span class="ident">big_e</span> <span class="op">*</span> <span class="ident">big_g</span> <span class="op">-</span> <span class="ident">big_f</span> <span class="op">*</span> <span class="ident">big_f</span>);
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;textures&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">dndu</span> <span class="op">=</span> <span class="ident">dpdu</span> <span class="op">*</span> ((<span class="ident">f</span> <span class="op">*</span> <span class="ident">big_f</span> <span class="op">-</span> <span class="ident">e</span> <span class="op">*</span> <span class="ident">big_g</span>) <span class="op">*</span> <span class="ident">inv_big_egf2</span>)
             <span class="op">+</span> <span class="ident">dpdv</span> <span class="op">*</span> ((<span class="ident">e</span> <span class="op">*</span> <span class="ident">big_f</span> <span class="op">-</span> <span class="ident">f</span> <span class="op">*</span> <span class="ident">big_e</span>) <span class="op">*</span> <span class="ident">inv_big_egf2</span>);
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;textures&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">dndv</span> <span class="op">=</span> <span class="ident">dpdu</span> <span class="op">*</span> ((<span class="ident">g</span> <span class="op">*</span> <span class="ident">big_f</span> <span class="op">-</span> <span class="ident">f</span> <span class="op">*</span> <span class="ident">big_g</span>) <span class="op">*</span> <span class="ident">inv_big_egf2</span>)
             <span class="op">+</span> <span class="ident">dpdv</span> <span class="op">*</span> ((<span class="ident">f</span> <span class="op">*</span> <span class="ident">big_f</span> <span class="op">-</span> <span class="ident">g</span> <span class="op">*</span> <span class="ident">big_e</span>) <span class="op">*</span> <span class="ident">inv_big_egf2</span>);
 
@@ -483,8 +459,6 @@ SOFTWARE.
         }
     }
 }
-
-
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">testing</span> {

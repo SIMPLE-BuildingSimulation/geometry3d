@@ -719,10 +719,6 @@
 <span id="683">683</span>
 <span id="684">684</span>
 <span id="685">685</span>
-<span id="686">686</span>
-<span id="687">687</span>
-<span id="688">688</span>
-<span id="689">689</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -747,13 +743,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">Loop3D</span>,
-    <span class="ident">Point3D</span>,
-    <span class="ident">Segment3D</span>,
-    <span class="ident">Vector3D</span>
-};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Loop3D</span>, <span class="ident">Point3D</span>, <span class="ident">Segment3D</span>, <span class="ident">Vector3D</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Polygon3D</span> {
@@ -988,16 +979,13 @@ SOFTWARE.
                     <span class="kw">let</span> <span class="ident">inner_normal</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>[<span class="ident">min_inner_loop_id</span>].<span class="ident">normal</span>();
 
                     <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n_inner_loop_vertices</span> <span class="op">+</span> <span class="number">1</span> {
-                        <span class="kw">let</span> <span class="ident">vertex_to_add</span>;
-                        <span class="kw">if</span> <span class="ident">outer_normal</span>.<span class="ident">is_same_direction</span>(<span class="ident">inner_normal</span>) {
+                        <span class="kw">let</span> <span class="ident">vertex_to_add</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">outer_normal</span>.<span class="ident">is_same_direction</span>(<span class="ident">inner_normal</span>) {
                             <span class="comment">// If both in the same direction, then we need to</span>
                             <span class="comment">// add the interior in reverse.</span>
-                            <span class="ident">vertex_to_add</span> <span class="op">=</span> (<span class="ident">inner_vertex_id</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="ident">j</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="ident">usize</span>
-                                <span class="op">%</span> <span class="ident">n_inner_loop_vertices</span>;
+                            (<span class="ident">inner_vertex_id</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="ident">j</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">n_inner_loop_vertices</span>
                         } <span class="kw">else</span> {
-                            <span class="ident">vertex_to_add</span> <span class="op">=</span> (<span class="ident">inner_vertex_id</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="ident">j</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="ident">usize</span>
-                                <span class="op">%</span> <span class="ident">n_inner_loop_vertices</span>;
-                        }
+                            (<span class="ident">inner_vertex_id</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="ident">j</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">n_inner_loop_vertices</span>
+                        };
 
                         <span class="kw">let</span> <span class="ident">inner_vertex</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>[<span class="ident">min_inner_loop_id</span>][<span class="ident">vertex_to_add</span>];
 
@@ -1110,7 +1098,7 @@ SOFTWARE.
         <span class="ident">the_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">poly</span> <span class="op">=</span> <span class="ident">Polygon3D::new</span>(<span class="ident">the_loop</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>((<span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span><span class="op">-</span> <span class="ident">poly</span>.<span class="ident">area</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
+        <span class="macro">assert!</span>((<span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">poly</span>.<span class="ident">area</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">poly</span>.<span class="ident">normal</span>.<span class="ident">is_zero</span>());
     }
 
@@ -1127,7 +1115,7 @@ SOFTWARE.
         <span class="ident">outer_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">poly</span> <span class="op">=</span> <span class="ident">Polygon3D::new</span>(<span class="ident">outer_loop</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>( (<span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span><span class="op">-</span> <span class="ident">poly</span>.<span class="ident">area</span>).<span class="ident">abs</span>()<span class="op">&lt;</span> <span class="number">1e-4</span>);
+        <span class="macro">assert!</span>((<span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">poly</span>.<span class="ident">area</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">poly</span>.<span class="ident">inner</span>.<span class="ident">len</span>(), <span class="number">0</span>);
 
         <span class="comment">// Add hole</span>
@@ -1141,7 +1129,11 @@ SOFTWARE.
 
         <span class="ident">poly</span>.<span class="ident">cut_hole</span>(<span class="ident">hole</span>).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert!</span>( (<span class="ident">poly</span>.<span class="ident">area</span> <span class="op">-</span> (<span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">l</span> <span class="op">*</span> <span class="ident">l</span>) ).<span class="ident">abs</span>()<span class="op">&lt;</span><span class="number">1e-4</span>, <span class="string">&quot;err is {}&quot;</span>, (<span class="ident">poly</span>.<span class="ident">area</span> <span class="op">-</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">l</span> <span class="op">*</span> <span class="ident">l</span>).<span class="ident">abs</span>() );
+        <span class="macro">assert!</span>(
+            (<span class="ident">poly</span>.<span class="ident">area</span> <span class="op">-</span> (<span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">l</span> <span class="op">*</span> <span class="ident">l</span>)).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>,
+            <span class="string">&quot;err is {}&quot;</span>,
+            (<span class="ident">poly</span>.<span class="ident">area</span> <span class="op">-</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">l</span> <span class="op">*</span> <span class="ident">l</span>).<span class="ident">abs</span>()
+        );
         <span class="macro">assert_eq!</span>(<span class="ident">poly</span>.<span class="ident">inner</span>.<span class="ident">len</span>(), <span class="number">1</span>);
 
         <span class="comment">/* Add hole in a different plane */</span>

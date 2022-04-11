@@ -931,30 +931,6 @@
 <span id="895">895</span>
 <span id="896">896</span>
 <span id="897">897</span>
-<span id="898">898</span>
-<span id="899">899</span>
-<span id="900">900</span>
-<span id="901">901</span>
-<span id="902">902</span>
-<span id="903">903</span>
-<span id="904">904</span>
-<span id="905">905</span>
-<span id="906">906</span>
-<span id="907">907</span>
-<span id="908">908</span>
-<span id="909">909</span>
-<span id="910">910</span>
-<span id="911">911</span>
-<span id="912">912</span>
-<span id="913">913</span>
-<span id="914">914</span>
-<span id="915">915</span>
-<span id="916">916</span>
-<span id="917">917</span>
-<span id="918">918</span>
-<span id="919">919</span>
-<span id="920">920</span>
-<span id="921">921</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -979,18 +955,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::intersection</span>::{<span class="ident">IntersectionInfo</span>, <span class="ident">SurfaceSide</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">Point3D</span>,
-    <span class="ident">Ray3D</span>,
-    <span class="ident">Segment3D</span>,
-    <span class="ident">Transform</span>,
-    <span class="ident">Vector3D</span>,
-    <span class="ident">BBox3D</span>,
-};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">BBox3D</span>, <span class="ident">Point3D</span>, <span class="ident">Ray3D</span>, <span class="ident">Segment3D</span>, <span class="ident">Transform</span>, <span class="ident">Vector3D</span>};
 
 <span class="doccomment">/// Intersects a [`Ray3D`] in local coordinates with Triangle described by the</span>
 <span class="doccomment">/// [`Point3D`] `a`, `b`, and `c`.</span>
@@ -1145,11 +1114,11 @@ SOFTWARE.
         <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bc</span>().<span class="ident">length</span>();
         <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ca</span>().<span class="ident">length</span>();
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> (<span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">+</span> <span class="ident">c</span>) <span class="op">*</span> (<span class="ident">b</span> <span class="op">+</span> <span class="ident">c</span> <span class="op">-</span> <span class="ident">a</span>) <span class="op">*</span> (<span class="ident">c</span> <span class="op">+</span> <span class="ident">a</span> <span class="op">-</span> <span class="ident">b</span>) <span class="op">*</span> (<span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">-</span> <span class="ident">c</span>);
-        
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;quick_inv_sqrt&quot;</span>))]</span>
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quick_inv_sqrt&quot;</span>))]</span>
         <span class="kw">return</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">c</span> <span class="op">/</span> <span class="ident">s</span>.<span class="ident">sqrt</span>();
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;quick_inv_sqrt&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quick_inv_sqrt&quot;</span>)]</span>
         <span class="kw">return</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">c</span> <span class="op">*</span> <span class="ident"><span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt</span>(<span class="ident">s</span>);
     }
 
@@ -1306,7 +1275,7 @@ SOFTWARE.
 
         <span class="comment">// Compute dot products</span>
         <span class="kw">let</span> <span class="ident">e2e2</span> <span class="op">=</span> <span class="ident">e2</span> <span class="op">*</span> <span class="ident">e2</span>;
-        <span class="kw">let</span> <span class="ident">e1e2</span> <span class="op">=</span> <span class="ident">e2</span> <span class="op">*</span> <span class="ident">e1</span>;        
+        <span class="kw">let</span> <span class="ident">e1e2</span> <span class="op">=</span> <span class="ident">e2</span> <span class="op">*</span> <span class="ident">e1</span>;
         <span class="kw">let</span> <span class="ident">e1e1</span> <span class="op">=</span> <span class="ident">e1</span> <span class="op">*</span> <span class="ident">e1</span>;
 
         <span class="kw">let</span> <span class="ident">left1</span> <span class="op">=</span> <span class="ident">e1</span> <span class="op">*</span> <span class="ident">p_minus_a</span>;
@@ -1367,12 +1336,7 @@ SOFTWARE.
     <span class="doccomment">/// Checks if a [`Triangle3D`] contains a certain Vertex in</span>
     <span class="doccomment">/// the same position as a [`Point3D`] `p`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">bool</span> {
-
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">compare</span>(<span class="ident">p</span>) <span class="op">|</span><span class="op">|</span>
-        <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">compare</span>(<span class="ident">p</span>) <span class="op">|</span><span class="op">|</span>
-        <span class="self">self</span>.<span class="ident">c</span>.<span class="ident">compare</span>(<span class="ident">p</span>)
-
-        
+        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">compare</span>(<span class="ident">p</span>) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">compare</span>(<span class="ident">p</span>) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">c</span>.<span class="ident">compare</span>(<span class="ident">p</span>)
     }
 
     <span class="doccomment">/// Checks whether three [`Triangle3D`] objects are made</span>
@@ -1413,7 +1377,7 @@ SOFTWARE.
     }
 
     <span class="doccomment">/// Gets a `BBox3D` bounding the object, in local coordinates</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bounds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)-&gt;<span class="ident">BBox3D</span>{
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bounds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BBox3D</span> {
         <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::from_point</span>(<span class="self">self</span>.<span class="ident">a</span>);
         <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::from_union_point</span>(<span class="kw-2">&amp;</span><span class="ident">bbox</span>, <span class="self">self</span>.<span class="ident">b</span>);
         <span class="ident">BBox3D::from_union_point</span>(<span class="kw-2">&amp;</span><span class="ident">bbox</span>, <span class="self">self</span>.<span class="ident">c</span>)
@@ -1423,10 +1387,6 @@ SOFTWARE.
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="prelude-val">None</span>
     }
-
-    
-
-    
 
     <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance</span>
     <span class="doccomment">/// `t` and the normal [`Vector3D`] at that point. If the distance</span>
@@ -1457,7 +1417,6 @@ SOFTWARE.
         <span class="comment">// eprintln!(&quot;normal = {}&quot;, normal);</span>
         <span class="kw">let</span> (<span class="ident">normal</span>, <span class="ident">side</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">ray</span>.<span class="ident">direction</span>);
 
-        
         <span class="prelude-val">Some</span>(<span class="ident">IntersectionInfo</span> {
             <span class="ident">p</span>: <span class="ident">phit</span>,
             <span class="ident">dpdu</span>,
@@ -1474,8 +1433,6 @@ SOFTWARE.
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
             <span class="ident">dndv</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
         })
-
-        
     }
 
     <span class="doccomment">/// Like `intersect_local_ray` but simplified because there is not need</span>
@@ -1490,7 +1447,7 @@ SOFTWARE.
         <span class="prelude-val">Some</span>(<span class="ident">p</span>)
     }
 
-    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, </span>
+    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,</span>
     <span class="doccomment">/// returning a detailed [`IntersectionInfo`] about the intersaction .</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntersectionInfo</span><span class="op">&gt;</span> {
         <span class="comment">// Transform ray into object space, if needed</span>
@@ -1514,8 +1471,8 @@ SOFTWARE.
         }
     }
 
-    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, </span>
-    <span class="doccomment">/// returning the point of intersection, if any. </span>
+    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,</span>
+    <span class="doccomment">/// returning the point of intersection, if any.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_intersect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> {
         <span class="comment">// Transform ray into object space, if needed</span>
         <span class="kw">let</span> (<span class="ident">local_ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform</span>() {
@@ -1538,25 +1495,20 @@ SOFTWARE.
         }
     }
 
-     <span class="doccomment">/// Gets a `BBox3D` bounding the object, in world&#39;s coordinates.</span>
-     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">world_bounds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)-&gt;<span class="ident">BBox3D</span>{
-         <span class="kw">let</span> <span class="ident">local_b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bounds</span>();
-         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">transform</span>() {
-             <span class="prelude-val">Some</span>(<span class="ident">t</span>)=&gt;{
-                 <span class="ident">t</span>.<span class="ident">transform_bbox</span>(<span class="ident">local_b</span>)
-             },
-             <span class="prelude-val">None</span> =&gt; <span class="ident">local_b</span>
-         }
-     }
+    <span class="doccomment">/// Gets a `BBox3D` bounding the object, in world&#39;s coordinates.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">world_bounds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BBox3D</span> {
+        <span class="kw">let</span> <span class="ident">local_b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bounds</span>();
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">transform</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">transform_bbox</span>(<span class="ident">local_b</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">local_b</span>,
+        }
+    }
 } <span class="comment">// end of impl Triangle3D</span>
 
 <span class="kw">fn</span> <span class="ident">det_3x3</span>(<span class="ident">col0</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>, <span class="ident">col1</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>, <span class="ident">col2</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>) -&gt; <span class="ident">Float</span> {
     <span class="ident">col0</span>.<span class="ident">x</span> <span class="op">*</span> (<span class="ident">col1</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col2</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">col2</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col1</span>.<span class="ident">z</span>) <span class="op">-</span> <span class="ident">col1</span>.<span class="ident">x</span> <span class="op">*</span> (<span class="ident">col0</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col2</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">col2</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col0</span>.<span class="ident">z</span>)
         <span class="op">+</span> <span class="ident">col2</span>.<span class="ident">x</span> <span class="op">*</span> (<span class="ident">col0</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col1</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">col1</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col0</span>.<span class="ident">z</span>)
 }
-
-
-
 
 <span class="comment">/***********/</span>
 <span class="comment">/* TESTING */</span>
@@ -1638,10 +1590,10 @@ SOFTWARE.
         <span class="macro">assert!</span>((<span class="ident">t</span>.<span class="ident">area</span>() <span class="op">-</span> <span class="number">6.</span> <span class="op">*</span> <span class="number">8.</span> <span class="op">/</span> <span class="number">2.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1E-10</span>);
 
         <span class="comment">// Check circumradius</span>
-        <span class="macro">assert!</span>( (<span class="ident">t</span>.<span class="ident">circumradius</span>() <span class="op">-</span> <span class="number">5.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">0.001</span>);
+        <span class="macro">assert!</span>((<span class="ident">t</span>.<span class="ident">circumradius</span>() <span class="op">-</span> <span class="number">5.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">0.001</span>);
 
         <span class="comment">// Check aspect ratio; circumradius/smallest side</span>
-        <span class="macro">assert!</span>( (<span class="ident">t</span>.<span class="ident">aspect_ratio</span>() <span class="op">-</span> <span class="number">5.</span><span class="op">/</span><span class="number">6.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">0.001</span>);
+        <span class="macro">assert!</span>((<span class="ident">t</span>.<span class="ident">aspect_ratio</span>() <span class="op">-</span> <span class="number">5.</span> <span class="op">/</span> <span class="number">6.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">0.001</span>);
 
         <span class="comment">// Check circumcenter</span>
         <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">circumcenter</span>().<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">3.</span>, <span class="number">4.</span>, <span class="number">0.</span>)));

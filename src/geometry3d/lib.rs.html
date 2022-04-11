@@ -137,6 +137,29 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -185,7 +208,7 @@ SOFTWARE.
 <span class="kw">mod</span> <span class="ident">utils</span>;
 <span class="comment">// pub mod intersect_trait;</span>
 
-
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">round_error</span>;
 
 <span class="comment">// Objects</span>
@@ -223,7 +246,7 @@ SOFTWARE.
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">transform::Transform</span>;
 
 <span class="kw">mod</span> <span class="ident">triangle3d</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">triangle3d</span>::{<span class="ident">Triangle3D</span>, <span class="ident">PointInTriangle</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">triangle3d</span>::{<span class="ident">PointInTriangle</span>, <span class="ident">Triangle3D</span>};
 
 <span class="kw">mod</span> <span class="ident">triangulation3d</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">triangulation3d::Triangulation3D</span>;
@@ -231,15 +254,38 @@ SOFTWARE.
 <span class="kw">mod</span> <span class="ident">vector3d</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">vector3d::Vector3D</span>;
 
-
 <span class="kw">mod</span> <span class="ident">bbox3d</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bbox3d</span>::{<span class="ident">BBox3D</span>, <span class="ident">BBoxAxis</span>};
 
-
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">intersection</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;quick_inv_sqrt&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quick_inv_sqrt&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">quick_inverse_sqrt</span>;
+
+<span class="attribute">#[<span class="ident">macro_export</span>]</span>
+<span class="macro">macro_rules!</span> <span class="ident">gamma</span> {
+    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> : <span class="ident">expr</span> ) =&gt; {{
+        <span class="kw">const</span> <span class="ident">HALF_EPSILON</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="ident">Float::EPSILON</span> <span class="op">/</span> <span class="number">2.0</span>;
+
+        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">HALF_EPSILON</span> <span class="op">*</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="kw">as</span> <span class="ident">Float</span>);
+        (<span class="ident">nm</span>) <span class="op">/</span> (<span class="number">1.</span> <span class="op">-</span> <span class="ident">nm</span>)
+    }};
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">testing</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_gamma_macro</span>() {
+        <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">20</span> {
+            <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">Float::EPSILON</span> <span class="op">/</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">Float</span>;
+            <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> (<span class="ident">nm</span>) <span class="op">/</span> (<span class="number">1.</span> <span class="op">-</span> <span class="ident">nm</span>);
+            <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="macro">gamma!</span>(<span class="ident">n</span>);
+            <span class="comment">// println!(&quot;exp  : {} \nfound: {}\n======&quot;, exp,found);</span>
+            <span class="macro">assert!</span>((<span class="ident">exp</span> <span class="op">-</span> <span class="ident">found</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>)
+        }
+    }
+}
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

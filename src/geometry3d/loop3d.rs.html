@@ -987,6 +987,10 @@
 <span id="951">951</span>
 <span id="952">952</span>
 <span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -1011,12 +1015,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">Point3D</span>,
-    <span class="ident">Segment3D</span>,
-    <span class="ident">Vector3D</span>,    
-};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Point3D</span>, <span class="ident">Segment3D</span>, <span class="ident">Vector3D</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Loop3D</span> {
@@ -1466,7 +1466,7 @@ SOFTWARE.
         <span class="macro">assert_eq!</span>(<span class="ident">l</span>.<span class="ident">n_vertices</span>(), <span class="number">4</span>);
         <span class="ident">l</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">l</span>.<span class="ident">n_vertices</span>(), <span class="number">4</span>);
-        <span class="macro">assert!</span>( (<span class="ident">l</span>.<span class="ident">area</span><span class="op">-</span> <span class="number">16.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
+        <span class="macro">assert!</span>((<span class="ident">l</span>.<span class="ident">area</span> <span class="op">-</span> <span class="number">16.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
 
         <span class="macro">assert_eq!</span>(<span class="ident">l</span>[<span class="number">0</span>], <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">l</span>[<span class="number">1</span>], <span class="ident">Point3D::new</span>(<span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>));
@@ -1488,7 +1488,7 @@ SOFTWARE.
         <span class="macro">assert_eq!</span>(<span class="number">5</span>, <span class="ident">l</span>.<span class="ident">vertices</span>.<span class="ident">len</span>());
         <span class="ident">l</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">l</span>.<span class="ident">n_vertices</span>(), <span class="number">4</span>);
-        <span class="macro">assert!</span>( (<span class="ident">l</span>.<span class="ident">area</span><span class="op">-</span> <span class="number">16.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
+        <span class="macro">assert!</span>((<span class="ident">l</span>.<span class="ident">area</span> <span class="op">-</span> <span class="number">16.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">l</span>[<span class="number">0</span>], <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">l</span>[<span class="number">1</span>], <span class="ident">Point3D::new</span>(<span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">l</span>[<span class="number">2</span>], <span class="ident">Point3D::new</span>(<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">0.</span>));
@@ -1509,7 +1509,7 @@ SOFTWARE.
         <span class="macro">assert_eq!</span>(<span class="number">5</span>, <span class="ident">l</span>.<span class="ident">vertices</span>.<span class="ident">len</span>());
         <span class="ident">l</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">l</span>.<span class="ident">n_vertices</span>(), <span class="number">4</span>);
-        <span class="macro">assert!</span>( (<span class="ident">l</span>.<span class="ident">area</span><span class="op">-</span> <span class="number">16.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
+        <span class="macro">assert!</span>((<span class="ident">l</span>.<span class="ident">area</span> <span class="op">-</span> <span class="number">16.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">l</span>[<span class="number">0</span>], <span class="ident">Point3D::new</span>(<span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">l</span>[<span class="number">1</span>], <span class="ident">Point3D::new</span>(<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">0.</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">l</span>[<span class="number">2</span>], <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="number">2.</span>, <span class="number">0.</span>));
@@ -1761,7 +1761,7 @@ SOFTWARE.
         <span class="ident">the_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">the_loop</span>.<span class="ident">area</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>( (<span class="number">4.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">a</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">0.0001</span>);
+        <span class="macro">assert!</span>((<span class="number">4.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">a</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">0.0001</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1782,8 +1782,12 @@ SOFTWARE.
         <span class="ident">the_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">the_loop</span>.<span class="ident">area</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>( (<span class="number">3.0</span><span class="op">-</span> <span class="ident">a</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
-        <span class="macro">assert!</span>( <span class="ident">the_loop</span>.<span class="ident">normal</span>().<span class="ident">compare</span>(<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>)), <span class="string">&quot;normal = {}&quot;</span>, <span class="ident">the_loop</span>.<span class="ident">normal</span>() );
+        <span class="macro">assert!</span>((<span class="number">3.0</span> <span class="op">-</span> <span class="ident">a</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
+        <span class="macro">assert!</span>(
+            <span class="ident">the_loop</span>.<span class="ident">normal</span>().<span class="ident">compare</span>(<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>)),
+            <span class="string">&quot;normal = {}&quot;</span>,
+            <span class="ident">the_loop</span>.<span class="ident">normal</span>()
+        );
 
         <span class="comment">// Clockwise</span>
         <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">1.</span>;
@@ -1800,8 +1804,12 @@ SOFTWARE.
         <span class="ident">the_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">the_loop</span>.<span class="ident">area</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>( (<span class="number">3.0</span><span class="op">-</span> <span class="ident">a</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
-        <span class="macro">assert!</span>( <span class="ident">the_loop</span>.<span class="ident">normal</span>().<span class="ident">compare</span>(<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>)), <span class="string">&quot;normal = {}&quot;</span>, <span class="ident">the_loop</span>.<span class="ident">normal</span>() );
+        <span class="macro">assert!</span>((<span class="number">3.0</span> <span class="op">-</span> <span class="ident">a</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
+        <span class="macro">assert!</span>(
+            <span class="ident">the_loop</span>.<span class="ident">normal</span>().<span class="ident">compare</span>(<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>)),
+            <span class="string">&quot;normal = {}&quot;</span>,
+            <span class="ident">the_loop</span>.<span class="ident">normal</span>()
+        );
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
