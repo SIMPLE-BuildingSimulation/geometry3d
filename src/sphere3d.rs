@@ -435,7 +435,7 @@ impl Sphere3D {
         _d_error: Point3D,
     ) -> Option<IntersectionInfo> {
         #[cfg(feature = "textures")]
-        let (phit, phi) = self.approx_basic_intersection(ray, o_error, d_error)?;
+        let (phit, phi) = self.approx_basic_intersection(ray, _o_error, _d_error)?;
         #[cfg(not(feature = "textures"))]
         let (phit, phi) = self.basic_intersection(ray)?;
 
@@ -451,7 +451,7 @@ impl Sphere3D {
     ) -> Option<Point3D> {
         // Do the first part
         #[cfg(feature = "textures")]
-        let (phit, _) = self.approx_basic_intersection(ray, o_error, d_error)?;
+        let (phit, _) = self.approx_basic_intersection(ray, _o_error, _d_error)?;
         #[cfg(not(feature = "textures"))]
         let (phit, _) = self.basic_intersection(ray)?;
 
