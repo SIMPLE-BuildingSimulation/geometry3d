@@ -235,9 +235,9 @@ impl BBox3D {
     ///     direction: Vector3D::new(0., 0., 1.)
     /// };
     /// let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
-    /// assert!(bbox.intersect(&ray, inv_dir));
+    /// assert!(bbox.intersect(&ray, &inv_dir));
     /// ```
-    pub fn intersect(&self, ray: &Ray3D, inv_dir: Vector3D) -> bool {
+    pub fn intersect(&self, ray: &Ray3D, inv_dir: &Vector3D) -> bool {
         let mut t_min = (self.min.x - ray.origin.x) * inv_dir.x;
         let mut t_max = (self.max.x - ray.origin.x) * inv_dir.x;
         if t_min > t_max {
@@ -515,7 +515,7 @@ mod testing {
                 1. / ray.direction.y,
                 1. / ray.direction.z,
             );
-            assert!(bbox.intersect(&ray, inv_dir));
+            assert!(bbox.intersect(&ray, &inv_dir));
         }
 
         // From outside pointing to the center of the box
@@ -535,7 +535,7 @@ mod testing {
                 1. / ray.direction.y,
                 1. / ray.direction.z,
             );
-            assert!(bbox.intersect(&ray, inv_dir));
+            assert!(bbox.intersect(&ray, &inv_dir));
         }
 
         // On top of the Box... should NOT intersect
@@ -553,7 +553,7 @@ mod testing {
                 1. / ray.direction.y,
                 1. / ray.direction.z,
             );
-            assert!(!bbox.intersect(&ray, inv_dir));
+            assert!(!bbox.intersect(&ray, &inv_dir));
         }
 
         /* PARALLEL TO Z AXIS */
@@ -567,7 +567,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(bbox.intersect(&ray, inv_dir));
+        assert!(bbox.intersect(&ray, &inv_dir));
 
         // From inside Down
         let ray = Ray3D {
@@ -579,7 +579,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(bbox.intersect(&ray, inv_dir));
+        assert!(bbox.intersect(&ray, &inv_dir));
 
         // From Below Up
         let ray = Ray3D {
@@ -591,7 +591,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(bbox.intersect(&ray, inv_dir));
+        assert!(bbox.intersect(&ray, &inv_dir));
 
         // From Below Down
         let ray = Ray3D {
@@ -603,7 +603,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(!bbox.intersect(&ray, inv_dir));
+        assert!(!bbox.intersect(&ray, &inv_dir));
 
         // From Top Up
         let ray = Ray3D {
@@ -615,7 +615,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(!bbox.intersect(&ray, inv_dir));
+        assert!(!bbox.intersect(&ray, &inv_dir));
 
         // From Top Down
         let ray = Ray3D {
@@ -627,7 +627,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(bbox.intersect(&ray, inv_dir));
+        assert!(bbox.intersect(&ray, &inv_dir));
 
         /* PARALLEL TO Y AXIS */
         // From inside Up
@@ -640,7 +640,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(bbox.intersect(&ray, inv_dir));
+        assert!(bbox.intersect(&ray, &inv_dir));
 
         // From inside Down
         let ray = Ray3D {
@@ -652,7 +652,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(bbox.intersect(&ray, inv_dir));
+        assert!(bbox.intersect(&ray, &inv_dir));
 
         // From Below Up
         let ray = Ray3D {
@@ -664,7 +664,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(bbox.intersect(&ray, inv_dir));
+        assert!(bbox.intersect(&ray, &inv_dir));
 
         // From Below Down
         let ray = Ray3D {
@@ -676,7 +676,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(!bbox.intersect(&ray, inv_dir));
+        assert!(!bbox.intersect(&ray, &inv_dir));
 
         // From Top Up
         let ray = Ray3D {
@@ -688,7 +688,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(!bbox.intersect(&ray, inv_dir));
+        assert!(!bbox.intersect(&ray, &inv_dir));
 
         // From Top Down
         let ray = Ray3D {
@@ -700,7 +700,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(bbox.intersect(&ray, inv_dir));
+        assert!(bbox.intersect(&ray, &inv_dir));
 
         /* PARALLEL TO X AXIS */
         // From inside Up
@@ -713,7 +713,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(bbox.intersect(&ray, inv_dir));
+        assert!(bbox.intersect(&ray, &inv_dir));
 
         // From inside Down
         let ray = Ray3D {
@@ -725,7 +725,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(bbox.intersect(&ray, inv_dir));
+        assert!(bbox.intersect(&ray, &inv_dir));
 
         // From Below Up
         let ray = Ray3D {
@@ -737,7 +737,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(bbox.intersect(&ray, inv_dir));
+        assert!(bbox.intersect(&ray, &inv_dir));
 
         // From Below Down
         let ray = Ray3D {
@@ -749,7 +749,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(!bbox.intersect(&ray, inv_dir));
+        assert!(!bbox.intersect(&ray, &inv_dir));
 
         // From Top Up
         let ray = Ray3D {
@@ -761,7 +761,7 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(!bbox.intersect(&ray, inv_dir));
+        assert!(!bbox.intersect(&ray, &inv_dir));
 
         // From Top Down
         let ray = Ray3D {
@@ -773,6 +773,6 @@ mod testing {
             1. / ray.direction.y,
             1. / ray.direction.z,
         );
-        assert!(bbox.intersect(&ray, inv_dir));
+        assert!(bbox.intersect(&ray, &inv_dir));
     }
 }

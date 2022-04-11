@@ -24,10 +24,13 @@ SOFTWARE.
 
 use crate::Float;
 
+#[cfg(not(feature = "float"))]
 const ZERO: u64 = 0;
+#[cfg(feature = "float")]
+const ZERO: u32 = 0;
 
 #[cfg(feature = "float")]
-const MINUS_ZERO: f64 = 2147483648;
+const MINUS_ZERO: u32 = 2147483648;
 #[cfg(not(feature = "float"))]
 const MINUS_ZERO: u64 = 9223372036854775808;
 
