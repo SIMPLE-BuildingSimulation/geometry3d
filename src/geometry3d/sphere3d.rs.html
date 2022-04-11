@@ -1259,7 +1259,7 @@ SOFTWARE.
         <span class="ident">_d_error</span>: <span class="ident">Point3D</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntersectionInfo</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-        <span class="kw">let</span> (<span class="ident">phit</span>, <span class="ident">phi</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">approx_basic_intersection</span>(<span class="ident">ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> (<span class="ident">phit</span>, <span class="ident">phi</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">approx_basic_intersection</span>(<span class="ident">ray</span>, <span class="ident">_o_error</span>, <span class="ident">_d_error</span>)<span class="question-mark">?</span>;
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>))]</span>
         <span class="kw">let</span> (<span class="ident">phit</span>, <span class="ident">phi</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">basic_intersection</span>(<span class="ident">ray</span>)<span class="question-mark">?</span>;
 
@@ -1275,7 +1275,7 @@ SOFTWARE.
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> {
         <span class="comment">// Do the first part</span>
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-        <span class="kw">let</span> (<span class="ident">phit</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">approx_basic_intersection</span>(<span class="ident">ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> (<span class="ident">phit</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">approx_basic_intersection</span>(<span class="ident">ray</span>, <span class="ident">_o_error</span>, <span class="ident">_d_error</span>)<span class="question-mark">?</span>;
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>))]</span>
         <span class="kw">let</span> (<span class="ident">phit</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">basic_intersection</span>(<span class="ident">ray</span>)<span class="question-mark">?</span>;
 
