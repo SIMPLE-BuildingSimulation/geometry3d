@@ -22,15 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
-use crate::{
-    Point3D,
-    Ray3D,
-    Transform,
-    Vector3D,
-    Float,
-};
-
+use crate::{Float, Point3D, Ray3D, Transform, Vector3D};
 
 /// Is the [`Ray3D`] intersecting from the Front or Back side?
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -53,19 +45,17 @@ impl SurfaceSide {
             (normal, Self::Front)
         } else if dot > 0. {
             (normal * -1., Self::Back)
-        } else {   
-            return (Vector3D::new(0., 0., 0.), Self::NonApplicable)                     
+        } else {
+            (Vector3D::new(0., 0., 0.), Self::NonApplicable)
         }
     }
 }
 
-impl std::default::Default for SurfaceSide{
-    fn default()->Self{
+impl std::default::Default for SurfaceSide {
+    fn default() -> Self {
         Self::NonApplicable
     }
 }
-
-
 
 /// Contains more detailed information about the
 /// what is happening at the surface in the intersection point
@@ -118,31 +108,30 @@ impl IntersectionInfo {
         _d2p_dvv: Vector3D,
         _d2p_duv: Vector3D,
     ) -> Self {
-
         let normal = dpdv.cross(dpdu).get_normalized();
         let (normal, side) = SurfaceSide::get_side(normal, ray.direction);
-        
+
         /* Weingarten equations */
-        #[cfg(feature="textures")]
+        #[cfg(feature = "textures")]
         let big_e = dpdu * dpdu;
-        #[cfg(feature="textures")]
+        #[cfg(feature = "textures")]
         let big_f = dpdu * dpdv;
-        #[cfg(feature="textures")]
+        #[cfg(feature = "textures")]
         let big_g = dpdv * dpdv;
 
-        #[cfg(feature="textures")]
+        #[cfg(feature = "textures")]
         let e = normal * _d2p_duu;
-        #[cfg(feature="textures")]
+        #[cfg(feature = "textures")]
         let f = normal * _d2p_duv;
-        #[cfg(feature="textures")]
+        #[cfg(feature = "textures")]
         let g = normal * _d2p_dvv;
 
-        #[cfg(feature="textures")]
+        #[cfg(feature = "textures")]
         let inv_big_egf2 = 1. / (big_e * big_g - big_f * big_f);
-        #[cfg(feature="textures")]
+        #[cfg(feature = "textures")]
         let dndu = dpdu * ((f * big_f - e * big_g) * inv_big_egf2)
             + dpdv * ((e * big_f - f * big_e) * inv_big_egf2);
-        #[cfg(feature="textures")]
+        #[cfg(feature = "textures")]
         let dndv = dpdu * ((g * big_f - f * big_g) * inv_big_egf2)
             + dpdv * ((f * big_f - g * big_e) * inv_big_egf2);
 
@@ -200,8 +189,6 @@ impl IntersectionInfo {
         }
     }
 }
-
-
 
 #[cfg(test)]
 mod testing {

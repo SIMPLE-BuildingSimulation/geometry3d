@@ -22,18 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::round_error::ApproxFloat;
-use crate::{Float, PI};
 use crate::intersection::IntersectionInfo;
 
-use crate::{
-    Point3D,
-    Ray3D,
-    Transform,
-    Vector3D,
-    BBox3D
-};
+#[cfg(feature = "textures")]
+use crate::round_error::ApproxFloat;
+use crate::{Float, PI};
+
 use crate::RefCount;
+use crate::{BBox3D, Point3D, Ray3D, Transform, Vector3D};
 
 /// A Cylinder of radius `radius` aligned witht the Z axis, starting at a
 /// Z value of `zmin` and ending at `zmax`.
@@ -60,13 +56,12 @@ pub struct Cylinder3D {
 }
 
 impl Cylinder3D {
-
     /// Creates a new full `Cylinder3D`; i.e., it is a revolution of 360 degrees
     pub fn new(p0: Point3D, p1: Point3D, radius: Float) -> Self {
         Self::new_partial(p0, p1, radius, 360.)
     }
 
-    /// Creates a new partial `Cylinder3D`; i.e., it does not have to be closed. For instance, 
+    /// Creates a new partial `Cylinder3D`; i.e., it does not have to be closed. For instance,
     /// it can only be a 180 degree revolution
     pub fn new_partial(p0: Point3D, p1: Point3D, radius: Float, phi_max: Float) -> Self {
         let l = p1 - p0;
@@ -81,7 +76,13 @@ impl Cylinder3D {
         transform *= Transform::rotate_y(rot_y_degrees);
         transform *= Transform::rotate_z(rot_z_degrees);
 
-        Self::new_transformed(radius, 0., l.length(), phi_max, Some(RefCount::new(transform)))
+        Self::new_transformed(
+            radius,
+            0.,
+            l.length(),
+            phi_max,
+            Some(RefCount::new(transform)),
+        )
     }
 
     /// The angle `phi_max` is in degrees
@@ -98,8 +99,8 @@ impl Cylinder3D {
                 zmin, zmax
             );
         }
-        let mut phi_max = phi_max;        
-        if !(-Float::EPSILON..=360. + Float::EPSILON).contains(&phi_max){
+        let mut phi_max = phi_max;
+        if !(-Float::EPSILON..=360. + Float::EPSILON).contains(&phi_max) {
             panic!("when creating a 'cylinder': given phi_max is not between 0 and 360 degrees (it was {})", phi_max);
         }
         phi_max = phi_max.clamp(0., 360.).to_radians();
@@ -119,6 +120,7 @@ impl Cylinder3D {
         }
     }
 
+    #[cfg(feature = "textures")]
     pub fn basic_intersection(
         &self,
         ray: &Ray3D,
@@ -205,6 +207,89 @@ impl Cylinder3D {
         Some((phit, phi))
     }
 
+    #[cfg(not(feature = "textures"))]
+    pub fn basic_intersection(
+        &self,
+        ray: &Ray3D,
+        _o_error: Point3D,
+        _d_error: Point3D,
+    ) -> Option<(Point3D, Float)> {
+        // decompose ray
+        let (dx, dy) = (ray.direction.x, ray.direction.y);
+        let (ox, oy) = (ray.origin.x, ray.origin.y);
+
+        let a = dx * dx + dy * dy;
+        let b = (dx * ox + dy * oy) * 2.;
+        let c = ox * ox + oy * oy - self.radius * self.radius;
+        let (t0, t1) = crate::utils::solve_quadratic(a, b, c)?;
+        debug_assert!(t1 >= t0);
+        // t0 < t1... so, check if they are possitive
+        if t1 <= 0.0 {
+            return None;
+        }
+
+        // We now know that t1 hits... check t0
+        let (mut thit, hit_is_t1) = if t0 > 0. {
+            // if t0 is a valid hit, keep that
+            (t0, false)
+        } else {
+            // else, use t1 (which we know works...)
+            (t1, true)
+        };
+
+        // We might try to do the same with 'thit' = t1, later
+        let calc_phit_and_phi = |thit: Float| -> (Point3D, Float) {
+            // Calculate point of intersection.
+            let mut phit = ray.project(thit);
+            // refine in order to avoid error accumulation
+            let hit_rad = (phit.x * phit.x + phit.y * phit.y).sqrt();
+            phit.x *= self.radius / hit_rad;
+            phit.y *= self.radius / hit_rad;
+
+            // calc phi
+            let mut phi = phit.y.atan2(phit.x);
+            if phi < 0. {
+                phi += 2. * PI;
+            }
+            (phit, phi)
+        };
+
+        let (mut phit, mut phi) = calc_phit_and_phi(thit);
+
+        // Check intersection against clipping parameters...
+        // it is possible that the first hit misses, but the second
+        // does not
+        if phit.z < self.zmin || // zmin is limiting but 'thit' missed it
+            phit.z > self.zmax || // zmax is limiting but 'thit' missed it
+            phi > self.phi_max
+        // 'thit' missed due to the phi limitation
+        {
+            // if this was already t1, then we missed the sphere
+            if hit_is_t1 {
+                return None;
+            }
+
+            // else, try with t1.
+            thit = t1;
+
+            // recalculate
+            let (new_phit, new_phi) = calc_phit_and_phi(thit);
+
+            if new_phit.z < self.zmin || // zmin is limiting but 'thit' missed it
+                new_phit.z > self.zmax || // zmax is limiting but 'thit' missed it
+                new_phi > self.phi_max
+            // 'thit' missed due to the phi limitation
+            {
+                return None;
+            }
+            // update values
+            phit = new_phit;
+            phi = new_phi;
+        }
+
+        Some((phit, phi))
+    }
+
     pub fn intersection_info(
         &self,
         ray: &Ray3D,
@@ -231,9 +316,9 @@ impl Cylinder3D {
     }
 
     /// Gets a `BBox3D` bounding the object, in local coordinates
-    pub fn bounds(&self)->BBox3D{
+    pub fn bounds(&self) -> BBox3D {
         let min = Point3D::new(-self.radius, -self.radius, self.zmin);
-        let max = Point3D::new( self.radius,  self.radius, self.zmax);
+        let max = Point3D::new(self.radius, self.radius, self.zmax);
         BBox3D::new(min, max)
     }
 
@@ -242,7 +327,6 @@ impl Cylinder3D {
         "cylinder"
     }
 
-    
     /// Gets the area of the object
     pub fn area(&self) -> Float {
         debug_assert!(self.zmax > self.zmin);
@@ -267,7 +351,6 @@ impl Cylinder3D {
         Some(phit)
     }
 
-    
     /// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance
     /// `t` and the normal [`Vector3D`] at that point. If the distance
     /// is negative (i.e., the object is behind the plane), it should return
@@ -289,7 +372,6 @@ impl Cylinder3D {
         let (phit, phi) = self.basic_intersection(ray, o_error, d_error)?;
         self.intersection_info(ray, phit, phi)
     }
-
 
     /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, returning the distance
     /// `t` and the normal [`Vector3D`] at that point. If the distance
@@ -317,8 +399,8 @@ impl Cylinder3D {
         }
     }
 
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
-    /// returning the point of intersection, if any. 
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
+    /// returning the point of intersection, if any.
     pub fn simple_intersect(&self, ray: &Ray3D) -> Option<Point3D> {
         // Transform ray into object space, if needed
         let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
@@ -340,22 +422,16 @@ impl Cylinder3D {
             }
         }
     }
-    
-     /// Gets a `BBox3D` bounding the object, in world's coordinates.
-     pub fn world_bounds(&self)->BBox3D{
-         let local_b = self.bounds();
-         match self.transform() {
-             Some(t)=>{
-                 t.transform_bbox(local_b)
-             },
-             None => local_b
-         }
-     }
 
+    /// Gets a `BBox3D` bounding the object, in world's coordinates.
+    pub fn world_bounds(&self) -> BBox3D {
+        let local_b = self.bounds();
+        match self.transform() {
+            Some(t) => t.transform_bbox(local_b),
+            None => local_b,
+        }
+    }
 }
-
-
-
 
 #[cfg(test)]
 mod testing {

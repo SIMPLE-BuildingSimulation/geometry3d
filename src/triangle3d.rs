@@ -22,18 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::RefCount;
 use crate::intersection::{IntersectionInfo, SurfaceSide};
+use crate::RefCount;
 
-use crate::{
-    Point3D,
-    Ray3D,
-    Segment3D,
-    Transform,
-    Vector3D,
-    BBox3D,
-};
 use crate::Float;
+use crate::{BBox3D, Point3D, Ray3D, Segment3D, Transform, Vector3D};
 
 /// Intersects a [`Ray3D`] in local coordinates with Triangle described by the
 /// [`Point3D`] `a`, `b`, and `c`.
@@ -188,11 +181,11 @@ impl Triangle3D {
         let b = self.bc().length();
         let c = self.ca().length();
         let s = (a + b + c) * (b + c - a) * (c + a - b) * (a + b - c);
-        
-        #[cfg(not(feature="quick_inv_sqrt"))]
+
+        #[cfg(not(feature = "quick_inv_sqrt"))]
         return a * b * c / s.sqrt();
 
-        #[cfg(feature="quick_inv_sqrt")]
+        #[cfg(feature = "quick_inv_sqrt")]
         return a * b * c * crate::quick_inverse_sqrt::quick_inv_sqrt(s);
     }
 
@@ -349,7 +342,7 @@ impl Triangle3D {
 
         // Compute dot products
         let e2e2 = e2 * e2;
-        let e1e2 = e2 * e1;        
+        let e1e2 = e2 * e1;
         let e1e1 = e1 * e1;
 
         let left1 = e1 * p_minus_a;
@@ -410,12 +403,7 @@ impl Triangle3D {
     /// Checks if a [`Triangle3D`] contains a certain Vertex in
     /// the same position as a [`Point3D`] `p`
     pub fn has_vertex(&self, p: Point3D) -> bool {
-
-        self.a.compare(p) ||
-        self.b.compare(p) ||
-        self.c.compare(p)
-
-        
+        self.a.compare(p) || self.b.compare(p) || self.c.compare(p)
     }
 
     /// Checks whether three [`Triangle3D`] objects are made
@@ -456,7 +444,7 @@ impl Triangle3D {
     }
 
     /// Gets a `BBox3D` bounding the object, in local coordinates
-    pub fn bounds(&self)->BBox3D{
+    pub fn bounds(&self) -> BBox3D {
         let bbox = BBox3D::from_point(self.a);
         let bbox = BBox3D::from_union_point(&bbox, self.b);
         BBox3D::from_union_point(&bbox, self.c)
@@ -466,10 +454,6 @@ impl Triangle3D {
     pub fn transform(&self) -> &Option<RefCount<Transform>> {
         &None
     }
-
-    
-
-    
 
     /// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance
     /// `t` and the normal [`Vector3D`] at that point. If the distance
@@ -500,7 +484,6 @@ impl Triangle3D {
         // eprintln!("normal = {}", normal);
         let (normal, side) = SurfaceSide::get_side(normal, ray.direction);
 
-        
         Some(IntersectionInfo {
             p: phit,
             dpdu,
@@ -517,8 +500,6 @@ impl Triangle3D {
             #[cfg(feature = "textures")]
             dndv: Vector3D::new(0., 0., 0.),
         })
-
-        
     }
 
     /// Like `intersect_local_ray` but simplified because there is not need
@@ -533,7 +514,7 @@ impl Triangle3D {
         Some(p)
     }
 
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
     /// returning a detailed [`IntersectionInfo`] about the intersaction .
     pub fn intersect(&self, ray: &Ray3D) -> Option<IntersectionInfo> {
         // Transform ray into object space, if needed
@@ -557,8 +538,8 @@ impl Triangle3D {
         }
     }
 
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
-    /// returning the point of intersection, if any. 
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
+    /// returning the point of intersection, if any.
     pub fn simple_intersect(&self, ray: &Ray3D) -> Option<Point3D> {
         // Transform ray into object space, if needed
         let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
@@ -581,25 +562,20 @@ impl Triangle3D {
         }
     }
 
-     /// Gets a `BBox3D` bounding the object, in world's coordinates.
-     pub fn world_bounds(&self)->BBox3D{
-         let local_b = self.bounds();
-         match self.transform() {
-             Some(t)=>{
-                 t.transform_bbox(local_b)
-             },
-             None => local_b
-         }
-     }
+    /// Gets a `BBox3D` bounding the object, in world's coordinates.
+    pub fn world_bounds(&self) -> BBox3D {
+        let local_b = self.bounds();
+        match self.transform() {
+            Some(t) => t.transform_bbox(local_b),
+            None => local_b,
+        }
+    }
 } // end of impl Triangle3D
 
 fn det_3x3(col0: &Vector3D, col1: &Vector3D, col2: &Vector3D) -> Float {
     col0.x * (col1.y * col2.z - col2.y * col1.z) - col1.x * (col0.y * col2.z - col2.y * col0.z)
         + col2.x * (col0.y * col1.z - col1.y * col0.z)
 }
-
-
-
 
 /***********/
 /* TESTING */
@@ -681,10 +657,10 @@ mod testing {
         assert!((t.area() - 6. * 8. / 2.).abs() < 1E-10);
 
         // Check circumradius
-        assert!( (t.circumradius() - 5.).abs() < 0.001);
+        assert!((t.circumradius() - 5.).abs() < 0.001);
 
         // Check aspect ratio; circumradius/smallest side
-        assert!( (t.aspect_ratio() - 5./6.).abs() < 0.001);
+        assert!((t.aspect_ratio() - 5. / 6.).abs() < 0.001);
 
         // Check circumcenter
         assert!(t.circumcenter().compare(Point3D::new(3., 4., 0.)));

@@ -22,19 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
 use crate::intersection::IntersectionInfo;
-use crate::{
-    Disk3D,
-    Point3D,
-    Ray3D,
-    Transform,
-    Vector3D,
-    BBox3D,
-};
+use crate::{BBox3D, Disk3D, Point3D, Ray3D, Transform, Vector3D};
 
-use crate::{Float, PI};
 use crate::RefCount;
+use crate::{Float, PI};
 
 /// Represents a solid angle pointing from any [`Point3D`] in the scene towards
 /// a certain `direction` (i.e., a [`Vector3D`]). So, this is not really a surface
@@ -97,22 +89,22 @@ impl DistantSource3D {
     pub fn id(&self) -> &'static str {
         "source"
     }
-    
+
     /// Gets a `BBox3D` bounding the object, in local coordinates
-    pub fn bounds(&self)->BBox3D{
+    pub fn bounds(&self) -> BBox3D {
         panic!("Trying to get the bounds of a {}", self.id())
     }
-    
+
     /// Gets the area of the object
     pub fn area(&self) -> Float {
         Float::MAX
     }
-    
+
     /// Borrows the [`Transform`]
     pub fn transform(&self) -> &Option<RefCount<Transform>> {
         &self.transform
     }
-    
+
     /// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance
     /// `t` and the normal [`Vector3D`] at that point. If the distance
     /// is negative (i.e., the object is behind the plane), it should return
@@ -140,7 +132,7 @@ impl DistantSource3D {
         info.p = phit;
         Some(info)
     }
-    
+
     /// Like `intersect_local_ray` but simplified because there is not need
     /// for calcuating the paramtrisized elements
     pub fn simple_intersect_local_ray(
@@ -158,7 +150,7 @@ impl DistantSource3D {
         }
     }
 
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
     /// returning a detailed [`IntersectionInfo`] about the intersaction .
     pub fn intersect(&self, ray: &Ray3D) -> Option<IntersectionInfo> {
         // Transform ray into object space, if needed
@@ -182,8 +174,8 @@ impl DistantSource3D {
         }
     }
 
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
-    /// returning the point of intersection, if any. 
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
+    /// returning the point of intersection, if any.
     pub fn simple_intersect(&self, ray: &Ray3D) -> Option<Point3D> {
         // Transform ray into object space, if needed
         let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
@@ -205,21 +197,13 @@ impl DistantSource3D {
             }
         }
     }
-    
-     /// Gets a `BBox3D` bounding the object, in world's coordinates.
-     pub fn world_bounds(&self)->BBox3D{
-         let local_b = self.bounds();
-         match self.transform() {
-             Some(t)=>{
-                 t.transform_bbox(local_b)
-             },
-             None => local_b
-         }
-     }
 
+    /// Gets a `BBox3D` bounding the object, in world's coordinates.
+    pub fn world_bounds(&self) -> BBox3D {
+        let local_b = self.bounds();
+        match self.transform() {
+            Some(t) => t.transform_bbox(local_b),
+            None => local_b,
+        }
+    }
 }
-
-
-
-    
-

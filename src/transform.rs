@@ -23,13 +23,8 @@ SOFTWARE.
 */
 
 use crate::gamma;
-use crate::{
-    Point3D,
-    Ray3D,
-    Vector3D,
-    BBox3D
-};
 use crate::Float;
+use crate::{BBox3D, Point3D, Ray3D, Vector3D};
 
 macro_rules! elem {
     ( $row : expr, $col:expr ) => {{
@@ -55,10 +50,22 @@ impl Default for Transform {
 
 fn mul4x4point(matrix: &[Float; 16], pt: Point3D) -> Point3D {
     let (x, y, z) = (pt.x, pt.y, pt.z);
-    let new_x = matrix[elem!(0, 0)] * x + matrix[elem!(0, 1)] * y + matrix[elem!(0, 2)] * z + matrix[elem!(0, 3)];
-    let new_y = matrix[elem!(1, 0)] * x + matrix[elem!(1, 1)] * y + matrix[elem!(1, 2)] * z + matrix[elem!(1, 3)];
-    let new_z = matrix[elem!(2, 0)] * x + matrix[elem!(2, 1)] * y + matrix[elem!(2, 2)] * z + matrix[elem!(2, 3)];
-    let w = matrix[elem!(3, 0)] * x + matrix[elem!(3, 1)] * y + matrix[elem!(3, 2)] * z + matrix[elem!(3, 3)];
+    let new_x = matrix[elem!(0, 0)] * x
+        + matrix[elem!(0, 1)] * y
+        + matrix[elem!(0, 2)] * z
+        + matrix[elem!(0, 3)];
+    let new_y = matrix[elem!(1, 0)] * x
+        + matrix[elem!(1, 1)] * y
+        + matrix[elem!(1, 2)] * z
+        + matrix[elem!(1, 3)];
+    let new_z = matrix[elem!(2, 0)] * x
+        + matrix[elem!(2, 1)] * y
+        + matrix[elem!(2, 2)] * z
+        + matrix[elem!(2, 3)];
+    let w = matrix[elem!(3, 0)] * x
+        + matrix[elem!(3, 1)] * y
+        + matrix[elem!(3, 2)] * z
+        + matrix[elem!(3, 3)];
 
     debug_assert!((1.0 - w.abs()) < 2. * Float::EPSILON);
 
@@ -500,29 +507,71 @@ impl Transform {
         (r, o_error, d_error)
     }
 
-    pub fn transform_bbox(&self, bbox: BBox3D)->BBox3D{
+    pub fn transform_bbox(&self, bbox: BBox3D) -> BBox3D {
         let p0 = self.transform_pt(Point3D::new(bbox.min.x, bbox.min.y, bbox.min.z));
-        let mut ret = BBox3D::from_point(p0);    
-        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.max.x, bbox.min.y, bbox.min.z)));
-        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.min.x, bbox.max.y, bbox.min.z)));
-        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.min.x, bbox.min.y, bbox.max.z)));
-        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.min.x, bbox.max.y, bbox.max.z)));
-        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.max.x, bbox.max.y, bbox.min.z)));
-        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.max.x, bbox.min.y, bbox.max.z)));
-        ret = BBox3D::from_union_point(&ret, self.transform_pt(Point3D::new(bbox.max.x, bbox.max.y, bbox.max.z)));
+        let mut ret = BBox3D::from_point(p0);
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.transform_pt(Point3D::new(bbox.max.x, bbox.min.y, bbox.min.z)),
+        );
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.transform_pt(Point3D::new(bbox.min.x, bbox.max.y, bbox.min.z)),
+        );
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.transform_pt(Point3D::new(bbox.min.x, bbox.min.y, bbox.max.z)),
+        );
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.transform_pt(Point3D::new(bbox.min.x, bbox.max.y, bbox.max.z)),
+        );
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.transform_pt(Point3D::new(bbox.max.x, bbox.max.y, bbox.min.z)),
+        );
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.transform_pt(Point3D::new(bbox.max.x, bbox.min.y, bbox.max.z)),
+        );
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.transform_pt(Point3D::new(bbox.max.x, bbox.max.y, bbox.max.z)),
+        );
         ret
     }
 
-    pub fn inv_transform_bbox(&self, bbox: BBox3D)->BBox3D{
+    pub fn inv_transform_bbox(&self, bbox: BBox3D) -> BBox3D {
         let p0 = self.inv_transform_pt(Point3D::new(bbox.min.x, bbox.min.y, bbox.min.z));
-        let mut ret = BBox3D::from_point(p0);    
-        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.max.x, bbox.min.y, bbox.min.z)));
-        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.min.x, bbox.max.y, bbox.min.z)));
-        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.min.x, bbox.min.y, bbox.max.z)));
-        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.min.x, bbox.max.y, bbox.max.z)));
-        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.max.x, bbox.max.y, bbox.min.z)));
-        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.max.x, bbox.min.y, bbox.max.z)));
-        ret = BBox3D::from_union_point(&ret, self.inv_transform_pt(Point3D::new(bbox.max.x, bbox.max.y, bbox.max.z)));
+        let mut ret = BBox3D::from_point(p0);
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.inv_transform_pt(Point3D::new(bbox.max.x, bbox.min.y, bbox.min.z)),
+        );
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.inv_transform_pt(Point3D::new(bbox.min.x, bbox.max.y, bbox.min.z)),
+        );
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.inv_transform_pt(Point3D::new(bbox.min.x, bbox.min.y, bbox.max.z)),
+        );
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.inv_transform_pt(Point3D::new(bbox.min.x, bbox.max.y, bbox.max.z)),
+        );
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.inv_transform_pt(Point3D::new(bbox.max.x, bbox.max.y, bbox.min.z)),
+        );
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.inv_transform_pt(Point3D::new(bbox.max.x, bbox.min.y, bbox.max.z)),
+        );
+        ret = BBox3D::from_union_point(
+            &ret,
+            self.inv_transform_pt(Point3D::new(bbox.max.x, bbox.max.y, bbox.max.z)),
+        );
         ret
     }
 } // end of Impl Transform

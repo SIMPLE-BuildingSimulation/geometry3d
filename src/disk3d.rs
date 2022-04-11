@@ -22,20 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::{Float, PI};
 use crate::RefCount;
+use crate::{Float, PI};
 
 // use crate::intersect_trait::{Intersect, IntersectionInfo, SurfaceSide};
 use crate::intersection::{IntersectionInfo, SurfaceSide};
 
-use crate::{
-    Plane3D,
-    Ray3D,
-    Point3D,
-    Transform,
-    Vector3D,
-    BBox3D
-};
+use crate::{BBox3D, Plane3D, Point3D, Ray3D, Transform, Vector3D};
 
 /// A disk of radius `radius` whose normal points in the
 /// `normal` direction, located at a height `height`. Can have a
@@ -121,7 +114,7 @@ impl Disk3D {
 
         // Convert phi_max
         let phi_max = phi_max.clamp(0., 360.).to_radians();
-        
+
         Self {
             centre,
             normal,
@@ -194,12 +187,12 @@ impl Disk3D {
         let dpdv = self.phi_zero * (-rhit_cos_phi)
             + zxn * (rhit_sin_phi / rhit * (self.radius - self.inner_radius));
 
-        let normal = self.normal;//dpdv.cross(dpdu).get_normalized();
+        let normal = self.normal; //dpdv.cross(dpdu).get_normalized();
         let (normal, side) = SurfaceSide::get_side(normal, ray.direction);
 
         // We know some things are Zero... so let's not call the `IntersectionInfo::new(..)` function.
-        
-        return Some(IntersectionInfo {
+
+        Some(IntersectionInfo {
             p: phit,
             dpdu,
             dpdv,
@@ -214,14 +207,11 @@ impl Disk3D {
             dndu: Vector3D::new(0., 0., 0.),
             #[cfg(feature = "textures")]
             dndv: Vector3D::new(0., 0., 0.),
-        });
-
-        
+        })
     }
 
-
     /// Gets a `BBox3D` bounding the object, in local coordinates     
-    pub fn bounds(&self)->BBox3D{
+    pub fn bounds(&self) -> BBox3D {
         unimplemented!();
     }
 
@@ -263,7 +253,7 @@ impl Disk3D {
         self.intersection_info(ray, phit, phi)
     }
 
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
     /// returning a detailed [`IntersectionInfo`] about the intersaction .
     pub fn intersect(&self, ray: &Ray3D) -> Option<IntersectionInfo> {
         // Transform ray into object space, if needed
@@ -287,8 +277,8 @@ impl Disk3D {
         }
     }
 
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
-    /// returning the point of intersection, if any. 
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
+    /// returning the point of intersection, if any.
     pub fn simple_intersect(&self, ray: &Ray3D) -> Option<Point3D> {
         // Transform ray into object space, if needed
         let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
@@ -310,22 +300,16 @@ impl Disk3D {
             }
         }
     }
-    
-     /// Gets a `BBox3D` bounding the object, in world's coordinates.
-     pub  fn world_bounds(&self)->BBox3D{
-         let local_b = self.bounds();
-         match self.transform() {
-             Some(t)=>{
-                 t.transform_bbox(local_b)
-             },
-             None => local_b
-         }
-     }
+
+    /// Gets a `BBox3D` bounding the object, in world's coordinates.
+    pub fn world_bounds(&self) -> BBox3D {
+        let local_b = self.bounds();
+        match self.transform() {
+            Some(t) => t.transform_bbox(local_b),
+            None => local_b,
+        }
+    }
 }
-
-
-
-
 
 #[cfg(test)]
 mod testing {
@@ -337,6 +321,6 @@ mod testing {
     fn test_disk_area() {
         let r = 4.212;
         let d = Disk3D::new(Point3D::new(0., 0., 0.), Vector3D::new(0., 0., 1.), r);
-        assert!( (d.area() - PI * r * r).abs() < 1e-5);
+        assert!((d.area() - PI * r * r).abs() < 1e-5);
     }
 }

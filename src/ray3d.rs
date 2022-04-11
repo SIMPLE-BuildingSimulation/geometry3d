@@ -22,10 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::{
-    Point3D,
-    Vector3D
-};
+use crate::{Point3D, Vector3D};
 
 use crate::Float;
 

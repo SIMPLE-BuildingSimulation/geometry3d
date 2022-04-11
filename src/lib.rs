@@ -46,7 +46,7 @@ type RefCount<T> = std::rc::Rc<T>;
 mod utils;
 // pub mod intersect_trait;
 
-
+#[cfg(feature = "textures")]
 pub mod round_error;
 
 // Objects
@@ -84,7 +84,7 @@ mod transform;
 pub use transform::Transform;
 
 mod triangle3d;
-pub use triangle3d::{Triangle3D, PointInTriangle};
+pub use triangle3d::{PointInTriangle, Triangle3D};
 
 mod triangulation3d;
 pub use triangulation3d::Triangulation3D;
@@ -92,12 +92,35 @@ pub use triangulation3d::Triangulation3D;
 mod vector3d;
 pub use vector3d::Vector3D;
 
-
 mod bbox3d;
 pub use bbox3d::{BBox3D, BBoxAxis};
 
-
 pub mod intersection;
 
-#[cfg(feature="quick_inv_sqrt")]
+#[cfg(feature = "quick_inv_sqrt")]
 mod quick_inverse_sqrt;
+
+#[macro_export]
+macro_rules! gamma {
+    ( $n : expr ) => {{
+        const HALF_EPSILON: Float = Float::EPSILON / 2.0;
+
+        let nm = HALF_EPSILON * ($n as Float);
+        (nm) / (1. - nm)
+    }};
+}
+
+#[cfg(test)]
+mod testing {
+    use super::*;
+    #[test]
+    fn test_gamma_macro() {
+        for n in 0..20 {
+            let nm = Float::EPSILON / 2. * n as Float;
+            let exp = (nm) / (1. - nm);
+            let found = gamma!(n);
+            // println!("exp  : {} \nfound: {}\n======", exp,found);
+            assert!((exp - found).abs() < Float::EPSILON)
+        }
+    }
+}

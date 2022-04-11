@@ -22,13 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::{
-    Loop3D,
-    Point3D,
-    Segment3D,
-    Vector3D
-};
 use crate::Float;
+use crate::{Loop3D, Point3D, Segment3D, Vector3D};
 
 #[derive(Clone)]
 pub struct Polygon3D {
@@ -263,16 +258,13 @@ impl Polygon3D {
                     let inner_normal = self.inner[min_inner_loop_id].normal();
 
                     for j in 0..n_inner_loop_vertices + 1 {
-                        let vertex_to_add;
-                        if outer_normal.is_same_direction(inner_normal) {
+                        let vertex_to_add = if outer_normal.is_same_direction(inner_normal) {
                             // If both in the same direction, then we need to
                             // add the interior in reverse.
-                            vertex_to_add = (inner_vertex_id as i32 - j as i32) as usize
-                                % n_inner_loop_vertices;
+                            (inner_vertex_id as i32 - j as i32) as usize % n_inner_loop_vertices
                         } else {
-                            vertex_to_add = (inner_vertex_id as i32 + j as i32) as usize
-                                % n_inner_loop_vertices;
-                        }
+                            (inner_vertex_id as i32 + j as i32) as usize % n_inner_loop_vertices
+                        };
 
                         let inner_vertex = self.inner[min_inner_loop_id][vertex_to_add];
 
@@ -385,7 +377,7 @@ mod testing {
         the_loop.close().unwrap();
 
         let poly = Polygon3D::new(the_loop).unwrap();
-        assert!((2. * l * 2. * l- poly.area).abs() < 1e-4);
+        assert!((2. * l * 2. * l - poly.area).abs() < 1e-4);
         assert!(!poly.normal.is_zero());
     }
 
@@ -402,7 +394,7 @@ mod testing {
         outer_loop.close().unwrap();
 
         let mut poly = Polygon3D::new(outer_loop).unwrap();
-        assert!( (2. * l * 2. * l- poly.area).abs()< 1e-4);
+        assert!((2. * l * 2. * l - poly.area).abs() < 1e-4);
         assert_eq!(poly.inner.len(), 0);
 
         // Add hole
@@ -416,7 +408,11 @@ mod testing {
 
         poly.cut_hole(hole).unwrap();
 
-        assert!( (poly.area - (2. * l * 2. * l - l * l) ).abs()<1e-4, "err is {}", (poly.area - 2. * l * 2. * l - l * l).abs() );
+        assert!(
+            (poly.area - (2. * l * 2. * l - l * l)).abs() < 1e-4,
+            "err is {}",
+            (poly.area - 2. * l * 2. * l - l * l).abs()
+        );
         assert_eq!(poly.inner.len(), 1);
 
         /* Add hole in a different plane */

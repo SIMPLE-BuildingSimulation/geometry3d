@@ -24,11 +24,7 @@ SOFTWARE.
 
 use crate::Float;
 
-use crate::{
-    Point3D,
-    Ray3D,
-    Vector3D
-};
+use crate::{Point3D, Ray3D, Vector3D};
 
 /// Describes a plane based on a [`Point3D`] (`P`) contained in the plane and
 /// a [`Vector3D`] (`N`) normal to the plane.
@@ -64,7 +60,7 @@ impl Plane3D {
         (self.normal * point - self.d).abs() < Float::EPSILON
     }
 
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
     /// returning the distance to the plane.
     pub fn intersect(&self, ray: &Ray3D) -> Option<Float> {
         let den = self.normal * ray.direction;
@@ -119,7 +115,7 @@ mod testing {
         let mut n = Vector3D::new(1.2, 3.1, 2.3);
         n.normalize();
         let plane = Plane3D::new(p, n);
-        assert!((plane.d - n*p).abs()< 1e-4);
+        assert!((plane.d - n * p).abs() < 1e-4);
         // assert_eq!(plane.d, n * p);
     }
 

@@ -50,12 +50,12 @@ pub fn solve_quadratic(a: Float, b: Float, c: Float) -> Option<(Float, Float)> {
     let discr_sqrt = disc.sqrt();
 
     // Use Muller's method for making this faster...
-    let q: Float;
-    if b < 0. {
-        q = -0.5 * (b - discr_sqrt);
+
+    let q = if b < 0. {
+        -0.5 * (b - discr_sqrt)
     } else {
-        q = -0.5 * (b + discr_sqrt);
-    }
+        -0.5 * (b + discr_sqrt)
+    };
     let mut x1 = q / a;
     let mut x2 = c / q;
 

@@ -31,12 +31,7 @@ use crate::Float;
 
 */
 
-use crate::{
-    Point3D,
-    Polygon3D,
-    Segment3D,
-    Triangle3D,PointInTriangle
-};
+use crate::{Point3D, PointInTriangle, Polygon3D, Segment3D, Triangle3D};
 
 #[derive(Clone, Copy, Eq, PartialEq, Debug)]
 #[repr(u8)]
@@ -244,7 +239,11 @@ impl Triangulation3D {
                 for edge_i in 0..3 {
                     let edge = self.triangles[this_i].triangle.segment(edge_i).unwrap();
 
-                    if self.triangles[other_i].triangle.get_edge_index_from_segment(&edge).is_some(){
+                    if self.triangles[other_i]
+                        .triangle
+                        .get_edge_index_from_segment(&edge)
+                        .is_some()
+                    {
                         self.mark_as_neighbours(this_i, Edge::from_i(edge_i), other_i)?;
                         break; // dont test other edges
                     }
@@ -365,7 +364,7 @@ impl Triangulation3D {
         }
 
         // Get edge segment from the other triangle... panic if does not work.
-        let edge_2 = match self.triangles[i2].triangle.get_edge_index_from_segment(&seg1){
+        let edge_2 = match self.triangles[i2].triangle.get_edge_index_from_segment(seg1){
             Some(e)=>e,
             None => panic!("The triangles that you are trying to mark as neighbours don't share a segment.\n Triangle 1 : {}\nTriangle 2: {}", self.triangles[i1].triangle, self.triangles[i2].triangle)
         };
@@ -1270,7 +1269,6 @@ mod testing {
     use std::io::prelude::*;
 
     fn draw_triangulation(filename: &str, cases: Vec<(&str, String)>) {
-        
         let mut file = File::create(format!("./test_data/{}", filename)).unwrap();
         file.write(b"<html><head></head><body>").unwrap();
 

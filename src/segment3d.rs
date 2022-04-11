@@ -22,11 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::{
-    Point3D,
-    Vector3D
-};
 use crate::Float;
+use crate::{Point3D, Vector3D};
 
 /// An imaginary line starting at one [`Point3D`] and ending
 /// on another [`Point3D`].
@@ -128,7 +125,7 @@ impl Segment3D {
             beta = (b2.x - a1.x) / a1b1.x;
         } else if a1b1.y.abs() > TINY {
             alpha = (a2.y - a1.y) / a1b1.y;
-            beta =  (b2.y - a1.y) / a1b1.y;
+            beta = (b2.y - a1.y) / a1b1.y;
         } else if a1b1.z.abs() > TINY {
             alpha = (a2.z - a1.z) / a1b1.z;
             beta = (b2.z - a1.z) / a1b1.z;

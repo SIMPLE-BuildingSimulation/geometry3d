@@ -22,12 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::{
-    Point3D,
-    Segment3D,
-    Vector3D,    
-};
 use crate::Float;
+use crate::{Point3D, Segment3D, Vector3D};
 
 #[derive(Clone)]
 pub struct Loop3D {
@@ -477,7 +473,7 @@ mod testing {
         assert_eq!(l.n_vertices(), 4);
         l.close().unwrap();
         assert_eq!(l.n_vertices(), 4);
-        assert!( (l.area- 16.).abs() < 1e-4);
+        assert!((l.area - 16.).abs() < 1e-4);
 
         assert_eq!(l[0], Point3D::new(-2., -2., 0.));
         assert_eq!(l[1], Point3D::new(2., -2., 0.));
@@ -499,7 +495,7 @@ mod testing {
         assert_eq!(5, l.vertices.len());
         l.close().unwrap();
         assert_eq!(l.n_vertices(), 4);
-        assert!( (l.area- 16.).abs() < 1e-4);
+        assert!((l.area - 16.).abs() < 1e-4);
         assert_eq!(l[0], Point3D::new(-2., -2., 0.));
         assert_eq!(l[1], Point3D::new(2., -2., 0.));
         assert_eq!(l[2], Point3D::new(2., 2., 0.));
@@ -520,7 +516,7 @@ mod testing {
         assert_eq!(5, l.vertices.len());
         l.close().unwrap();
         assert_eq!(l.n_vertices(), 4);
-        assert!( (l.area- 16.).abs() < 1e-4);
+        assert!((l.area - 16.).abs() < 1e-4);
         assert_eq!(l[0], Point3D::new(2., -2., 0.));
         assert_eq!(l[1], Point3D::new(2., 2., 0.));
         assert_eq!(l[2], Point3D::new(-2., 2., 0.));
@@ -772,7 +768,7 @@ mod testing {
         the_loop.close().unwrap();
 
         let a = the_loop.area().unwrap();
-        assert!( (4. * l * l - a).abs() < 0.0001);
+        assert!((4. * l * l - a).abs() < 0.0001);
     }
 
     #[test]
@@ -793,8 +789,12 @@ mod testing {
         the_loop.close().unwrap();
 
         let a = the_loop.area().unwrap();
-        assert!( (3.0- a).abs() < 1e-4);
-        assert!( the_loop.normal().compare(Vector3D::new(0., 0., 1.)), "normal = {}", the_loop.normal() );
+        assert!((3.0 - a).abs() < 1e-4);
+        assert!(
+            the_loop.normal().compare(Vector3D::new(0., 0., 1.)),
+            "normal = {}",
+            the_loop.normal()
+        );
 
         // Clockwise
         let l = 1.;
@@ -811,8 +811,12 @@ mod testing {
         the_loop.close().unwrap();
 
         let a = the_loop.area().unwrap();
-        assert!( (3.0- a).abs() < 1e-4);
-        assert!( the_loop.normal().compare(Vector3D::new(0., 0., -1.)), "normal = {}", the_loop.normal() );
+        assert!((3.0 - a).abs() < 1e-4);
+        assert!(
+            the_loop.normal().compare(Vector3D::new(0., 0., -1.)),
+            "normal = {}",
+            the_loop.normal()
+        );
     }
 
     #[test]

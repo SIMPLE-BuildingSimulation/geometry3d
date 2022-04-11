@@ -22,18 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::{Float, PI};
-use crate::RefCount;
 use crate::intersection::IntersectionInfo;
+use crate::RefCount;
+use crate::{Float, PI};
 
-use crate::{
-    Point3D,
-    Ray3D,
-    Transform,
-    Vector3D,
-    BBox3D
-};
+#[cfg(feature = "textures")]
 use crate::round_error::ApproxFloat;
+
+use crate::{BBox3D, Point3D, Ray3D, Transform, Vector3D};
 
 /// A Full or Partial sphere in three dimensions, centered at the origin
 ///
@@ -149,7 +145,7 @@ impl Sphere3D {
             std::mem::swap(&mut theta_min, &mut theta_max);
         }
         let mut phi_max = phi_max;
-        if !(-Float::EPSILON..=360. + Float::EPSILON).contains(&phi_max){
+        if !(-Float::EPSILON..=360. + Float::EPSILON).contains(&phi_max) {
             panic!("when creating a 'sphere': given phi_max is not between 0 and 360 degrees (it was {})", phi_max);
         }
         phi_max = phi_max.clamp(0., 360.).to_radians();
@@ -171,7 +167,7 @@ impl Sphere3D {
         }
     }
 
-   
+    #[cfg(feature = "textures")]
     fn approx_basic_intersection(
         &self,
         ray: &Ray3D,
@@ -269,6 +265,94 @@ impl Sphere3D {
         Some((phit, phi))
     }
 
+    #[cfg(not(feature = "textures"))]
+    fn basic_intersection(&self, ray: &Ray3D) -> Option<(Point3D, Float)> {
+        // decompose ray
+        let (dx, dy, dz) = (ray.direction.x, ray.direction.y, ray.direction.z);
+        let (ox, oy, oz) = (ray.origin.x, ray.origin.y, ray.origin.z);
+
+        let a = dx * dx + dy * dy + dz * dz;
+        let b = (ox * dx + oy * dy + oz * dz) * 2.;
+        let c = ox * ox + oy * oy + oz * oz - self.radius * self.radius;
+
+        let (t0, t1) = crate::utils::solve_quadratic(a, b, c)?;
+        #[cfg(debug_assertions)]
+        if t0.is_nan() || t1.is_nan() || t0.is_infinite() || t1.is_infinite() {
+            panic!(
+                "After solve_quadratic in Sphere intersection: t0. = {}, t1. = {}",
+                t0, t1
+            );
+        }
+        debug_assert!(t1 >= t0);
+        // t0 < t1... so, check if they are possitive
+        if t1 <= 0.0 {
+            return None;
+        }
+
+        // We now know that t1 hits... check t0
+        let (mut thit, hit_is_t1) = if t0 > 0. {
+            // if t0 is a valid hit, keep that
+            (t0, false)
+        } else {
+            // else, use t1 (which we know works...)
+            (t1, true)
+        };
+
+        // We might try to do the same with 'thit' = t1, later
+        let calc_phit_and_phi = |thit: Float| -> (Point3D, Float) {
+            // Calculate point of intersection.
+            let mut phit = ray.project(thit);
+            // refine in order to avoid error accumulation
+            phit *= self.radius / phit.as_vector3d().length();
+
+            // Avoid a singularity on top of the sphere
+            let limit = 1e-5 * self.radius;
+            if phit.x.abs() < limit && phit.y.abs() < limit {
+                phit.x = limit
+            }
+
+            // calc phi
+            let mut phi = phit.y.atan2(phit.x);
+            if phi < 0. {
+                phi += 2. * PI;
+            }
+            (phit, phi)
+        };
+        let (mut phit, mut phi) = calc_phit_and_phi(thit);
+
+        // Check intersection against clipping parameters...
+        // it is possible that the first hit misses, but the second
+        // does not
+        if (self.zmin > -self.radius && phit.z < self.zmin) || // zmin is limiting but 'thit' missed it
+            (self.zmax <  self.radius && phit.z > self.zmax) || // zmax is limiting but 'thit' missed it
+            phi > self.phi_max
+        // 'thit' missed due to the phi limitation
+        {
+            // if this was already t1, then we missed the sphere
+            if hit_is_t1 {
+                return None;
+            }
+            // else, try with t1.
+            thit = t1;
+
+            // recalculate
+            let (new_phit, new_phi) = calc_phit_and_phi(thit);
+
+            if (self.zmin > -self.radius && new_phit.z < self.zmin) || // zmin is limiting but 'thit' missed it
+                (self.zmax <  self.radius && new_phit.z > self.zmax) || // zmax is limiting but 'thit' missed it
+                new_phi > self.phi_max
+            // 'thit' missed due to the phi limitation
+            {
+                return None;
+            }
+            // update values
+            phit = new_phit;
+            phi = new_phi;
+        }
+
+        Some((phit, phi))
+    }
+
     pub fn intersection_info(
         &self,
         ray: &Ray3D,
@@ -295,12 +379,13 @@ impl Sphere3D {
 
         // Calcuate first derivatives
         let dpdu = Vector3D::new(-self.phi_max * hit_y, self.phi_max * hit_x, 0.);
-        let dpdv =
-            Vector3D::new(hit_z * cos_phi, hit_z * sin_phi, -self.radius * sin_theta) * self.delta_theta;
+        let dpdv = Vector3D::new(hit_z * cos_phi, hit_z * sin_phi, -self.radius * sin_theta)
+            * self.delta_theta;
 
         // Calculate second derivatives
         let d2p_duu = Vector3D::new(hit_x, hit_y, 0.) * (-self.phi_max * self.phi_max);
-        let d2p_duv = Vector3D::new(-sin_phi, cos_phi, 0.) * (self.delta_theta * hit_z * self.phi_max);
+        let d2p_duv =
+            Vector3D::new(-sin_phi, cos_phi, 0.) * (self.delta_theta * hit_z * self.phi_max);
         let d2p_dvv = Vector3D::new(hit_x, hit_y, hit_z) * (-self.delta_theta * self.delta_theta);
 
         // return
@@ -315,23 +400,21 @@ impl Sphere3D {
     }
 
     /// Gets a `BBox3D` bounding the object, in local coordinates
-    pub fn bounds(&self)->BBox3D{
+    pub fn bounds(&self) -> BBox3D {
         let min = Point3D::new(-self.radius, -self.radius, self.zmin);
-        let max = Point3D::new( self.radius,  self.radius, self.zmax);
+        let max = Point3D::new(self.radius, self.radius, self.zmax);
         BBox3D::new(min, max)
     }
 
     /// Gets the area of the object
-    pub  fn area(&self) -> Float {
+    pub fn area(&self) -> Float {
         self.phi_max * self.radius * (self.zmax - self.zmin)
     }
 
     /// Borrows the [`Transform`]
-    pub  fn transform(&self) -> &Option<RefCount<Transform>> {
+    pub fn transform(&self) -> &Option<RefCount<Transform>> {
         &self.transform
     }
-
-    
 
     /// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance
     /// `t` and the normal [`Vector3D`] at that point. If the distance
@@ -348,10 +431,13 @@ impl Sphere3D {
     pub fn intersect_local_ray(
         &self,
         ray: &Ray3D,
-        o_error: Point3D,
-        d_error: Point3D,
+        _o_error: Point3D,
+        _d_error: Point3D,
     ) -> Option<IntersectionInfo> {
+        #[cfg(feature = "textures")]
         let (phit, phi) = self.approx_basic_intersection(ray, o_error, d_error)?;
+        #[cfg(not(feature = "textures"))]
+        let (phit, phi) = self.basic_intersection(ray)?;
 
         self.intersection_info(ray, phit, phi)
     }
@@ -360,15 +446,19 @@ impl Sphere3D {
     pub fn simple_intersect_local_ray(
         &self,
         ray: &Ray3D,
-        o_error: Point3D,
-        d_error: Point3D,
+        _o_error: Point3D,
+        _d_error: Point3D,
     ) -> Option<Point3D> {
         // Do the first part
+        #[cfg(feature = "textures")]
         let (phit, _) = self.approx_basic_intersection(ray, o_error, d_error)?;
+        #[cfg(not(feature = "textures"))]
+        let (phit, _) = self.basic_intersection(ray)?;
+
         Some(phit)
     }
 
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
     /// returning a detailed [`IntersectionInfo`] about the intersaction .
     pub fn intersect(&self, ray: &Ray3D) -> Option<IntersectionInfo> {
         // Transform ray into object space, if needed
@@ -392,8 +482,8 @@ impl Sphere3D {
         }
     }
 
-    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward, 
-    /// returning the point of intersection, if any. 
+    /// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
+    /// returning the point of intersection, if any.
     pub fn simple_intersect(&self, ray: &Ray3D) -> Option<Point3D> {
         // Transform ray into object space, if needed
         let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
@@ -416,20 +506,15 @@ impl Sphere3D {
         }
     }
 
-     /// Gets a `BBox3D` bounding the object, in world's coordinates.
-     pub fn world_bounds(&self)->BBox3D{
-         let local_b = self.bounds();
-         match self.transform() {
-             Some(t)=>{
-                 t.transform_bbox(local_b)
-             },
-             None => local_b
-         }
-     }
+    /// Gets a `BBox3D` bounding the object, in world's coordinates.
+    pub fn world_bounds(&self) -> BBox3D {
+        let local_b = self.bounds();
+        match self.transform() {
+            Some(t) => t.transform_bbox(local_b),
+            None => local_b,
+        }
+    }
 }
-
-
-
 
 #[cfg(test)]
 mod testing {

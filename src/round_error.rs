@@ -24,16 +24,22 @@ SOFTWARE.
 
 use crate::Float;
 
-fn next_float_up(mut v: Float) -> Float {
-    
+const ZERO: u64 = 0;
+
+#[cfg(feature = "float")]
+const MINUS_ZERO: f64 = 2147483648;
+#[cfg(not(feature = "float"))]
+const MINUS_ZERO: u64 = 9223372036854775808;
+
+fn next_float_up(v: Float) -> Float {
     // Handle infinity and negative zero for _NextFloatUp()_
     if v.is_infinite() && v > 0. {
         return v;
     }
-    if v.to_bits() == (-0.0 as Float).to_bits() {    
-        v = 0. as Float;
-    }
     let mut ui = v.to_bits();
+    if ui == MINUS_ZERO {
+        return 0.0;
+    }
 
     // Advance _v_ to next higher float
     if v >= 0. {
@@ -44,32 +50,20 @@ fn next_float_up(mut v: Float) -> Float {
     Float::from_bits(ui)
 }
 
-fn next_float_down(mut v: Float) -> Float {
-    
-    
+fn next_float_down(v: Float) -> Float {
     if v.is_infinite() && v < 0. {
         return v;
     }
-    if v.to_bits() == (0.0 as Float).to_bits() {
-        v = -0.0 as Float;
-    }
     let mut ui = v.to_bits();
+    if ui == ZERO {
+        return 0.0;
+    }
     if v > 0. {
         ui -= 1;
     } else {
         ui += 1;
     }
     Float::from_bits(ui)
-}
-
-#[macro_export]
-macro_rules! gamma {
-    ( $n : expr ) => {{
-        const HALF_EPSILON: Float = Float::EPSILON / 2.0;
-
-        let nm = HALF_EPSILON * ($n as Float);
-        (nm) / (1. - nm)
-    }};
 }
 
 /// Contains a `Float` value as well as an error
@@ -116,17 +110,13 @@ impl ApproxFloat {
 
     /// Calculates the square root
     pub fn sqrt(&self) -> Self {
-        
-
         let low = next_float_down(self.low.sqrt());
         // if low < 0. {
         //     low = 0.
         // }
         let high = next_float_up(self.high.sqrt());
 
-        Self{
-            low,high
-        }
+        Self { low, high }
     }
 
     // Retrieves the absolute error
@@ -151,8 +141,6 @@ impl ApproxFloat {
             return None;
         }
         let discr_sqrt = disc.sqrt();
-        
-        
 
         // Use Muller's method for making this faster...
         let q: ApproxFloat;
@@ -163,7 +151,7 @@ impl ApproxFloat {
         }
         let mut x1 = q / a;
         let mut x2 = c / q;
-        
+
         // Sort them
         if x1.low > x2.low {
             std::mem::swap(&mut x1, &mut x2);
@@ -241,15 +229,23 @@ impl std::ops::Mul for ApproxFloat {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self {
-        
-
-        let lp = [next_float_down(self.low * other.low), next_float_down(self.high * other.low), next_float_down(self.low * other.high), next_float_down(self.high * other.high)];
-        let hp = [next_float_up(self.low * other.low), next_float_up(self.high * other.low), next_float_up(self.low * other.high), next_float_up(self.high * other.high)];
-        let (_,min) = max_min(&lp);
-        let (max,_) = max_min(&hp);
+        let lp = [
+            next_float_down(self.low * other.low),
+            next_float_down(self.high * other.low),
+            next_float_down(self.low * other.high),
+            next_float_down(self.high * other.high),
+        ];
+        let hp = [
+            next_float_up(self.low * other.low),
+            next_float_up(self.high * other.low),
+            next_float_up(self.low * other.high),
+            next_float_up(self.high * other.high),
+        ];
+        let (_, min) = max_min(&lp);
+        let (max, _) = max_min(&hp);
 
         Self {
-            low:  next_float_down(min),
+            low: next_float_down(min),
             high: next_float_up(max),
         }
     }
@@ -261,8 +257,7 @@ impl std::ops::Mul<Float> for ApproxFloat {
     fn mul(self, other: Float) -> Self {
         // The code in here is basically an optimized version of doing the following:
         // self * Self::from(other)
-        
-        
+
         // assume it is possitive
         let mut min = next_float_down(self.low * other);
         let mut max = next_float_up(self.high * other);
@@ -272,7 +267,7 @@ impl std::ops::Mul<Float> for ApproxFloat {
         }
 
         Self {
-            low:  next_float_down(min),
+            low: next_float_down(min),
             high: next_float_up(max),
         }
     }
@@ -282,15 +277,23 @@ impl std::ops::Div for ApproxFloat {
     type Output = Self;
 
     fn div(self, other: Self) -> Self {
-        
+        let lp = [
+            next_float_down(self.low / other.low),
+            next_float_down(self.high / other.low),
+            next_float_down(self.low / other.high),
+            next_float_down(self.high / other.high),
+        ];
+        let hp = [
+            next_float_up(self.low / other.low),
+            next_float_up(self.high / other.low),
+            next_float_up(self.low / other.high),
+            next_float_up(self.high / other.high),
+        ];
 
-        let lp = [next_float_down(self.low / other.low), next_float_down(self.high / other.low), next_float_down(self.low / other.high), next_float_down(self.high / other.high)];
-        let hp = [next_float_up(self.low / other.low), next_float_up(self.high / other.low), next_float_up(self.low / other.high), next_float_up(self.high / other.high)];
-                
-        let (_,min) = max_min(&lp);
-        let (max,_) = max_min(&hp);
+        let (_, min) = max_min(&lp);
+        let (max, _) = max_min(&hp);
         Self {
-            low:  next_float_down(min),
+            low: next_float_down(min),
             high: next_float_up(max),
         }
     }
@@ -332,10 +335,14 @@ impl std::ops::SubAssign<Float> for ApproxFloat {
 
 impl std::ops::MulAssign for ApproxFloat {
     fn mul_assign(&mut self, other: Self) {
-        
-        let aux = [self.low * other.low, self.high * other.low, self.low * other.high, self.high * other.high];
-        let (max,min) = max_min(&aux);        
-        self.low =  next_float_down(min);
+        let aux = [
+            self.low * other.low,
+            self.high * other.low,
+            self.low * other.high,
+            self.high * other.high,
+        ];
+        let (max, min) = max_min(&aux);
+        self.low = next_float_down(min);
         self.high = next_float_up(max);
     }
 }
@@ -348,10 +355,14 @@ impl std::ops::MulAssign<Float> for ApproxFloat {
 
 impl std::ops::DivAssign for ApproxFloat {
     fn div_assign(&mut self, other: Self) {
-        
-        let aux = [self.low / other.low, self.high / other.low, self.low / other.high, self.high / other.high];
-        let (max,min) = max_min(&aux);
-        self.low =  next_float_down(min);
+        let aux = [
+            self.low / other.low,
+            self.high / other.low,
+            self.low / other.high,
+            self.high / other.high,
+        ];
+        let (max, min) = max_min(&aux);
+        self.low = next_float_down(min);
         self.high = next_float_up(max);
     }
 }
@@ -379,8 +390,6 @@ mod testing {
                 return Err(format!("'adown' ({}) is larger than 'a' ({})", adown, a));
             }
 
-            
-
             Ok(())
         }
 
@@ -390,17 +399,6 @@ mod testing {
         check(-12312.).unwrap();
 
         check(Float::MAX).unwrap();
-    }
-
-    #[test]
-    fn test_gamma_macro() {
-        for n in 0..20 {
-            let nm = Float::EPSILON / 2. * n as Float;
-            let exp = (nm) / (1. - nm);
-            let found = gamma!(n);
-            // println!("exp  : {} \nfound: {}\n======", exp,found);
-            assert!((exp - found).abs() < Float::EPSILON)
-        }
     }
 
     #[test]
@@ -454,8 +452,8 @@ mod testing {
         // With error
         let a = 0.2;
         let err = 0.1;
-        let app = ApproxFloat::from_value_and_error(a, err);        
-        assert!(  (a.sqrt() - app.sqrt().as_float()).abs() < 2.*err);
+        let app = ApproxFloat::from_value_and_error(a, err);
+        assert!((a.sqrt() - app.sqrt().as_float()).abs() < 2. * err);
     }
 
     #[test]
@@ -479,8 +477,8 @@ mod testing {
         let c = ApproxFloat::from(-6.);
         if let Some((x1, x2)) = ApproxFloat::solve_quadratic(a, b, c) {
             println!("x1 = {}, x2 = {}", x1.midpoint(), x2.midpoint());
-            assert!( (x1.midpoint()- -2.).abs() < 1e-6);
-            assert!( (x2.midpoint() - 3.).abs() < Float::EPSILON);
+            assert!((x1.midpoint() - -2.).abs() < 1e-6);
+            assert!((x2.midpoint() - 3.).abs() < Float::EPSILON);
         } else {
             panic!("Expecting results!")
         }
@@ -490,8 +488,8 @@ mod testing {
         let c = ApproxFloat::from(36.);
         if let Some((x1, x2)) = ApproxFloat::solve_quadratic(a, b, c) {
             println!("x1 = {}, x2 = {}", x1.midpoint(), x2.midpoint());
-            assert!((x1.midpoint()- -1.5).abs() < Float::EPSILON);
-            assert!((x2.midpoint() - 4.).abs() < 5.*Float::EPSILON);// still pretty accurate
+            assert!((x1.midpoint() - -1.5).abs() < Float::EPSILON);
+            assert!((x2.midpoint() - 4.).abs() < 5. * Float::EPSILON); // still pretty accurate
         } else {
             panic!("Expected results!")
         }
@@ -501,8 +499,8 @@ mod testing {
         let c = ApproxFloat::from(-6.);
         if let Some((x1, x2)) = ApproxFloat::solve_quadratic(a, b, c) {
             println!("x1 = {}, x2 = {}", x1.midpoint(), x2.midpoint());
-            assert!((x1.midpoint()- -3. / 2.).abs() < Float::EPSILON);
-            assert!((x2.midpoint()- 2. / 3.).abs() < Float::EPSILON);
+            assert!((x1.midpoint() - -3. / 2.).abs() < Float::EPSILON);
+            assert!((x2.midpoint() - 2. / 3.).abs() < Float::EPSILON);
         } else {
             panic!("Expected results!")
         }
@@ -583,19 +581,19 @@ mod testing {
 
         // Mul Self
         let result = this * other;
-        assert!((result.as_float()- value * other_value).abs() < 2.*error);
+        assert!((result.as_float() - value * other_value).abs() < 2. * error);
 
         // Mul Float
         let result = this * other_value;
-        assert!((result.as_float() - value * other_value).abs() < 2.*error);
+        assert!((result.as_float() - value * other_value).abs() < 2. * error);
 
         // Div Self
         let result = this / other;
-        assert!((result.as_float()- value / other_value).abs() < 2.*error);
+        assert!((result.as_float() - value / other_value).abs() < 2. * error);
 
         // Div Float
         let result = this / other_value;
-        assert!((result.as_float()- value / other_value).abs() < 2.*error);
+        assert!((result.as_float() - value / other_value).abs() < 2. * error);
 
         // Add Assign Self
         let mut new_this = this;
@@ -620,21 +618,21 @@ mod testing {
         // Mul Assign Self
         let mut new_this = this;
         new_this *= other;
-        assert!( (new_this.as_float()- value * other_value).abs() < 2.*error);
+        assert!((new_this.as_float() - value * other_value).abs() < 2. * error);
 
         // Mul Assign Float
         let mut new_this = this;
         new_this *= other_value;
-        assert!( (new_this.as_float()- value * other_value).abs() < 2.*error);
+        assert!((new_this.as_float() - value * other_value).abs() < 2. * error);
 
         // Div Assign Self
         let mut new_this = this;
-        new_this /= other;        
-        assert!( (new_this.as_float()- value / other_value).abs() < 2.*error);
+        new_this /= other;
+        assert!((new_this.as_float() - value / other_value).abs() < 2. * error);
 
         // Div Assign Float
         let mut new_this = this;
         new_this /= other_value;
-        assert!( (new_this.as_float()- value / other_value).abs() < 2.*error);
+        assert!((new_this.as_float() - value / other_value).abs() < 2. * error);
     }
 }
