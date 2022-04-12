@@ -32,7 +32,7 @@ use crate::Vector3D;
 
 /// Represents one dimension of the `BBox3D`
 #[repr(u8)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum BBoxAxis {
     X,
     Y,
