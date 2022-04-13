@@ -238,18 +238,23 @@ impl BBox3D {
     /// assert!(bbox.intersect(&ray, &inv_dir));
     /// ```
     pub fn intersect(&self, ray: &Ray3D, inv_dir: &Vector3D) -> bool {
-        let mut t_min = (self.min.x - ray.origin.x) * inv_dir.x;
-        let mut t_max = (self.max.x - ray.origin.x) * inv_dir.x;
-        if t_min > t_max {
-            std::mem::swap(&mut t_min, &mut t_max);
+
+
+
+        let mut tx_min = (self.min.x - ray.origin.x) * inv_dir.x;
+        let mut tx_max = (self.max.x - ray.origin.x) * inv_dir.x;
+        let mut ty_min = (self.min.y - ray.origin.y) * inv_dir.y;
+        let mut ty_max = (self.max.y - ray.origin.y) * inv_dir.y;
+        
+        if tx_min > tx_max {
+            std::mem::swap(&mut tx_min, &mut tx_max);
         }
-        if t_max < 0. {
+        if tx_max < 0. {
             // We are running away from the box in the X component
             return false;
         }
 
-        let mut ty_min = (self.min.y - ray.origin.y) * inv_dir.y;
-        let mut ty_max = (self.max.y - ray.origin.y) * inv_dir.y;
+        
         if ty_min > ty_max {
             std::mem::swap(&mut ty_min, &mut ty_max);
         }
@@ -259,19 +264,19 @@ impl BBox3D {
         }
 
         // Update _tMax_ and _tyMax_ to ensure robust bounds intersection
-        t_max *= 1. + 2. * gamma!(3.);
+        tx_max *= 1. + 2. * gamma!(3.);
         ty_max *= 1. + 2. * gamma!(3.);
-        if t_min > ty_max || ty_min > t_max {
+        if tx_min > ty_max || ty_min > tx_max {
             // The times do not intersect
             return false;
         }
         // Narrow down the intersection... Now t_min and t_max
         // represent the intersection between the X an Y dimensions.
-        if ty_min > t_min {
-            t_min = ty_min;
+        if ty_min > tx_min {
+            tx_min = ty_min;
         }
-        if ty_max < t_max {
-            t_max = ty_max;
+        if ty_max < tx_max {
+            tx_max = ty_max;
         }
 
         let mut tz_min = (self.min.z - ray.origin.z) * inv_dir.z;
@@ -286,20 +291,20 @@ impl BBox3D {
 
         // // Update _tzMax_ to ensure robust bounds intersection
         tz_max *= 1. + 2. * gamma!(3.);
-        if t_min > tz_max || tz_min > t_max {
+        if tx_min > tz_max || tz_min > tx_max {
             // No intersection
             return false;
         }
         // Narrow down intersection
-        if tz_min > t_min {
-            t_min = tz_min;
+        if tz_min > tx_min {
+            tx_min = tz_min;
         }
-        if tz_max < t_max {
-            t_max = tz_max;
+        if tz_max < tx_max {
+            tx_max = tz_max;
         }
 
         // return
-        t_max > t_min && t_max > 0.
+        tx_max > tx_min && tx_max > 0.
     }
 }
 
