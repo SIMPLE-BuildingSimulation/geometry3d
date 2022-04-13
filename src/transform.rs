@@ -99,19 +99,18 @@ fn mul4x4_abs(matrix: &[Float; 16], x: Float, y: Float, z: Float) -> Point3D {
     Point3D::new(err_x, err_y, err_z)
 }
 
+// fn simd_row4x4(row: usize, m: &[Float; 16])->std::simd::Simd<Float, 4>{
+//     std::simd::Simd::from([ m[elem!(row, 0)], m[elem!(row, 1)], m[elem!(row, 2)], m[elem!(row, 3)]] )
+// }
 
-fn simd_row4x4(row: usize, m: &[Float; 16])->std::simd::Simd<Float, 4>{    
-    std::simd::Simd::from([ m[elem!(row, 0)], m[elem!(row, 1)], m[elem!(row, 2)], m[elem!(row, 3)]] )
-}
-
-fn simd_col4x4(col: usize, m: &[Float; 16])->std::simd::Simd<Float, 4>{
-    std::simd::Simd::from([ m[elem!(0, col)], m[elem!(1, col)], m[elem!(2, col)], m[elem!(3, col)]] )
-}
+// fn simd_col4x4(col: usize, m: &[Float; 16])->std::simd::Simd<Float, 4>{
+//     std::simd::Simd::from([ m[elem!(0, col)], m[elem!(1, col)], m[elem!(2, col)], m[elem!(3, col)]] )
+// }
 
 pub fn mul4x4(m1: &[Float; 16], m2: &[Float; 16]) -> [Float; 16] {
-        
     let mut ret = [0.; 16];
 
+    // This was for SIMD... but did not help.
     // let m1_row0 = simd_row4x4(0, m1);
     // let m1_row1 = simd_row4x4(1, m1);
     // let m1_row2 = simd_row4x4(2, m1);
@@ -121,7 +120,6 @@ pub fn mul4x4(m1: &[Float; 16], m2: &[Float; 16]) -> [Float; 16] {
     // let m2_col1 = simd_col4x4(1, m2);
     // let m2_col2 = simd_col4x4(2, m2);
     // let m2_col3 = simd_col4x4(3, m2);
-
 
     // ret[elem!(0,0)] = (m1_row0*m2_col0).reduce_sum();
     // ret[elem!(1,0)] = (m1_row1*m2_col0).reduce_sum();
@@ -142,7 +140,6 @@ pub fn mul4x4(m1: &[Float; 16], m2: &[Float; 16]) -> [Float; 16] {
     // ret[elem!(1,3)] = (m1_row1*m2_col3).reduce_sum();
     // ret[elem!(2,3)] = (m1_row2*m2_col3).reduce_sum();
     // ret[elem!(3,3)] = (m1_row3*m2_col3).reduce_sum();
-    
 
     let mut calc_elem = |row: usize, col: usize| {
         ret[elem!(row, col)] = m1[elem!(row, 0)] * m2[elem!(0, col)]
@@ -150,28 +147,27 @@ pub fn mul4x4(m1: &[Float; 16], m2: &[Float; 16]) -> [Float; 16] {
             + m1[elem!(row, 2)] * m2[elem!(2, col)]
             + m1[elem!(row, 3)] * m2[elem!(3, col)];
     };
-    
+
     calc_elem(0, 0);
     calc_elem(0, 1);
     calc_elem(0, 2);
     calc_elem(0, 3);
-    
+
     calc_elem(1, 0);
     calc_elem(1, 1);
     calc_elem(1, 2);
     calc_elem(1, 3);
-    
+
     calc_elem(2, 0);
     calc_elem(2, 1);
     calc_elem(2, 2);
     calc_elem(2, 3);
-    
+
     calc_elem(3, 0);
     calc_elem(3, 1);
     calc_elem(3, 2);
     calc_elem(3, 3);
-    
-    
+
     ret
 }
 
@@ -1014,22 +1010,20 @@ mod testing {
     }
 
     #[test]
-    fn test_mul_4x4(){
+    fn test_mul_4x4() {
         // this is an example from the internet
-        let a = [ 5., 7., 9., 10., 
-                            2., 3., 3., 8., 
-                            8., 10., 2., 3., 
-                            3., 3., 4., 8.];
+        let a = [
+            5., 7., 9., 10., 2., 3., 3., 8., 8., 10., 2., 3., 3., 3., 4., 8.,
+        ];
 
-        let b = [ 3., 10., 12., 18., 
-                            12., 1., 4., 9., 
-                            9., 10., 12., 2., 
-                            3., 12., 4., 10.];
+        let b = [
+            3., 10., 12., 18., 12., 1., 4., 9., 9., 10., 12., 2., 3., 12., 4., 10.,
+        ];
 
-        let exp = [210., 267., 236., 271., 
-                            93., 149., 104., 149., 
-                            171., 146., 172., 268., 
-                            105., 169., 128., 169.];
+        let exp = [
+            210., 267., 236., 271., 93., 149., 104., 149., 171., 146., 172., 268., 105., 169.,
+            128., 169.,
+        ];
         let c = mul4x4(&a, &b);
         assert_eq!(c, exp)
     }

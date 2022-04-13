@@ -216,7 +216,6 @@ impl std::ops::Sub<Float> for ApproxFloat {
 pub fn max_min(aux: &[Float; 4]) -> (Float, Float) {
     let v = std::simd::Simd::from(*aux);
     (v.reduce_max(), v.reduce_min())
-    
 }
 
 impl std::ops::Mul for ApproxFloat {

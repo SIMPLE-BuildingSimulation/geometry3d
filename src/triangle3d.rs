@@ -45,8 +45,11 @@ pub fn intersect_triangle(
     // Solve this with Cramer's rule
     // println!("Intersecting Triangle");
     let a_ro = vertex_a - ray.origin;
+
     let a_b = vertex_a - vertex_b;
+
     let a_c = vertex_a - vertex_c;
+
     let rd = ray.direction;
 
     let det_a = det_3x3(&a_b, &a_c, &rd);
