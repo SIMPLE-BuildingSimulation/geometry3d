@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#![feature(portable_simd)]
+
 // Define whether we are working with
 // doubles (i.e., f64) or floats (i.e., f32)
 
@@ -46,9 +48,7 @@ type RefCount<T> = std::rc::Rc<T>;
 mod utils;
 // pub mod intersect_trait;
 
-#[cfg(feature = "textures")]
 pub mod round_error;
-
 // Objects
 mod cylinder3d;
 pub use cylinder3d::Cylinder3D;

@@ -47,6 +47,19 @@ pub fn criterion_benchmark(c: &mut Criterion) {
         })
     });
 
+
+
+    let v = black_box([1., 2., -9.1, 12.]);
+    c.bench_function("max_min", |b| {
+        b.iter(|| {
+            
+            let  _ = black_box(geometry3d::round_error::max_min(&v));
+        })
+    });
+
+
+
+
 }
 
 criterion_group!(benches, criterion_benchmark);

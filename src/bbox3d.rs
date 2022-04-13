@@ -239,13 +239,27 @@ impl BBox3D {
     /// ```
     pub fn intersect(&self, ray: &Ray3D, inv_dir: &Vector3D) -> bool {
 
+        let mut mins_maxes = std::simd::Simd::from([self.min.x, self.max.x, self.min.y, self.max.y]);
 
+        let mut aux = std::simd::Simd::from([ray.origin.x, ray.origin.x, ray.origin.y, ray.origin.y]);
+        mins_maxes -= aux;
+        aux = std::simd::Simd::from([inv_dir.x, inv_dir.x, inv_dir.y, inv_dir.y]);
+        mins_maxes *= aux;
+        // aux = std::simd::Simd::from([1. + 2. * gamma!(3.);4]);
+        // mins_maxes *= aux;
+        // let mut tx_min2 = (self.min.x - ray.origin.x) * inv_dir.x;
+        // let mut tx_max2 = (self.max.x - ray.origin.x) * inv_dir.x;
+        // let mut ty_min2 = (self.min.y - ray.origin.y) * inv_dir.y;
+        // let mut ty_max2 = (self.max.y - ray.origin.y) * inv_dir.y;
 
-        let mut tx_min = (self.min.x - ray.origin.x) * inv_dir.x;
-        let mut tx_max = (self.max.x - ray.origin.x) * inv_dir.x;
-        let mut ty_min = (self.min.y - ray.origin.y) * inv_dir.y;
-        let mut ty_max = (self.max.y - ray.origin.y) * inv_dir.y;
+        let [mut tx_min, mut tx_max, mut ty_min, mut ty_max] = *mins_maxes.as_array();
+
         
+        
+        
+        //= std::simd::Simd::from([tx_min, tx_max, ty_min, ty_max, 1., 2.]);
+        
+
         if tx_min > tx_max {
             std::mem::swap(&mut tx_min, &mut tx_max);
         }
@@ -254,7 +268,6 @@ impl BBox3D {
             return false;
         }
 
-        
         if ty_min > ty_max {
             std::mem::swap(&mut ty_min, &mut ty_max);
         }
@@ -263,7 +276,7 @@ impl BBox3D {
             return false;
         }
 
-        // Update _tMax_ and _tyMax_ to ensure robust bounds intersection
+        // // Update _tMax_ and _tyMax_ to ensure robust bounds intersection
         tx_max *= 1. + 2. * gamma!(3.);
         ty_max *= 1. + 2. * gamma!(3.);
         if tx_min > ty_max || ty_min > tx_max {
@@ -540,7 +553,10 @@ mod testing {
                 1. / ray.direction.y,
                 1. / ray.direction.z,
             );
-            assert!(bbox.intersect(&ray, &inv_dir));
+            if !bbox.intersect(&ray, &inv_dir){
+                bbox.intersect(&ray, &inv_dir);
+                panic!("Did not intersect!");
+            }
         }
 
         // On top of the Box... should NOT intersect

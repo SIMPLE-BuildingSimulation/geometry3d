@@ -213,19 +213,10 @@ impl std::ops::Sub<Float> for ApproxFloat {
     }
 }
 
-fn max_min(aux: &[Float; 4]) -> (Float, Float) {
-    let mut min = aux[0];
-    let mut max = aux[0];
-    for val in aux.iter().skip(1) {
-        min = val.min(min);
-        max = val.max(max);
-        // if *val < min {
-        //     min = *val;
-        // } else if *val > max {
-        //     max = *val;
-        // }
-    }
-    (max, min)
+pub fn max_min(aux: &[Float; 4]) -> (Float, Float) {
+    let v = std::simd::Simd::from(*aux);
+    (v.reduce_max(), v.reduce_min())
+    
 }
 
 impl std::ops::Mul for ApproxFloat {
