@@ -80,7 +80,7 @@ pub use segment3d::Segment3D;
 mod sphere3d;
 pub use sphere3d::Sphere3D;
 
-mod transform;
+pub mod transform;
 pub use transform::Transform;
 
 mod triangle3d;

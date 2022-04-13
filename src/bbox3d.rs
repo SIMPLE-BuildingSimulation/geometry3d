@@ -240,24 +240,15 @@ impl BBox3D {
     pub fn intersect(&self, ray: &Ray3D, inv_dir: &Vector3D) -> bool {
 
         let mut mins_maxes = std::simd::Simd::from([self.min.x, self.max.x, self.min.y, self.max.y]);
-
-        let mut aux = std::simd::Simd::from([ray.origin.x, ray.origin.x, ray.origin.y, ray.origin.y]);
-        mins_maxes -= aux;
-        aux = std::simd::Simd::from([inv_dir.x, inv_dir.x, inv_dir.y, inv_dir.y]);
-        mins_maxes *= aux;
-        // aux = std::simd::Simd::from([1. + 2. * gamma!(3.);4]);
-        // mins_maxes *= aux;
+        let aux1 = std::simd::Simd::from([ray.origin.x, ray.origin.x, ray.origin.y, ray.origin.y]);
+        mins_maxes -= aux1;
+        let aux2 = std::simd::Simd::from([inv_dir.x, inv_dir.x, inv_dir.y, inv_dir.y]);
+        mins_maxes *= aux2;
+        
+        let [mut tx_min, mut tx_max, mut ty_min, mut ty_max] = *mins_maxes.as_array();
+        
         // let mut tx_min2 = (self.min.x - ray.origin.x) * inv_dir.x;
         // let mut tx_max2 = (self.max.x - ray.origin.x) * inv_dir.x;
-        // let mut ty_min2 = (self.min.y - ray.origin.y) * inv_dir.y;
-        // let mut ty_max2 = (self.max.y - ray.origin.y) * inv_dir.y;
-
-        let [mut tx_min, mut tx_max, mut ty_min, mut ty_max] = *mins_maxes.as_array();
-
-        
-        
-        
-        //= std::simd::Simd::from([tx_min, tx_max, ty_min, ty_max, 1., 2.]);
         
 
         if tx_min > tx_max {
@@ -267,6 +258,9 @@ impl BBox3D {
             // We are running away from the box in the X component
             return false;
         }
+
+        // let mut ty_min2 = (self.min.y - ray.origin.y) * inv_dir.y;
+        // let mut ty_max2 = (self.max.y - ray.origin.y) * inv_dir.y;
 
         if ty_min > ty_max {
             std::mem::swap(&mut ty_min, &mut ty_max);
