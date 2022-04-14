@@ -4,7 +4,14 @@ on:
   pull_request:
 name: coverage
 jobs:
+  toolchain:
+    runs-on: ubuntu-latest    
+    steps:
+      - uses: actions/checkout@v1   
+      - name: Set Toolchain
+        run: rustup default nightly
   test:
+    needs: toolchain
     runs-on: ubuntu-latest
     container:
       image: xd009642/tarpaulin

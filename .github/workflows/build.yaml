@@ -10,31 +10,42 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:  
-  build:
+  toolchain:
     runs-on: ubuntu-latest    
     steps:
     - uses: actions/checkout@v1   
-    - name: Build
-      run: cargo build --verbose
-  build_float:    
+    - name: Set Toolchain
+      run: rustup default nightly
+  build:  
+    needs: toolchain  
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1   
+    - name: Build Float
+      run: cargo build --verbose 
+  build_float:  
+    needs: toolchain  
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1   
     - name: Build Float
       run: cargo build --verbose --features float 
   build_parallel:    
+    needs: toolchain  
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1   
     - name: Build Float
       run: cargo build --verbose --features parallel 
   build_textures:    
+    needs: toolchain  
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1   
     - name: Build Float
       run: cargo build --verbose --features textures 
-  build_quick_inv:    
+  build_quick_inv:  
+    needs: toolchain    
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1   

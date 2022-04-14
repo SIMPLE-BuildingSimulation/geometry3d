@@ -1,7 +1,14 @@
 on: push
 name: Clippy check
 jobs:
+  toolchain:
+    runs-on: ubuntu-latest    
+    steps:
+      - uses: actions/checkout@v1   
+      - name: Set Toolchain
+        run: rustup default nightly
   clippy_check:
+    needs: toolchain
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1

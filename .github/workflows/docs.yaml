@@ -9,8 +9,15 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
-jobs:         
+jobs:       
+  toolchain:
+    runs-on: ubuntu-latest    
+    steps:
+      - uses: actions/checkout@v1   
+      - name: Set Toolchain
+        run: rustup default nightly  
   docs:    
+    needs: toolchain
     runs-on: ubuntu-latest    
     steps:
     - uses: actions/checkout@v1    

@@ -10,21 +10,40 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:  
-  test:
-    runs-on: ubuntu-latest     
+  toolchain:
+    runs-on: ubuntu-latest    
     steps:
-    # - uses: taiki-e/install-action@cargo-hack 
-    # - name: Run tests
-    #   # run: cargo hack test --feature-powerset --verbose     
+    - uses: actions/checkout@v1   
+    - name: Set Toolchain
+      run: rustup default nightly
+  test:
+    needs: toolchain
+    runs-on: ubuntu-latest         
     - uses: actions/checkout@v1   
     - name: Run tests
       run: cargo test --verbose    
-    - name: Run tests textures
-      run: cargo test --features textures --verbose     
-    - name: Run tests float
-      run: cargo test --features float --verbose     
-    - name: Run tests parallel
-      run: cargo test --features parallel --verbose     
-    - name: Run tests all
-      run: cargo test --all-features --verbose     
-  
+  test_float:
+    needs: toolchain
+    runs-on: ubuntu-latest         
+    - uses: actions/checkout@v1   
+    - name: Run tests
+      run: cargo test --features float --verbose    
+  test_parallel:
+    needs: toolchain
+    runs-on: ubuntu-latest         
+    - uses: actions/checkout@v1   
+    - name: Run tests
+      run: cargo test --features parallel --verbose    
+  test_textures:
+    needs: toolchain
+    runs-on: ubuntu-latest         
+    - uses: actions/checkout@v1   
+    - name: Run tests
+      run: cargo test --features textures --verbose   
+  test_quick_inv_sqrt:
+    needs: toolchain
+    runs-on: ubuntu-latest         
+    - uses: actions/checkout@v1   
+    - name: Run tests
+      run: cargo test --features quick_inv_sqrt --verbose    
+        
