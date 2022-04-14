@@ -9,43 +9,55 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
-jobs:  
-  toolchain:
-    runs-on: ubuntu-latest    
+jobs:    
+  test:    
+    runs-on: ubuntu-latest         
     steps:
-    - uses: actions/checkout@v1   
-    - name: Update
-      run: rustup update
-    - name: Set Toolchain
-      run: rustup default nightly    
-  test:
-    needs: toolchain
+      - uses: actions/checkout@v1   
+      - name: Set Toolchain
+        run: rustup default nightly    
+      - name: Update
+        run: rustup update
+      - name: Run tests
+        run: cargo test --verbose    
+  test_float:    
     runs-on: ubuntu-latest         
-    - uses: actions/checkout@v1   
-    - name: Run tests
-      run: cargo test --verbose    
-  test_float:
-    needs: toolchain
-    runs-on: ubuntu-latest         
-    - uses: actions/checkout@v1   
-    - name: Run tests
-      run: cargo test --features float --verbose    
+    steps:
+      - uses: actions/checkout@v1   
+      - name: Set Toolchain
+        run: rustup default nightly    
+      - name: Update
+        run: rustup update
+      - name: Run tests
+        run: cargo test --features float --verbose    
   test_parallel:
-    needs: toolchain
     runs-on: ubuntu-latest         
-    - uses: actions/checkout@v1   
-    - name: Run tests
-      run: cargo test --features parallel --verbose    
+    steps:
+      - uses: actions/checkout@v1   
+      - name: Set Toolchain
+        run: rustup default nightly    
+      - name: Update
+        run: rustup update
+      - name: Run tests
+        run: cargo test --features parallel --verbose    
   test_textures:
-    needs: toolchain
-    runs-on: ubuntu-latest         
-    - uses: actions/checkout@v1   
-    - name: Run tests
-      run: cargo test --features textures --verbose   
+    runs-on: ubuntu-latest   
+    steps:      
+      - uses: actions/checkout@v1   
+      - name: Set Toolchain
+        run: rustup default nightly    
+      - name: Update
+        run: rustup update
+      - name: Run tests
+        run: cargo test --features textures --verbose   
   test_quick_inv_sqrt:
-    needs: toolchain
-    runs-on: ubuntu-latest         
-    - uses: actions/checkout@v1   
-    - name: Run tests
-      run: cargo test --features quick_inv_sqrt --verbose    
+    runs-on: ubuntu-latest    
+    steps:     
+      - uses: actions/checkout@v1   
+      - name: Set Toolchain
+        run: rustup default nightly    
+      - name: Update
+        run: rustup update
+      - name: Run tests
+        run: cargo test --features quick_inv_sqrt --verbose    
         

@@ -3,23 +3,18 @@ on:
     branches: [master]
   pull_request:
 name: coverage
-jobs:
-  toolchain:
-    runs-on: ubuntu-latest    
-    steps:
-      - uses: actions/checkout@v1  
-      - name: Update
-        run: rustup update 
-      - name: Set Toolchain
-        run: rustup default nightly
-  test:
-    needs: toolchain
+jobs:  
+  test:    
     runs-on: ubuntu-latest
     container:
       image: xd009642/tarpaulin
       options: --security-opt seccomp=unconfined
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2       
+      - name: Set Toolchain
+        run: rustup default nightly    
+      - name: Update
+        run: rustup update
       - name: Generate code coverage
         run: |
           cargo tarpaulin --verbose --timeout 600 --out Xml
