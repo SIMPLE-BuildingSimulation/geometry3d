@@ -15,4 +15,6 @@ jobs:
       - run: rustup component add clippy
       - uses: actions-rs/clippy-check@v1
         with:
+          toolchain: nightly
+          override: true
           token: ${{ secrets.GITHUB_TOKEN }}          
