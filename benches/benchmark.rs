@@ -27,23 +27,23 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     //     })
     // });
 
-    // let bbox = black_box(geometry3d::BBox3D::new(
-    //     geometry3d::Point3D::new(0., 0., 0.) ,
-    //     geometry3d::Point3D::new(1., 1., 1.) ,
-    // ));
-    // let (x, y, z) = (0.5, 0.5, -2.);
-    // let ray = black_box(geometry3d::Ray3D{
-    //     origin: geometry3d::Point3D::new(x, y, z),
-    //     direction: geometry3d::Vector3D::new(0., 0., 1.),
-    // });
-    // let inv_dir = black_box(geometry3d::Vector3D::new(1./x, 1./y, 1./z));
+    let bbox = black_box(geometry3d::BBox3D::new(
+        geometry3d::Point3D::new(0., 0., 0.) ,
+        geometry3d::Point3D::new(1., 1., 1.) ,
+    ));
+    let (x, y, z) = (0.5, 0.5, -2.);
+    let ray = black_box(geometry3d::Ray3D{
+        origin: geometry3d::Point3D::new(x, y, z),
+        direction: geometry3d::Vector3D::new(0., 0., 1.),
+    });
+    let inv_dir = black_box(geometry3d::Vector3D::new(1./x, 1./y, 1./z));
 
-    // c.bench_function("bbox_intersection", |b| {
-    //     b.iter(|| {
+    c.bench_function("bbox_intersection", |b| {
+        b.iter(|| {
 
-    //         let  _ = black_box(bbox.intersect(&ray, &inv_dir));
-    //     })
-    // });
+            let  _ = black_box(bbox.intersect(&ray, &inv_dir));
+        })
+    });
 
     // let v = black_box([1., 2., -9.1, 12.]);
     // c.bench_function("max_min", |b| {
@@ -53,17 +53,17 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     //     })
     // });
 
-    let m1 = black_box([
-        1., 1., 2., 3., 4., 5., 1., 2., 3., 1., 5., 1., 8., 7., 2., 1.,
-    ]);
-    let m2 = black_box([
-        1., 1., 2., 3., 4., 5., 1., 2., 3., 11., 25., 1., 8., -7., 2., 12.,
-    ]);
-    c.bench_function("mul4x4", |b| {
-        b.iter(|| {
-            let _ = black_box(geometry3d::transform::mul4x4(&m1, &m2));
-        })
-    });
+    // let m1 = black_box([
+    //     1., 1., 2., 3., 4., 5., 1., 2., 3., 1., 5., 1., 8., 7., 2., 1.,
+    // ]);
+    // let m2 = black_box([
+    //     1., 1., 2., 3., 4., 5., 1., 2., 3., 11., 25., 1., 8., -7., 2., 12.,
+    // ]);
+    // c.bench_function("mul4x4", |b| {
+    //     b.iter(|| {
+    //         let _ = black_box(geometry3d::transform::mul4x4(&m1, &m2));
+    //     })
+    // });
 }
 
 criterion_group!(benches, criterion_benchmark);
