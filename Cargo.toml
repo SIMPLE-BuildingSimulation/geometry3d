@@ -29,5 +29,4 @@ harness = false
 default = []
 float = []
 parallel = []
-textures = []
 quick_inv_sqrt = []

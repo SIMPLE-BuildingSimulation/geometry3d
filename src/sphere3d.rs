@@ -26,7 +26,6 @@ use crate::intersection::IntersectionInfo;
 use crate::RefCount;
 use crate::{Float, PI};
 
-#[cfg(feature = "textures")]
 use crate::round_error::ApproxFloat;
 
 use crate::{BBox3D, Point3D, Ray3D, Transform, Vector3D};
@@ -167,7 +166,7 @@ impl Sphere3D {
         }
     }
 
-    #[cfg(feature = "textures")]
+    
     fn approx_basic_intersection(
         &self,
         ray: &Ray3D,
@@ -265,93 +264,6 @@ impl Sphere3D {
         Some((phit, phi))
     }
 
-    #[cfg(not(feature = "textures"))]
-    fn basic_intersection(&self, ray: &Ray3D) -> Option<(Point3D, Float)> {
-        // decompose ray
-        let (dx, dy, dz) = (ray.direction.x, ray.direction.y, ray.direction.z);
-        let (ox, oy, oz) = (ray.origin.x, ray.origin.y, ray.origin.z);
-
-        let a = dx * dx + dy * dy + dz * dz;
-        let b = (ox * dx + oy * dy + oz * dz) * 2.;
-        let c = ox * ox + oy * oy + oz * oz - self.radius * self.radius;
-
-        let (t0, t1) = crate::utils::solve_quadratic(a, b, c)?;
-        #[cfg(debug_assertions)]
-        if t0.is_nan() || t1.is_nan() || t0.is_infinite() || t1.is_infinite() {
-            panic!(
-                "After solve_quadratic in Sphere intersection: t0. = {}, t1. = {}",
-                t0, t1
-            );
-        }
-        debug_assert!(t1 >= t0);
-        // t0 < t1... so, check if they are possitive
-        if t1 <= 0.0 {
-            return None;
-        }
-
-        // We now know that t1 hits... check t0
-        let (mut thit, hit_is_t1) = if t0 > 0. {
-            // if t0 is a valid hit, keep that
-            (t0, false)
-        } else {
-            // else, use t1 (which we know works...)
-            (t1, true)
-        };
-
-        // We might try to do the same with 'thit' = t1, later
-        let calc_phit_and_phi = |thit: Float| -> (Point3D, Float) {
-            // Calculate point of intersection.
-            let mut phit = ray.project(thit);
-            // refine in order to avoid error accumulation
-            phit *= self.radius / phit.as_vector3d().length();
-
-            // Avoid a singularity on top of the sphere
-            let limit = 1e-5 * self.radius;
-            if phit.x.abs() < limit && phit.y.abs() < limit {
-                phit.x = limit
-            }
-
-            // calc phi
-            let mut phi = phit.y.atan2(phit.x);
-            if phi < 0. {
-                phi += 2. * PI;
-            }
-            (phit, phi)
-        };
-        let (mut phit, mut phi) = calc_phit_and_phi(thit);
-
-        // Check intersection against clipping parameters...
-        // it is possible that the first hit misses, but the second
-        // does not
-        if (self.zmin > -self.radius && phit.z < self.zmin) || // zmin is limiting but 'thit' missed it
-            (self.zmax <  self.radius && phit.z > self.zmax) || // zmax is limiting but 'thit' missed it
-            phi > self.phi_max
-        // 'thit' missed due to the phi limitation
-        {
-            // if this was already t1, then we missed the sphere
-            if hit_is_t1 {
-                return None;
-            }
-            // else, try with t1.
-            thit = t1;
-
-            // recalculate
-            let (new_phit, new_phi) = calc_phit_and_phi(thit);
-
-            if (self.zmin > -self.radius && new_phit.z < self.zmin) || // zmin is limiting but 'thit' missed it
-                (self.zmax <  self.radius && new_phit.z > self.zmax) || // zmax is limiting but 'thit' missed it
-                new_phi > self.phi_max
-            // 'thit' missed due to the phi limitation
-            {
-                return None;
-            }
-            // update values
-            phit = new_phit;
-            phi = new_phi;
-        }
-
-        Some((phit, phi))
-    }
 
     pub fn intersection_info(
         &self,
@@ -433,12 +345,8 @@ impl Sphere3D {
         ray: &Ray3D,
         _o_error: Point3D,
         _d_error: Point3D,
-    ) -> Option<IntersectionInfo> {
-        #[cfg(feature = "textures")]
-        let (phit, phi) = self.approx_basic_intersection(ray, _o_error, _d_error)?;
-        #[cfg(not(feature = "textures"))]
-        let (phit, phi) = self.basic_intersection(ray)?;
-
+    ) -> Option<IntersectionInfo> {        
+        let (phit, phi) = self.approx_basic_intersection(ray, _o_error, _d_error)?;        
         self.intersection_info(ray, phit, phi)
     }
     /// Like `intersect_local_ray` but simplified because there is not need
@@ -450,11 +358,9 @@ impl Sphere3D {
         _d_error: Point3D,
     ) -> Option<Point3D> {
         // Do the first part
-        #[cfg(feature = "textures")]
+        
         let (phit, _) = self.approx_basic_intersection(ray, _o_error, _d_error)?;
-        #[cfg(not(feature = "textures"))]
-        let (phit, _) = self.basic_intersection(ray)?;
-
+        
         Some(phit)
     }
 

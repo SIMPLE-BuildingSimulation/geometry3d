@@ -24,7 +24,6 @@ SOFTWARE.
 
 use crate::intersection::IntersectionInfo;
 
-#[cfg(feature = "textures")]
 use crate::round_error::ApproxFloat;
 use crate::{Float, PI};
 
@@ -120,7 +119,7 @@ impl Cylinder3D {
         }
     }
 
-    #[cfg(feature = "textures")]
+    
     pub fn basic_intersection(
         &self,
         ray: &Ray3D,
@@ -158,89 +157,6 @@ impl Cylinder3D {
         let calc_phit_and_phi = |thit: ApproxFloat| -> (Point3D, Float) {
             // Calculate point of intersection.
             let mut phit = ray.project(thit.as_float());
-            // refine in order to avoid error accumulation
-            let hit_rad = (phit.x * phit.x + phit.y * phit.y).sqrt();
-            phit.x *= self.radius / hit_rad;
-            phit.y *= self.radius / hit_rad;
-
-            // calc phi
-            let mut phi = phit.y.atan2(phit.x);
-            if phi < 0. {
-                phi += 2. * PI;
-            }
-            (phit, phi)
-        };
-
-        let (mut phit, mut phi) = calc_phit_and_phi(thit);
-
-        // Check intersection against clipping parameters...
-        // it is possible that the first hit misses, but the second
-        // does not
-        if phit.z < self.zmin || // zmin is limiting but 'thit' missed it
-            phit.z > self.zmax || // zmax is limiting but 'thit' missed it
-            phi > self.phi_max
-        // 'thit' missed due to the phi limitation
-        {
-            // if this was already t1, then we missed the sphere
-            if hit_is_t1 {
-                return None;
-            }
-
-            // else, try with t1.
-            thit = t1;
-
-            // recalculate
-            let (new_phit, new_phi) = calc_phit_and_phi(thit);
-
-            if new_phit.z < self.zmin || // zmin is limiting but 'thit' missed it
-                new_phit.z > self.zmax || // zmax is limiting but 'thit' missed it
-                new_phi > self.phi_max
-            // 'thit' missed due to the phi limitation
-            {
-                return None;
-            }
-            // update values
-            phit = new_phit;
-            phi = new_phi;
-        }
-
-        Some((phit, phi))
-    }
-
-    #[cfg(not(feature = "textures"))]
-    pub fn basic_intersection(
-        &self,
-        ray: &Ray3D,
-        _o_error: Point3D,
-        _d_error: Point3D,
-    ) -> Option<(Point3D, Float)> {
-        // decompose ray
-        let (dx, dy) = (ray.direction.x, ray.direction.y);
-        let (ox, oy) = (ray.origin.x, ray.origin.y);
-
-        let a = dx * dx + dy * dy;
-        let b = (dx * ox + dy * oy) * 2.;
-        let c = ox * ox + oy * oy - self.radius * self.radius;
-        let (t0, t1) = crate::utils::solve_quadratic(a, b, c)?;
-        debug_assert!(t1 >= t0);
-        // t0 < t1... so, check if they are possitive
-        if t1 <= 0.0 {
-            return None;
-        }
-
-        // We now know that t1 hits... check t0
-        let (mut thit, hit_is_t1) = if t0 > 0. {
-            // if t0 is a valid hit, keep that
-            (t0, false)
-        } else {
-            // else, use t1 (which we know works...)
-            (t1, true)
-        };
-
-        // We might try to do the same with 'thit' = t1, later
-        let calc_phit_and_phi = |thit: Float| -> (Point3D, Float) {
-            // Calculate point of intersection.
-            let mut phit = ray.project(thit);
             // refine in order to avoid error accumulation
             let hit_rad = (phit.x * phit.x + phit.y * phit.y).sqrt();
             phit.x *= self.radius / hit_rad;

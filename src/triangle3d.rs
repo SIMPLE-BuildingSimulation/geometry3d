@@ -476,7 +476,7 @@ impl Triangle3D {
         o_error: Point3D,
         d_error: Point3D,
     ) -> Option<IntersectionInfo> {
-        let (phit, _u, _v) = self.basic_intersection(ray, o_error, d_error)?;
+        let (phit, u, v) = self.basic_intersection(ray, o_error, d_error)?;
         // eprintln!("Ray is {:?}", ray);
         // eprintln!("Triangle is {}", self);
         // eprintln!("phit = {} | u = {} | v = {}", phit, u, v);
@@ -493,14 +493,9 @@ impl Triangle3D {
             dpdv,
             normal,
             side,
-
-            #[cfg(feature = "textures")]
-            u: _u,
-            #[cfg(feature = "textures")]
-            v: _v,
-            #[cfg(feature = "textures")]
+            u,
+            v,
             dndu: Vector3D::new(0., 0., 0.),
-            #[cfg(feature = "textures")]
             dndv: Vector3D::new(0., 0., 0.),
         })
     }
