@@ -40,16 +40,6 @@ jobs:
         run: rustup update
       - name: Run tests
         run: cargo test --features parallel --verbose    
-  test_textures:
-    runs-on: ubuntu-latest   
-    steps:      
-      - uses: actions/checkout@v1   
-      - name: Set Toolchain
-        run: rustup default nightly    
-      - name: Update
-        run: rustup update
-      - name: Run tests
-        run: cargo test --features textures --verbose   
   test_quick_inv_sqrt:
     runs-on: ubuntu-latest    
     steps:     

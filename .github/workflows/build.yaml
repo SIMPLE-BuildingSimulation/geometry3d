@@ -40,16 +40,7 @@ jobs:
         run: rustup update
       - name: Build Float
         run: cargo build --verbose --features parallel 
-  build_textures:    
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1            
-      - name: Set Toolchain
-        run: rustup default nightly    
-      - name: Update
-        run: rustup update
-      - name: Build Float
-        run: cargo build --verbose --features textures 
+  
   build_quick_inv:   
     runs-on: ubuntu-latest
     steps:
