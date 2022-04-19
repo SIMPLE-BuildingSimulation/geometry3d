@@ -29,42 +29,41 @@ use crate::Float;
 use crate::{BBox3D, Point3D, Ray3D, Segment3D, Transform, Vector3D};
 
 /// Intersects a [`Ray3D`] in local coordinates with Triangle described by the
-/// [`Point3D`] `a`, `b`, and `c`.
+/// [`Point3D`] `a`, `b`, and `c`. We use the [Möller–Trumbore intersection algorithm](https://en.wikipedia.org/wiki/Möller–Trumbore_intersection_algorithm).
 ///
 /// Returns the [`Point3D`] of intersection and the values `u` and `v`, indicating
 /// the parametric coordinates of the point of intersection
+/// 
 pub fn intersect_triangle(
     ray: &Ray3D,
-    vertex_a: Point3D,
-    vertex_b: Point3D,
-    vertex_c: Point3D,
+    vertex0: Point3D,
+    vertex1: Point3D,
+    vertex2: Point3D,
 ) -> Option<(Point3D, Float, Float)> {
-    // Solve `Rorigin+t*Rdirection = A + u*(B-A) + v*(C-A)`;
-    // Meaning:
-    // u(A-B) + v(A-C) + t*Rdirection = (A - Rorigin)
-    // Solve this with Cramer's rule
-    // println!("Intersecting Triangle");
-    let a_ro = vertex_a - ray.origin;
-
-    let a_b = vertex_a - vertex_b;
-
-    let a_c = vertex_a - vertex_c;
-
-    let rd = ray.direction;
-
-    let det_a = det_3x3(&a_b, &a_c, &rd);
-
-    let u = det_3x3(&a_ro, &a_c, &rd) / det_a;
-    let v = det_3x3(&a_b, &a_ro, &rd) / det_a;
-    let t = det_3x3(&a_b, &a_c, &a_ro) / det_a;
-
-    // t must be positive, and alpha, beta and gamma must add to 1 and
-    // be positive
-    if t < 0. || u + v > 1. || u < 0. || v < 0. {
-        None
-    } else {
-        Some((ray.project(t), u, v))
+    let edge1 = vertex1 - vertex0;
+    let edge2 = vertex2 - vertex0;
+    let h = ray.direction.cross(edge2);
+    let a = edge1 * h;
+    const TINY: Float = 1e-5;
+    if a > -TINY && a < TINY {
+        return None;
     }
+    let f = 1. / a;
+    let s = ray.origin - vertex0;
+    let u = f * (s * h);
+    if u > 1. || u < 0.0 {
+        return None;
+    }
+    let q = s.cross(edge1);
+    let v = f * (ray.direction * q);
+    if v > 1.0 || v < 0.0 {
+        return None;
+    }
+    let t = f * (edge2 * q);
+    if t > TINY {
+        return Some((ray.project(t), u, v));
+    }
+    None
 }
 
 #[derive(Clone, Copy)]
@@ -570,11 +569,6 @@ impl Triangle3D {
     }
 } // end of impl Triangle3D
 
-fn det_3x3(col0: &Vector3D, col1: &Vector3D, col2: &Vector3D) -> Float {
-    col0.x * (col1.y * col2.z - col2.y * col1.z) - col1.x * (col0.y * col2.z - col2.y * col0.z)
-        + col2.x * (col0.y * col1.z - col1.y * col0.z)
-}
-
 /***********/
 /* TESTING */
 /***********/
@@ -582,34 +576,6 @@ fn det_3x3(col0: &Vector3D, col1: &Vector3D, col2: &Vector3D) -> Float {
 #[cfg(test)]
 mod testing {
     use super::*;
-
-    #[test]
-    fn test_det_3x3() {
-        assert_eq!(
-            1.,
-            det_3x3(
-                &Vector3D::new(1., 0., 0.),
-                &Vector3D::new(0., 1., 0.),
-                &Vector3D::new(0., 0., 1.)
-            )
-        );
-        assert_eq!(
-            8.,
-            det_3x3(
-                &Vector3D::new(2., 0., 0.),
-                &Vector3D::new(0., 2., 0.),
-                &Vector3D::new(0., 0., 2.)
-            )
-        );
-        assert_eq!(
-            49.,
-            det_3x3(
-                &Vector3D::new(2., 2., 1.),
-                &Vector3D::new(-3., 0., 4.),
-                &Vector3D::new(1., -1., 5.)
-            )
-        );
-    }
 
     #[test]
     fn test_new() {

@@ -28,20 +28,19 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     // });
 
     let bbox = black_box(geometry3d::BBox3D::new(
-        geometry3d::Point3D::new(0., 0., 0.) ,
-        geometry3d::Point3D::new(1., 1., 1.) ,
+        geometry3d::Point3D::new(0., 0., 0.),
+        geometry3d::Point3D::new(1., 1., 1.),
     ));
     let (x, y, z) = (0.5, 0.5, -2.);
-    let ray = black_box(geometry3d::Ray3D{
+    let ray = black_box(geometry3d::Ray3D {
         origin: geometry3d::Point3D::new(x, y, z),
         direction: geometry3d::Vector3D::new(0., 0., 1.),
     });
-    let inv_dir = black_box(geometry3d::Vector3D::new(1./x, 1./y, 1./z));
+    let inv_dir = black_box(geometry3d::Vector3D::new(1. / x, 1. / y, 1. / z));
 
     c.bench_function("bbox_intersection", |b| {
         b.iter(|| {
-
-            let  _ = black_box(bbox.intersect(&ray, &inv_dir));
+            let _ = black_box(bbox.intersect(&ray, &inv_dir));
         })
     });
 

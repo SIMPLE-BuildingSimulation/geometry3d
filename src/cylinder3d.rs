@@ -119,7 +119,6 @@ impl Cylinder3D {
         }
     }
 
-    
     pub fn basic_intersection(
         &self,
         ray: &Ray3D,

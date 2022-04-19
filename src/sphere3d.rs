@@ -166,7 +166,6 @@ impl Sphere3D {
         }
     }
 
-    
     fn approx_basic_intersection(
         &self,
         ray: &Ray3D,
@@ -264,7 +263,6 @@ impl Sphere3D {
         Some((phit, phi))
     }
 
-
     pub fn intersection_info(
         &self,
         ray: &Ray3D,
@@ -345,8 +343,8 @@ impl Sphere3D {
         ray: &Ray3D,
         _o_error: Point3D,
         _d_error: Point3D,
-    ) -> Option<IntersectionInfo> {        
-        let (phit, phi) = self.approx_basic_intersection(ray, _o_error, _d_error)?;        
+    ) -> Option<IntersectionInfo> {
+        let (phit, phi) = self.approx_basic_intersection(ray, _o_error, _d_error)?;
         self.intersection_info(ray, phit, phi)
     }
     /// Like `intersect_local_ray` but simplified because there is not need
@@ -358,9 +356,9 @@ impl Sphere3D {
         _d_error: Point3D,
     ) -> Option<Point3D> {
         // Do the first part
-        
+
         let (phit, _) = self.approx_basic_intersection(ray, _o_error, _d_error)?;
-        
+
         Some(phit)
     }
 
