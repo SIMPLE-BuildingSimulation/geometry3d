@@ -897,7 +897,6 @@
 <span id="858">858</span>
 <span id="859">859</span>
 <span id="860">860</span>
-<span id="861">861</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -933,7 +932,7 @@ SOFTWARE.
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns the [`Point3D`] of intersection and the values `u` and `v`, indicating</span>
 <span class="doccomment">/// the parametric coordinates of the point of intersection</span>
-<span class="doccomment">/// </span>
+<span class="doccomment">///</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersect_triangle</span>(
     <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
     <span class="ident">vertex0</span>: <span class="ident">Point3D</span>,
@@ -944,7 +943,7 @@ SOFTWARE.
     <span class="kw">let</span> <span class="ident">edge2</span> <span class="op">=</span> <span class="ident">vertex2</span> <span class="op">-</span> <span class="ident">vertex0</span>;
     <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">cross</span>(<span class="ident">edge2</span>);
     <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">edge1</span> <span class="op">*</span> <span class="ident">h</span>;
-    <span class="kw">const</span> <span class="ident">TINY</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">1e-5</span>;
+    <span class="kw">const</span> <span class="ident">TINY</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">100.</span> <span class="op">*</span> <span class="ident">Float::EPSILON</span>;
     <span class="kw">if</span> <span class="ident">a</span> <span class="op">&gt;</span> <span class="op">-</span><span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="ident">a</span> <span class="op">&lt;</span> <span class="ident">TINY</span> {
         <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
@@ -1418,8 +1417,7 @@ SOFTWARE.
         <span class="kw">let</span> (<span class="ident">local_ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform</span>() {
             <span class="ident">t</span>.<span class="ident">inv_transform_ray</span>(<span class="ident">ray</span>)
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">Transform::new</span>();
-            <span class="ident">t</span>.<span class="ident">inv_transform_ray</span>(<span class="ident">ray</span>)
+            (<span class="kw-2">*</span><span class="ident">ray</span>, <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>), <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>))
         };
 
         <span class="comment">// Intersect, and return transformed back... if needed</span>
