@@ -33,7 +33,7 @@ use crate::{BBox3D, Point3D, Ray3D, Segment3D, Transform, Vector3D};
 ///
 /// Returns the [`Point3D`] of intersection and the values `u` and `v`, indicating
 /// the parametric coordinates of the point of intersection
-/// 
+///
 pub fn intersect_triangle(
     ray: &Ray3D,
     vertex0: Point3D,
@@ -44,7 +44,7 @@ pub fn intersect_triangle(
     let edge2 = vertex2 - vertex0;
     let h = ray.direction.cross(edge2);
     let a = edge1 * h;
-    const TINY: Float = 1e-5;
+    const TINY: Float = 100. * Float::EPSILON;
     if a > -TINY && a < TINY {
         return None;
     }
@@ -518,8 +518,7 @@ impl Triangle3D {
         let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
             t.inv_transform_ray(ray)
         } else {
-            let t = Transform::new();
-            t.inv_transform_ray(ray)
+            (*ray, Point3D::new(0., 0., 0.), Point3D::new(0., 0., 0.))
         };
 
         // Intersect, and return transformed back... if needed

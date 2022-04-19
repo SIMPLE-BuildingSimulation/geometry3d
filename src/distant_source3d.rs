@@ -157,8 +157,7 @@ impl DistantSource3D {
         let (local_ray, o_error, d_error) = if let Some(t) = self.transform() {
             t.inv_transform_ray(ray)
         } else {
-            let t = Transform::new();
-            t.inv_transform_ray(ray)
+            (*ray, Point3D::new(0., 0., 0.), Point3D::new(0., 0., 0.))
         };
 
         // Intersect, and return transformed back... if needed
