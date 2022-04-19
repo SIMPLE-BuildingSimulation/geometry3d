@@ -898,40 +898,6 @@
 <span id="859">859</span>
 <span id="860">860</span>
 <span id="861">861</span>
-<span id="862">862</span>
-<span id="863">863</span>
-<span id="864">864</span>
-<span id="865">865</span>
-<span id="866">866</span>
-<span id="867">867</span>
-<span id="868">868</span>
-<span id="869">869</span>
-<span id="870">870</span>
-<span id="871">871</span>
-<span id="872">872</span>
-<span id="873">873</span>
-<span id="874">874</span>
-<span id="875">875</span>
-<span id="876">876</span>
-<span id="877">877</span>
-<span id="878">878</span>
-<span id="879">879</span>
-<span id="880">880</span>
-<span id="881">881</span>
-<span id="882">882</span>
-<span id="883">883</span>
-<span id="884">884</span>
-<span id="885">885</span>
-<span id="886">886</span>
-<span id="887">887</span>
-<span id="888">888</span>
-<span id="889">889</span>
-<span id="890">890</span>
-<span id="891">891</span>
-<span id="892">892</span>
-<span id="893">893</span>
-<span id="894">894</span>
-<span id="895">895</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -963,42 +929,41 @@ SOFTWARE.
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">BBox3D</span>, <span class="ident">Point3D</span>, <span class="ident">Ray3D</span>, <span class="ident">Segment3D</span>, <span class="ident">Transform</span>, <span class="ident">Vector3D</span>};
 
 <span class="doccomment">/// Intersects a [`Ray3D`] in local coordinates with Triangle described by the</span>
-<span class="doccomment">/// [`Point3D`] `a`, `b`, and `c`.</span>
+<span class="doccomment">/// [`Point3D`] `a`, `b`, and `c`. We use the [Möller–Trumbore intersection algorithm](https://en.wikipedia.org/wiki/Möller–Trumbore_intersection_algorithm).</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns the [`Point3D`] of intersection and the values `u` and `v`, indicating</span>
 <span class="doccomment">/// the parametric coordinates of the point of intersection</span>
+<span class="doccomment">/// </span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersect_triangle</span>(
     <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
-    <span class="ident">vertex_a</span>: <span class="ident">Point3D</span>,
-    <span class="ident">vertex_b</span>: <span class="ident">Point3D</span>,
-    <span class="ident">vertex_c</span>: <span class="ident">Point3D</span>,
+    <span class="ident">vertex0</span>: <span class="ident">Point3D</span>,
+    <span class="ident">vertex1</span>: <span class="ident">Point3D</span>,
+    <span class="ident">vertex2</span>: <span class="ident">Point3D</span>,
 ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Point3D</span>, <span class="ident">Float</span>, <span class="ident">Float</span>)<span class="op">&gt;</span> {
-    <span class="comment">// Solve `Rorigin+t*Rdirection = A + u*(B-A) + v*(C-A)`;</span>
-    <span class="comment">// Meaning:</span>
-    <span class="comment">// u(A-B) + v(A-C) + t*Rdirection = (A - Rorigin)</span>
-    <span class="comment">// Solve this with Cramer&#39;s rule</span>
-    <span class="comment">// println!(&quot;Intersecting Triangle&quot;);</span>
-    <span class="kw">let</span> <span class="ident">a_ro</span> <span class="op">=</span> <span class="ident">vertex_a</span> <span class="op">-</span> <span class="ident">ray</span>.<span class="ident">origin</span>;
-
-    <span class="kw">let</span> <span class="ident">a_b</span> <span class="op">=</span> <span class="ident">vertex_a</span> <span class="op">-</span> <span class="ident">vertex_b</span>;
-
-    <span class="kw">let</span> <span class="ident">a_c</span> <span class="op">=</span> <span class="ident">vertex_a</span> <span class="op">-</span> <span class="ident">vertex_c</span>;
-
-    <span class="kw">let</span> <span class="ident">rd</span> <span class="op">=</span> <span class="ident">ray</span>.<span class="ident">direction</span>;
-
-    <span class="kw">let</span> <span class="ident">det_a</span> <span class="op">=</span> <span class="ident">det_3x3</span>(<span class="kw-2">&amp;</span><span class="ident">a_b</span>, <span class="kw-2">&amp;</span><span class="ident">a_c</span>, <span class="kw-2">&amp;</span><span class="ident">rd</span>);
-
-    <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">det_3x3</span>(<span class="kw-2">&amp;</span><span class="ident">a_ro</span>, <span class="kw-2">&amp;</span><span class="ident">a_c</span>, <span class="kw-2">&amp;</span><span class="ident">rd</span>) <span class="op">/</span> <span class="ident">det_a</span>;
-    <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">det_3x3</span>(<span class="kw-2">&amp;</span><span class="ident">a_b</span>, <span class="kw-2">&amp;</span><span class="ident">a_ro</span>, <span class="kw-2">&amp;</span><span class="ident">rd</span>) <span class="op">/</span> <span class="ident">det_a</span>;
-    <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">det_3x3</span>(<span class="kw-2">&amp;</span><span class="ident">a_b</span>, <span class="kw-2">&amp;</span><span class="ident">a_c</span>, <span class="kw-2">&amp;</span><span class="ident">a_ro</span>) <span class="op">/</span> <span class="ident">det_a</span>;
-
-    <span class="comment">// t must be positive, and alpha, beta and gamma must add to 1 and</span>
-    <span class="comment">// be positive</span>
-    <span class="kw">if</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="number">0.</span> <span class="op">|</span><span class="op">|</span> <span class="ident">u</span> <span class="op">+</span> <span class="ident">v</span> <span class="op">&gt;</span> <span class="number">1.</span> <span class="op">|</span><span class="op">|</span> <span class="ident">u</span> <span class="op">&lt;</span> <span class="number">0.</span> <span class="op">|</span><span class="op">|</span> <span class="ident">v</span> <span class="op">&lt;</span> <span class="number">0.</span> {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>((<span class="ident">ray</span>.<span class="ident">project</span>(<span class="ident">t</span>), <span class="ident">u</span>, <span class="ident">v</span>))
+    <span class="kw">let</span> <span class="ident">edge1</span> <span class="op">=</span> <span class="ident">vertex1</span> <span class="op">-</span> <span class="ident">vertex0</span>;
+    <span class="kw">let</span> <span class="ident">edge2</span> <span class="op">=</span> <span class="ident">vertex2</span> <span class="op">-</span> <span class="ident">vertex0</span>;
+    <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">cross</span>(<span class="ident">edge2</span>);
+    <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">edge1</span> <span class="op">*</span> <span class="ident">h</span>;
+    <span class="kw">const</span> <span class="ident">TINY</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">1e-5</span>;
+    <span class="kw">if</span> <span class="ident">a</span> <span class="op">&gt;</span> <span class="op">-</span><span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="ident">a</span> <span class="op">&lt;</span> <span class="ident">TINY</span> {
+        <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
+    <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="number">1.</span> <span class="op">/</span> <span class="ident">a</span>;
+    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">ray</span>.<span class="ident">origin</span> <span class="op">-</span> <span class="ident">vertex0</span>;
+    <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">f</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">*</span> <span class="ident">h</span>);
+    <span class="kw">if</span> <span class="ident">u</span> <span class="op">&gt;</span> <span class="number">1.</span> <span class="op">|</span><span class="op">|</span> <span class="ident">u</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
+        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    }
+    <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">cross</span>(<span class="ident">edge1</span>);
+    <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">f</span> <span class="op">*</span> (<span class="ident">ray</span>.<span class="ident">direction</span> <span class="op">*</span> <span class="ident">q</span>);
+    <span class="kw">if</span> <span class="ident">v</span> <span class="op">&gt;</span> <span class="number">1.0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">v</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
+        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    }
+    <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">f</span> <span class="op">*</span> (<span class="ident">edge2</span> <span class="op">*</span> <span class="ident">q</span>);
+    <span class="kw">if</span> <span class="ident">t</span> <span class="op">&gt;</span> <span class="ident">TINY</span> {
+        <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">ray</span>.<span class="ident">project</span>(<span class="ident">t</span>), <span class="ident">u</span>, <span class="ident">v</span>));
+    }
+    <span class="prelude-val">None</span>
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
@@ -1504,11 +1469,6 @@ SOFTWARE.
     }
 } <span class="comment">// end of impl Triangle3D</span>
 
-<span class="kw">fn</span> <span class="ident">det_3x3</span>(<span class="ident">col0</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>, <span class="ident">col1</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>, <span class="ident">col2</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>) -&gt; <span class="ident">Float</span> {
-    <span class="ident">col0</span>.<span class="ident">x</span> <span class="op">*</span> (<span class="ident">col1</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col2</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">col2</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col1</span>.<span class="ident">z</span>) <span class="op">-</span> <span class="ident">col1</span>.<span class="ident">x</span> <span class="op">*</span> (<span class="ident">col0</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col2</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">col2</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col0</span>.<span class="ident">z</span>)
-        <span class="op">+</span> <span class="ident">col2</span>.<span class="ident">x</span> <span class="op">*</span> (<span class="ident">col0</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col1</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">col1</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">col0</span>.<span class="ident">z</span>)
-}
-
 <span class="comment">/***********/</span>
 <span class="comment">/* TESTING */</span>
 <span class="comment">/***********/</span>
@@ -1516,34 +1476,6 @@ SOFTWARE.
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">testing</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_det_3x3</span>() {
-        <span class="macro">assert_eq!</span>(
-            <span class="number">1.</span>,
-            <span class="ident">det_3x3</span>(
-                <span class="kw-2">&amp;</span><span class="ident">Vector3D::new</span>(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
-                <span class="kw-2">&amp;</span><span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>),
-                <span class="kw-2">&amp;</span><span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>)
-            )
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="number">8.</span>,
-            <span class="ident">det_3x3</span>(
-                <span class="kw-2">&amp;</span><span class="ident">Vector3D::new</span>(<span class="number">2.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
-                <span class="kw-2">&amp;</span><span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">2.</span>, <span class="number">0.</span>),
-                <span class="kw-2">&amp;</span><span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">2.</span>)
-            )
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="number">49.</span>,
-            <span class="ident">det_3x3</span>(
-                <span class="kw-2">&amp;</span><span class="ident">Vector3D::new</span>(<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">1.</span>),
-                <span class="kw-2">&amp;</span><span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="number">3.</span>, <span class="number">0.</span>, <span class="number">4.</span>),
-                <span class="kw-2">&amp;</span><span class="ident">Vector3D::new</span>(<span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">5.</span>)
-            )
-        );
-    }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_new</span>() {
@@ -1828,5 +1760,5 @@ SOFTWARE.
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (311e2683e 2022-04-18)" ></div>
 </body></html>

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["PointInTriangle",""]],"fn":[["det_3x3",""],["intersect_triangle","Intersects a [`Ray3D`] in local coordinates with Triangle described by the [`Point3D`] `a`, `b`, and `c`."]],"struct":[["Triangle3D",""]]});
+initSidebarItems({"enum":[["PointInTriangle",""]],"fn":[["intersect_triangle","Intersects a [`Ray3D`] in local coordinates with Triangle described by the [`Point3D`] `a`, `b`, and `c`. We use the Möller–Trumbore intersection algorithm."]],"struct":[["Triangle3D",""]]});
