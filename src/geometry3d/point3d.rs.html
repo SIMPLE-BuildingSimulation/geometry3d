@@ -512,6 +512,62 @@
 <span id="473">473</span>
 <span id="474">474</span>
 <span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -540,10 +596,14 @@ SOFTWARE.
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Vector3D</span>;
 
+<span class="doccomment">/// A very simple implementation of a 3D-Point</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Point3D</span> {
+    <span class="doccomment">/// The X component</span>
     <span class="kw">pub</span> <span class="ident">x</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// The Y component</span>
     <span class="kw">pub</span> <span class="ident">y</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// The Z component</span>
     <span class="kw">pub</span> <span class="ident">z</span>: <span class="ident">Float</span>,
 }
 
@@ -553,20 +613,52 @@ SOFTWARE.
     }
 }
 
+<span class="kw">impl</span> <span class="ident">std::convert::From</span><span class="op">&lt;</span><span class="ident">Vector3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Point3D</span>{
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Vector3D</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">Point3D::new</span>(<span class="ident">v</span>.<span class="ident">x</span>, <span class="ident">v</span>.<span class="ident">y</span>, <span class="ident">v</span>.<span class="ident">z</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">std::convert::Into</span><span class="op">&lt;</span><span class="ident">Vector3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Point3D</span>{
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">Vector3D</span> {
+        <span class="ident">Vector3D::new</span>(<span class="self">self</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">y</span>, <span class="self">self</span>.<span class="ident">z</span>)
+    }
+}
+
 <span class="kw">impl</span> <span class="ident">Point3D</span> {
+
+    <span class="doccomment">/// Creates a new [`Point3D`]</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use geometry3d::Point3D;</span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// let pt = Point3D::new(0., 1., 2.);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">Float</span>, <span class="ident">y</span>: <span class="ident">Float</span>, <span class="ident">z</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Point3D</span> {
         <span class="ident">Point3D</span> { <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span> }
     }
 
+    <span class="doccomment">/// Checks whether the [`Point3D`] is located at the origin</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use geometry3d::Point3D;</span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// let pt = Point3D::new(0., 0., 0.);</span>
+    <span class="doccomment">/// assert!(pt.is_zero());</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_zero</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">const</span> <span class="ident">TINY</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">100.</span> <span class="op">*</span> <span class="ident">Float::EPSILON</span>;
         <span class="self">self</span>.<span class="ident">x</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">y</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">z</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_vector3d</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="ident">Vector3D::new</span>(<span class="self">self</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">y</span>, <span class="self">self</span>.<span class="ident">z</span>)
-    }
-
+    
+    <span class="doccomment">/// Calculates the square of the distance between two [`Point3D`]</span>
+    <span class="doccomment">/// This is faster than calculating the `distance()`</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use geometry3d::Point3D;</span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// let a = Point3D::new(0., 0., 0.);</span>
+    <span class="doccomment">/// let b = Point3D::new(2., 0., 0.);</span>
+    <span class="doccomment">/// assert_eq!(a.squared_distance(b), 4.);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">squared_distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">point</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">Float</span> {
         <span class="kw">let</span> <span class="ident">dx</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">point</span>.<span class="ident">x</span>) <span class="op">*</span> (<span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">point</span>.<span class="ident">x</span>);
         <span class="kw">let</span> <span class="ident">dy</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">point</span>.<span class="ident">y</span>) <span class="op">*</span> (<span class="self">self</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">point</span>.<span class="ident">y</span>);
@@ -574,16 +666,36 @@ SOFTWARE.
         <span class="ident">dx</span> <span class="op">+</span> <span class="ident">dy</span> <span class="op">+</span> <span class="ident">dz</span>
     }
 
+    <span class="doccomment">/// Calculates the distance between two [`Point3D`]</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use geometry3d::Point3D;</span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// let a = Point3D::new(0., 0., 0.);</span>
+    <span class="doccomment">/// let b = Point3D::new(2., 0., 0.);</span>
+    <span class="doccomment">/// assert_eq!(a.distance(b), 2.);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">point</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">Float</span> {
         <span class="kw">let</span> <span class="ident">d2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">squared_distance</span>(<span class="ident">point</span>);
         <span class="ident">d2</span>.<span class="ident">sqrt</span>()
     }
 
+    <span class="doccomment">/// Checks if two [`Point3D`] are sifnificantly close</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use geometry3d::Point3D;</span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// let a = Point3D::new(0., 0., 0.);</span>
+    <span class="doccomment">/// let b = Point3D::new(2., 0., 0.);</span>
+    <span class="doccomment">/// assert!(!a.compare(b));</span>
+    <span class="doccomment">/// assert!(a.compare(a));</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">const</span> <span class="ident">EPS</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">1e-5</span>;
         (<span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">EPS</span> <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">EPS</span> <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">EPS</span>
     }
 
+    <span class="doccomment">/// Checks if a certain [`Point3D`] is collinear with two </span>
+    <span class="doccomment">/// other [`Point3D`]. Will return an error if the two other</span>
+    <span class="doccomment">/// points are the same</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_collinear</span>(<span class="self">self</span>, <span class="ident">b</span>: <span class="ident">Point3D</span>, <span class="ident">c</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// check that they are not ALL the same</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">compare</span>(<span class="ident">b</span>) <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">compare</span>(<span class="ident">c</span>) {
@@ -937,7 +1049,7 @@ SOFTWARE.
         <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="number">9123.2</span>;
 
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">as_vector3d</span>();
+        <span class="kw">let</span> <span class="ident">v</span> : <span class="ident">Vector3D</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">into</span>();
 
         <span class="macro">assert_eq!</span>(<span class="ident">x</span>, <span class="ident">v</span>.<span class="ident">x</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">y</span>, <span class="ident">v</span>.<span class="ident">y</span>);
@@ -988,5 +1100,5 @@ SOFTWARE.
     }
 } <span class="comment">// end of Testing module</span>
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (311e2683e 2022-04-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (879aff385 2022-04-20)" ></div>
 </body></html>

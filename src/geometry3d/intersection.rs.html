@@ -246,6 +246,14 @@
 <span id="207">207</span>
 <span id="208">208</span>
 <span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -275,8 +283,12 @@ SOFTWARE.
 <span class="doccomment">/// Is the [`Ray3D`] intersecting from the Front or Back side?</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SurfaceSide</span> {
+    <span class="doccomment">/// The intersection happens at the front</span>
     <span class="ident">Front</span>,
+    <span class="doccomment">/// The intersection happens at the back</span>
     <span class="ident">Back</span>,
+    <span class="doccomment">/// The intersectionis not possible (e.g., the ray is parallel </span>
+    <span class="doccomment">/// to a `Triangle3D` but it still goes through one of its vertices)</span>
     <span class="ident">NonApplicable</span>,
 }
 
@@ -341,6 +353,7 @@ SOFTWARE.
 }
 
 <span class="kw">impl</span> <span class="ident">IntersectionInfo</span> {
+    <span class="doccomment">/// Creates a new `IntersectionInfo` object</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
         <span class="ident">p</span>: <span class="ident">Point3D</span>,
@@ -384,6 +397,8 @@ SOFTWARE.
         }
     }
 
+
+    <span class="doccomment">/// Applies a `Transform` to the `IntersectionInfo`, creating a new one. </span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">transform</span>: <span class="kw-2">&amp;</span><span class="ident">Transform</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">p</span>: <span class="ident">transform</span>.<span class="ident">transform_pt</span>(<span class="self">self</span>.<span class="ident">p</span>),
@@ -398,6 +413,7 @@ SOFTWARE.
         }
     }
 
+    <span class="doccomment">/// Applies the inverse of a `Transform` to the `IntersectionInfo`, creating a new one.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inv_transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">transform</span>: <span class="kw-2">&amp;</span><span class="ident">Transform</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">p</span>: <span class="ident">transform</span>.<span class="ident">inv_transform_pt</span>(<span class="self">self</span>.<span class="ident">p</span>),
@@ -456,5 +472,5 @@ SOFTWARE.
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (311e2683e 2022-04-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (879aff385 2022-04-20)" ></div>
 </body></html>

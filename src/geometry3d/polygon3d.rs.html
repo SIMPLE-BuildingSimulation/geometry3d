@@ -722,6 +722,16 @@
 <span id="683">683</span>
 <span id="684">684</span>
 <span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -749,11 +759,21 @@ SOFTWARE.
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Loop3D</span>, <span class="ident">Point3D</span>, <span class="ident">Segment3D</span>, <span class="ident">Vector3D</span>};
 
+
+<span class="doccomment">/// A 3-dimensional Polygon which can contain holes.</span>
+<span class="doccomment">/// </span>
+<span class="doccomment">/// It is a structure containing several [`Loop3D`]. One of them is </span>
+<span class="doccomment">/// the `outer` [`Loop3D`], and there there can be several `inner` [`Loop3D`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Polygon3D</span> {
+    <span class="doccomment">/// The outer [`Loop3D`]</span>
     <span class="ident">outer</span>: <span class="ident">Loop3D</span>,
+
+    <span class="doccomment">/// A vector of inner [`Loop3D`]</span>
     <span class="ident">inner</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Loop3D</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The area of the `Polygon3D`</span>
     <span class="ident">area</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// The normal of the `Polygon3D`, following a right-hand convention</span>
     <span class="ident">normal</span>: <span class="ident">Vector3D</span>,
 }
 
@@ -1408,5 +1428,5 @@ SOFTWARE.
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (311e2683e 2022-04-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (879aff385 2022-04-20)" ></div>
 </body></html>

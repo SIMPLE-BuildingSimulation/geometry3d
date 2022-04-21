@@ -897,6 +897,25 @@
 <span id="858">858</span>
 <span id="859">859</span>
 <span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -965,34 +984,50 @@ SOFTWARE.
     <span class="prelude-val">None</span>
 }
 
+<span class="doccomment">/// A simple 3-dimentional Triangle.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Triangle3D</span> {
-    <span class="comment">// Vertices</span>
+    <span class="doccomment">/// First vertex</span>
     <span class="ident">a</span>: <span class="ident">Point3D</span>,
+    <span class="doccomment">/// Second vertex</span>
     <span class="ident">b</span>: <span class="ident">Point3D</span>,
+    <span class="doccomment">/// Third vertex</span>
     <span class="ident">c</span>: <span class="ident">Point3D</span>,
+    <span class="doccomment">/// The normal, following right-hand convention</span>
     <span class="ident">normal</span>: <span class="ident">Vector3D</span>,
+    <span class="doccomment">/// The area of the triangle</span>
     <span class="ident">area</span>: <span class="ident">Float</span>,
 }
 
+<span class="doccomment">/// Represents the position of a [`Point3D`] in a [`Triangle3D`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PointInTriangle</span> {
+    <span class="doccomment">/// The point is in vertex A</span>
     <span class="ident">VertexA</span>,
+    <span class="doccomment">/// The point is in vertex B</span>
     <span class="ident">VertexB</span>,
+    <span class="doccomment">/// The point is in vertex C</span>
     <span class="ident">VertexC</span>,
+    <span class="doccomment">/// The point is in the edge between A and B</span>
     <span class="ident">EdgeAB</span>,
+    <span class="doccomment">/// The point is in the edge between B and C</span>
     <span class="ident">EdgeBC</span>,
+    <span class="doccomment">/// The point is in the edge between A and C</span>
     <span class="ident">EdgeAC</span>,
+    <span class="doccomment">/// The point is inside of the [`Triangle3D`]</span>
     <span class="ident">Inside</span>,
+    <span class="doccomment">/// The point is outside of the [`Triangle3D`]</span>
     <span class="ident">Outside</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">PointInTriangle</span> {
+    <span class="doccomment">/// Checks whether a [`PointInTriangle`] lies in a vertex</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::VertexA</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::VertexB</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::VertexC</span>)
     }
 
+    <span class="doccomment">/// Checks whether a [`PointInTriangle`] lies in an edge</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_edge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::EdgeAB</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::EdgeAC</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::EdgeBC</span>)
     }
@@ -1009,6 +1044,7 @@ SOFTWARE.
 }
 
 <span class="kw">impl</span> <span class="ident">Triangle3D</span> {
+    <span class="doccomment">/// Creates a new [`Triangle3D`]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vertex_a</span>: <span class="ident">Point3D</span>, <span class="ident">vertex_b</span>: <span class="ident">Point3D</span>, <span class="ident">vertex_c</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// check that points are not the same</span>
         <span class="kw">if</span> <span class="ident">vertex_a</span>.<span class="ident">compare</span>(<span class="ident">vertex_b</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">vertex_a</span>.<span class="ident">compare</span>(<span class="ident">vertex_c</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">vertex_b</span>.<span class="ident">compare</span>(<span class="ident">vertex_c</span>) {
@@ -1133,8 +1169,9 @@ SOFTWARE.
         <span class="ident">Point3D::new</span>(<span class="ident">dx</span> <span class="op">/</span> <span class="number">3.</span>, <span class="ident">dy</span> <span class="op">/</span> <span class="number">3.</span>, <span class="ident">dz</span> <span class="op">/</span> <span class="number">3.</span>)
     }
 
-    <span class="comment">/* Other */</span>
-
+    
+    <span class="doccomment">/// Gets  a specific vertex. Returns an error if the number </span>
+    <span class="doccomment">/// of the vertex is greater than 2 (i.e., valid vertices are 0, 1, 2)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Point3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">i</span> {
             <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">a</span>),
@@ -1296,6 +1333,7 @@ SOFTWARE.
         }
     }
 
+    <span class="doccomment">/// Retreives a certain edge based on two vertices</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_edge_index_from_points</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">Point3D</span>, <span class="ident">b</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">segment</span> <span class="op">=</span> <span class="ident">Segment3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>);
         <span class="self">self</span>.<span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">segment</span>)
@@ -1758,5 +1796,5 @@ SOFTWARE.
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (311e2683e 2022-04-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (879aff385 2022-04-20)" ></div>
 </body></html>

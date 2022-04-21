@@ -1064,9 +1064,6 @@
 <span id="1025">1025</span>
 <span id="1026">1026</span>
 <span id="1027">1027</span>
-<span id="1028">1028</span>
-<span id="1029">1029</span>
-<span id="1030">1030</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -1168,14 +1165,8 @@ SOFTWARE.
     <span class="ident">Point3D::new</span>(<span class="ident">err_x</span>, <span class="ident">err_y</span>, <span class="ident">err_z</span>)
 }
 
-<span class="comment">// fn simd_row4x4(row: usize, m: &amp;[Float; 16])-&gt;std::simd::Simd&lt;Float, 4&gt;{</span>
-<span class="comment">//     std::simd::Simd::from([ m[elem!(row, 0)], m[elem!(row, 1)], m[elem!(row, 2)], m[elem!(row, 3)]] )</span>
-<span class="comment">// }</span>
 
-<span class="comment">// fn simd_col4x4(col: usize, m: &amp;[Float; 16])-&gt;std::simd::Simd&lt;Float, 4&gt;{</span>
-<span class="comment">//     std::simd::Simd::from([ m[elem!(0, col)], m[elem!(1, col)], m[elem!(2, col)], m[elem!(3, col)]] )</span>
-<span class="comment">// }</span>
-
+<span class="doccomment">/// Multiplies two 4x4 matrices, represented as `[Float; 16]`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul4x4</span>(<span class="ident">m1</span>: <span class="kw-2">&amp;</span>[<span class="ident">Float</span>; <span class="number">16</span>], <span class="ident">m2</span>: <span class="kw-2">&amp;</span>[<span class="ident">Float</span>; <span class="number">16</span>]) -&gt; [<span class="ident">Float</span>; <span class="number">16</span>] {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0.</span>; <span class="number">16</span>];
 
@@ -1615,6 +1606,7 @@ SOFTWARE.
         (<span class="ident">r</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>)
     }
 
+    <span class="doccomment">/// Transforms a [`BBox3D`] object</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transform_bbox</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bbox</span>: <span class="ident">BBox3D</span>) -&gt; <span class="ident">BBox3D</span> {
         <span class="kw">let</span> <span class="ident">p0</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform_pt</span>(<span class="ident">Point3D::new</span>(<span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">x</span>, <span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">y</span>, <span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">z</span>));
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">BBox3D::from_point</span>(<span class="ident">p0</span>);
@@ -1649,6 +1641,8 @@ SOFTWARE.
         <span class="ident">ret</span>
     }
 
+
+    <span class="doccomment">/// Applies the inverse of a transform to a [`BBox3D`] object</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inv_transform_bbox</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bbox</span>: <span class="ident">BBox3D</span>) -&gt; <span class="ident">BBox3D</span> {
         <span class="kw">let</span> <span class="ident">p0</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inv_transform_pt</span>(<span class="ident">Point3D::new</span>(<span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">x</span>, <span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">y</span>, <span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">z</span>));
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">BBox3D::from_point</span>(<span class="ident">p0</span>);
@@ -2098,5 +2092,5 @@ SOFTWARE.
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (311e2683e 2022-04-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (879aff385 2022-04-20)" ></div>
 </body></html>

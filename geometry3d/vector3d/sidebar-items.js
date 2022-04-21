@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Vector3D",""]]});
+initSidebarItems({"struct":[["Vector3D","A 3-dimensional Vector"]]});

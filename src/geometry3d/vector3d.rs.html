@@ -680,6 +680,17 @@
 <span id="641">641</span>
 <span id="642">642</span>
 <span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -709,10 +720,14 @@ SOFTWARE.
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Point3D</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
+<span class="doccomment">/// A 3-dimensional Vector</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Vector3D</span> {
+    <span class="doccomment">/// the X component</span>
     <span class="kw">pub</span> <span class="ident">x</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// the Y component    </span>
     <span class="kw">pub</span> <span class="ident">y</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// the Z component</span>
     <span class="kw">pub</span> <span class="ident">z</span>: <span class="ident">Float</span>,
 }
 
@@ -723,10 +738,12 @@ SOFTWARE.
 }
 
 <span class="kw">impl</span> <span class="ident">Vector3D</span> {
+    <span class="doccomment">/// Creates a new vector.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">Float</span>, <span class="ident">y</span>: <span class="ident">Float</span>, <span class="ident">z</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Vector3D</span> {
         <span class="ident">Vector3D</span> { <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span> }
     }
-
+    
+    <span class="doccomment">/// Returns a new vector, containing the absolute values of each component of `self`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">x</span>: <span class="self">self</span>.<span class="ident">x</span>.<span class="ident">abs</span>(),
@@ -822,10 +839,13 @@ SOFTWARE.
         <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
     }
 
+    <span class="doccomment">/// Checks whether a vector is equal (or close) to another vector</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-5</span> <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-5</span> <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-5</span>
+        <span class="kw">const</span> <span class="ident">TINY</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">1e-5</span>;
+        (<span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span>
     }
 
+    <span class="doccomment">/// Cross product between two vectors</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cross</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">Vector3D</span> {
         <span class="kw">let</span> <span class="ident">dx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">z</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">y</span>;
         <span class="kw">let</span> <span class="ident">dy</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">z</span>;
@@ -834,14 +854,22 @@ SOFTWARE.
         <span class="ident">Vector3D::new</span>(<span class="ident">dx</span>, <span class="ident">dy</span>, <span class="ident">dz</span>)
     }
 
+    <span class="doccomment">/// Calculates the length of a vector</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
         <span class="self">self</span>.<span class="ident">length_squared</span>().<span class="ident">sqrt</span>()
     }
 
+    <span class="doccomment">/// Calculates the length of a vector squared. </span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// Often using the squared of the length is the same as using the length of a vector</span>
+    <span class="doccomment">/// (e.g., when comparing distances, the squared lengths of vectors are sorted in the same order</span>
+    <span class="doccomment">/// as the lengths themselves). In such cases, using `length_squared()` is preferred because </span>
+    <span class="doccomment">/// it is faster</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length_squared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
         <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">z</span>
     }
 
+    <span class="doccomment">/// Normalizes a Vector, mutating it.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quick_inv_sqrt&quot;</span>))]</span>
         <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">1.</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">length</span>();
@@ -853,20 +881,14 @@ SOFTWARE.
         <span class="self">self</span>.<span class="ident">z</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">l</span>;
     }
 
+    <span class="doccomment">/// Returns a normalized version of a vector</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_normalized</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">length</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">1e-9</span>, <span class="string">&quot;Length was {}&quot;</span>, <span class="self">self</span>.<span class="ident">length</span>());
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quick_inv_sqrt&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">1.</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">length</span>();
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quick_inv_sqrt&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt</span>(<span class="self">self</span>.<span class="ident">length_squared</span>());
-
-        <span class="ident">Vector3D</span> {
-            <span class="ident">x</span>: <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">l</span>,
-            <span class="ident">y</span>: <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">l</span>,
-            <span class="ident">z</span>: <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">l</span>,
-        }
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
+        <span class="ident">ret</span>.<span class="ident">normalize</span>();
+        <span class="ident">ret</span>
     }
 
+    <span class="doccomment">/// Checks whether a vector is Zero</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_zero</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">const</span> <span class="ident">TINY</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">100.</span> <span class="op">*</span> <span class="ident">Float::EPSILON</span>;
         <span class="self">self</span>.<span class="ident">x</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">y</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">z</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span>
@@ -1324,5 +1346,5 @@ SOFTWARE.
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (311e2683e 2022-04-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (879aff385 2022-04-20)" ></div>
 </body></html>
