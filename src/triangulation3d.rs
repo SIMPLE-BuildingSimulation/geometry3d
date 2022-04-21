@@ -213,6 +213,7 @@ impl Triangulation3D {
         }
     }
 
+    /// Transforms the `Triangulation3D` into a `Vec<Triangle3D>`.
     pub fn get_trilist(&self) -> Vec<Triangle3D> {
         self.triangles.iter().map(|t| t.triangle).collect()
     }
@@ -377,6 +378,7 @@ impl Triangulation3D {
         Ok(())
     }
 
+    /// Creates a [`Triangle3D`] and pushes it into the [`Triangulation3D`]
     pub fn push(
         &mut self,
         vertex_a: Point3D,

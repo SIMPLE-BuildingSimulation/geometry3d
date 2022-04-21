@@ -34,8 +34,11 @@ use crate::Vector3D;
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum BBoxAxis {
+    /// the X dimension
     X,
+    /// the Y dimension
     Y,
+    /// the Z dimension
     Z,
 }
 

@@ -99,14 +99,8 @@ fn mul4x4_abs(matrix: &[Float; 16], x: Float, y: Float, z: Float) -> Point3D {
     Point3D::new(err_x, err_y, err_z)
 }
 
-// fn simd_row4x4(row: usize, m: &[Float; 16])->std::simd::Simd<Float, 4>{
-//     std::simd::Simd::from([ m[elem!(row, 0)], m[elem!(row, 1)], m[elem!(row, 2)], m[elem!(row, 3)]] )
-// }
 
-// fn simd_col4x4(col: usize, m: &[Float; 16])->std::simd::Simd<Float, 4>{
-//     std::simd::Simd::from([ m[elem!(0, col)], m[elem!(1, col)], m[elem!(2, col)], m[elem!(3, col)]] )
-// }
-
+/// Multiplies two 4x4 matrices, represented as `[Float; 16]`
 pub fn mul4x4(m1: &[Float; 16], m2: &[Float; 16]) -> [Float; 16] {
     let mut ret = [0.; 16];
 
@@ -546,6 +540,7 @@ impl Transform {
         (r, o_error, d_error)
     }
 
+    /// Transforms a [`BBox3D`] object
     pub fn transform_bbox(&self, bbox: BBox3D) -> BBox3D {
         let p0 = self.transform_pt(Point3D::new(bbox.min.x, bbox.min.y, bbox.min.z));
         let mut ret = BBox3D::from_point(p0);
@@ -580,6 +575,8 @@ impl Transform {
         ret
     }
 
+
+    /// Applies the inverse of a transform to a [`BBox3D`] object
     pub fn inv_transform_bbox(&self, bbox: BBox3D) -> BBox3D {
         let p0 = self.inv_transform_pt(Point3D::new(bbox.min.x, bbox.min.y, bbox.min.z));
         let mut ret = BBox3D::from_point(p0);

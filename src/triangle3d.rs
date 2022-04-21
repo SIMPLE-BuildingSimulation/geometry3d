@@ -66,34 +66,50 @@ pub fn intersect_triangle(
     None
 }
 
+/// A simple 3-dimentional Triangle.
 #[derive(Clone, Copy)]
 pub struct Triangle3D {
-    // Vertices
+    /// First vertex
     a: Point3D,
+    /// Second vertex
     b: Point3D,
+    /// Third vertex
     c: Point3D,
+    /// The normal, following right-hand convention
     normal: Vector3D,
+    /// The area of the triangle
     area: Float,
 }
 
+/// Represents the position of a [`Point3D`] in a [`Triangle3D`].
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 #[repr(u8)]
 pub enum PointInTriangle {
+    /// The point is in vertex A
     VertexA,
+    /// The point is in vertex B
     VertexB,
+    /// The point is in vertex C
     VertexC,
+    /// The point is in the edge between A and B
     EdgeAB,
+    /// The point is in the edge between B and C
     EdgeBC,
+    /// The point is in the edge between A and C
     EdgeAC,
+    /// The point is inside of the [`Triangle3D`]
     Inside,
+    /// The point is outside of the [`Triangle3D`]
     Outside,
 }
 
 impl PointInTriangle {
+    /// Checks whether a [`PointInTriangle`] lies in a vertex
     pub fn is_vertex(&self) -> bool {
         matches!(self, Self::VertexA | Self::VertexB | Self::VertexC)
     }
 
+    /// Checks whether a [`PointInTriangle`] lies in an edge
     pub fn is_edge(&self) -> bool {
         matches!(self, Self::EdgeAB | Self::EdgeAC | Self::EdgeBC)
     }
@@ -110,6 +126,7 @@ impl std::fmt::Display for Triangle3D {
 }
 
 impl Triangle3D {
+    /// Creates a new [`Triangle3D`]
     pub fn new(vertex_a: Point3D, vertex_b: Point3D, vertex_c: Point3D) -> Result<Self, String> {
         // check that points are not the same
         if vertex_a.compare(vertex_b) || vertex_a.compare(vertex_c) || vertex_b.compare(vertex_c) {
@@ -234,8 +251,9 @@ impl Triangle3D {
         Point3D::new(dx / 3., dy / 3., dz / 3.)
     }
 
-    /* Other */
-
+    
+    /// Gets  a specific vertex. Returns an error if the number 
+    /// of the vertex is greater than 2 (i.e., valid vertices are 0, 1, 2)
     pub fn vertex(&self, i: usize) -> Result<Point3D, String> {
         match i {
             0 => Ok(self.a),
@@ -397,6 +415,7 @@ impl Triangle3D {
         }
     }
 
+    /// Retreives a certain edge based on two vertices
     pub fn get_edge_index_from_points(&self, a: Point3D, b: Point3D) -> Option<usize> {
         let segment = Segment3D::new(a, b);
         self.get_edge_index_from_segment(&segment)

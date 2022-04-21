@@ -122,7 +122,7 @@ impl ApproxFloat {
         Self { low, high }
     }
 
-    // Retrieves the absolute error
+    /// Retrieves the absolute error
     pub fn absolute_error(&self) -> Float {
         (self.high - self.low) / 2.
     }
@@ -213,6 +213,7 @@ impl std::ops::Sub<Float> for ApproxFloat {
     }
 }
 
+/// Calculates the minimum and the maximum of a `&[Float; 4]`
 pub fn max_min(aux: &[Float; 4]) -> (Float, Float) {
     let v = std::simd::Simd::from(*aux);
     (v.reduce_max(), v.reduce_min())

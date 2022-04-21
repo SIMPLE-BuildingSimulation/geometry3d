@@ -26,10 +26,14 @@ use crate::Float;
 
 use crate::Vector3D;
 
+/// A very simple implementation of a 3D-Point
 #[derive(Debug, Copy, Clone, PartialEq, Default)]
 pub struct Point3D {
+    /// The X component
     pub x: Float,
+    /// The Y component
     pub y: Float,
+    /// The Z component
     pub z: Float,
 }
 
@@ -39,20 +43,52 @@ impl std::fmt::Display for Point3D {
     }
 }
 
+impl std::convert::From<Vector3D> for Point3D{
+    fn from(v: Vector3D) -> Self {
+        Point3D::new(v.x, v.y, v.z)
+    }
+}
+
+impl std::convert::Into<Vector3D> for Point3D{
+    fn into(self) -> Vector3D {
+        Vector3D::new(self.x, self.y, self.z)
+    }
+}
+
 impl Point3D {
+
+    /// Creates a new [`Point3D`]
+    /// ```
+    /// # use geometry3d::Point3D;
+    /// 
+    /// let pt = Point3D::new(0., 1., 2.);
+    /// ```
     pub fn new(x: Float, y: Float, z: Float) -> Point3D {
         Point3D { x, y, z }
     }
 
+    /// Checks whether the [`Point3D`] is located at the origin
+    /// ```
+    /// # use geometry3d::Point3D;
+    /// 
+    /// let pt = Point3D::new(0., 0., 0.);
+    /// assert!(pt.is_zero());
+    /// ```
     pub fn is_zero(&self) -> bool {
         const TINY: Float = 100. * Float::EPSILON;
         self.x.abs() < TINY && self.y.abs() < TINY && self.z.abs() < TINY
     }
 
-    pub fn as_vector3d(&self) -> Vector3D {
-        Vector3D::new(self.x, self.y, self.z)
-    }
-
+    
+    /// Calculates the square of the distance between two [`Point3D`]
+    /// This is faster than calculating the `distance()`
+    /// ```
+    /// # use geometry3d::Point3D;
+    /// 
+    /// let a = Point3D::new(0., 0., 0.);
+    /// let b = Point3D::new(2., 0., 0.);
+    /// assert_eq!(a.squared_distance(b), 4.);
+    /// ```
     pub fn squared_distance(&self, point: Point3D) -> Float {
         let dx = (self.x - point.x) * (self.x - point.x);
         let dy = (self.y - point.y) * (self.y - point.y);
@@ -60,16 +96,36 @@ impl Point3D {
         dx + dy + dz
     }
 
+    /// Calculates the distance between two [`Point3D`]
+    /// ```
+    /// # use geometry3d::Point3D;
+    /// 
+    /// let a = Point3D::new(0., 0., 0.);
+    /// let b = Point3D::new(2., 0., 0.);
+    /// assert_eq!(a.distance(b), 2.);
+    /// ```
     pub fn distance(&self, point: Point3D) -> Float {
         let d2 = self.squared_distance(point);
         d2.sqrt()
     }
 
+    /// Checks if two [`Point3D`] are sifnificantly close
+    /// ```
+    /// # use geometry3d::Point3D;
+    /// 
+    /// let a = Point3D::new(0., 0., 0.);
+    /// let b = Point3D::new(2., 0., 0.);
+    /// assert!(!a.compare(b));
+    /// assert!(a.compare(a));
+    /// ```
     pub fn compare(&self, p: Point3D) -> bool {
         const EPS: Float = 1e-5;
         (self.x - p.x).abs() < EPS && (self.y - p.y).abs() < EPS && (self.z - p.z).abs() < EPS
     }
 
+    /// Checks if a certain [`Point3D`] is collinear with two 
+    /// other [`Point3D`]. Will return an error if the two other
+    /// points are the same
     pub fn is_collinear(self, b: Point3D, c: Point3D) -> Result<bool, String> {
         // check that they are not ALL the same
         if self.compare(b) && self.compare(c) {
@@ -423,7 +479,7 @@ mod testing {
         let z = 9123.2;
 
         let p = Point3D::new(x, y, z);
-        let v = p.as_vector3d();
+        let v : Vector3D = p.into();
 
         assert_eq!(x, v.x);
         assert_eq!(y, v.y);

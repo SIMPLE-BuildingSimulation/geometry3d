@@ -119,6 +119,8 @@ impl Cylinder3D {
         }
     }
 
+    /// Performs a basic intersection of a ray and a `Cylinder3D`, returning 
+    /// the point of intersection and the angle `phi` of that intersection
     pub fn basic_intersection(
         &self,
         ray: &Ray3D,
@@ -205,6 +207,8 @@ impl Cylinder3D {
         Some((phit, phi))
     }
 
+
+    /// Grabs the result of the `basic_intersection` and creates an [`IntersectionInfo`]
     pub fn intersection_info(
         &self,
         ray: &Ray3D,

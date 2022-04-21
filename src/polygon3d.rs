@@ -25,11 +25,21 @@ SOFTWARE.
 use crate::Float;
 use crate::{Loop3D, Point3D, Segment3D, Vector3D};
 
+
+/// A 3-dimensional Polygon which can contain holes.
+/// 
+/// It is a structure containing several [`Loop3D`]. One of them is 
+/// the `outer` [`Loop3D`], and there there can be several `inner` [`Loop3D`].
 #[derive(Clone)]
 pub struct Polygon3D {
+    /// The outer [`Loop3D`]
     outer: Loop3D,
+
+    /// A vector of inner [`Loop3D`]
     inner: Vec<Loop3D>,
+    /// The area of the `Polygon3D`
     area: Float,
+    /// The normal of the `Polygon3D`, following a right-hand convention
     normal: Vector3D,
 }
 

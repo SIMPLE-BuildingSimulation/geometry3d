@@ -61,6 +61,7 @@ pub struct Disk3D {
 }
 
 impl Disk3D {
+    /// Creates a new `Disk3D` based on its `centre`, `normal` and `radius`.
     pub fn new(centre: Point3D, normal: Vector3D, radius: Float) -> Self {
         Self::new_detailed(
             centre,
@@ -73,6 +74,7 @@ impl Disk3D {
         )
     }
 
+    /// Creates a new—potentially partial—`Disk3D`     
     pub fn new_detailed(
         centre: Point3D,
         normal: Vector3D,
@@ -166,6 +168,7 @@ impl Disk3D {
         }
     }
 
+    /// Intersects a ray—in world coordinates—and a `Disk3D`, returning the [`IntersectionInfo`]
     pub fn intersection_info(
         &self,
         ray: &Ray3D,
@@ -237,6 +240,7 @@ impl Disk3D {
         Some(phit)
     }
 
+    /// Intersects a ray—in local coordinates—and a `Disk3D`, returning the [`IntersectionInfo`]
     pub fn intersect_local_ray(
         &self,
         ray: &Ray3D,

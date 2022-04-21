@@ -25,11 +25,56 @@ SOFTWARE.
 use crate::Float;
 use crate::{Point3D, Segment3D, Vector3D};
 
+/// A set of [`Point3D`] in sequence, forming a closed loop.
+/// It has some particularities. 
+/// 
+/// ```
+/// use geometry3d::{Loop3D, Point3D};
+/// let mut the_loop = Loop3D::new();
+/// assert!(the_loop.is_empty());
+/// let l = 0.5;
+///
+/// the_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
+/// the_loop.push(Point3D::new(-l, l, 0.)).unwrap();
+/// the_loop.push(Point3D::new(l, l, 0.)).unwrap();
+/// the_loop.push(Point3D::new(l, -l, 0.)).unwrap();
+///
+/// assert!(the_loop.area().is_err());
+/// the_loop.close().unwrap();
+///
+/// let a = the_loop.area().unwrap();
+/// assert!((4. * l * l - a).abs() < 0.0001);
+/// ```
+/// # Note:
+/// It has some peculiarities. For instance, it attempts
+/// to reduce the number of points on a [`Loop3D`]. This is done by 
+/// identifying when a colinear [`Point3D`] is to be added and, instead
+/// of extending the [`Loop3D`], replacing the last element.
+/// 
+/// ```
+/// use geometry3d::{Loop3D, Point3D};
+/// let mut the_loop = Loop3D::new();
+/// 
+/// the_loop.push(Point3D::new(0., 0., 0.)).unwrap();
+/// the_loop.push(Point3D::new(1., 1., 0.)).unwrap();
+/// assert_eq!(2, the_loop.n_vertices());
+/// 
+/// // Adding a collinear point will not extend.
+/// let collinear = Point3D::new(2., 2., 0.);
+/// the_loop.push(collinear).unwrap();
+/// assert_eq!(2, the_loop.n_vertices());
+/// assert_eq!(the_loop[1], collinear);
+/// ```
+/// 
 #[derive(Clone)]
 pub struct Loop3D {
+    /// The points of the [`Loop3D`]
     vertices: Vec<Point3D>,
+    /// The normal, following a right-hand-side convention
     normal: Vector3D,
+    /// A flag indicating whether the [`Loop3D`] is considered finished or not.
     closed: bool,
+    /// The area of the [`Loop3D`], only calculated when closing it
     area: Float,
 }
 
@@ -66,6 +111,12 @@ impl Loop3D {
             area: -1.0,
         }
     }
+
+    /// Checks if the [`Loop3D`] has Zero vertices
+    pub fn is_empty(&self)->bool{
+        self.vertices.is_empty()
+    }
+    
 
     /// Borrows the vertices
     pub fn vertices(&self) -> &[Point3D] {
@@ -374,12 +425,12 @@ impl Loop3D {
 
         // We need to go around from 0 to N vertices,
         // ... so, n+1 valid vertices.
-        let mut v = self.vertices[0].as_vector3d();
-        let mut v_p1 = self.vertices[1].as_vector3d();
+        let mut v : Vector3D = self.vertices[0].into();
+        let mut v_p1 : Vector3D = self.vertices[1].into();
         for i in 2..n + 2 {
             rhs += v.cross(v_p1);
             v = v_p1;
-            v_p1 = self.vertices[i % n].as_vector3d();
+            v_p1 = self.vertices[i % n].into();
         }
 
         let area = self.normal * rhs / 2.0;
@@ -702,6 +753,7 @@ mod testing {
     #[test]
     fn test_point_concave_loop_interior_with_clean() {
         //Vector3D normal = Vector3D(0, 0, 1);
+        
         let mut the_loop = Loop3D::new();
         let l = 1. / (2 as Float).sqrt();
         let bigl = 2. / (2 as Float).sqrt();

@@ -56,6 +56,7 @@ impl Plane3D {
         }
     }
 
+    /// Tests whether a point is in a certain plane or not
     pub fn test_point(&self, point: Point3D) -> bool {
         (self.normal * point - self.d).abs() < Float::EPSILON
     }

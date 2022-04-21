@@ -213,7 +213,8 @@ impl Sphere3D {
             // Calculate point of intersection.
             let mut phit = ray.project(thit.as_float());
             // refine in order to avoid error accumulation
-            phit *= self.radius / phit.as_vector3d().length();
+            let aux : Vector3D = phit.into();
+            phit *= self.radius / aux.length();
 
             // Avoid a singularity on top of the sphere
             let limit = 1e-5 * self.radius;
@@ -263,6 +264,8 @@ impl Sphere3D {
         Some((phit, phi))
     }
 
+    /// Uses the results of `approx_basic_intersection()` to build an
+    /// [`IntersectionInfo`] object
     pub fn intersection_info(
         &self,
         ray: &Ray3D,

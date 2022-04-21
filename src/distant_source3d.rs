@@ -48,14 +48,14 @@ pub struct DistantSource3D {
     /// Tan of half angle
     pub tan_half_alpha: Float,
 
-    /// A pointer to the [`Transform`] associated with this [`DistantSouRefCounte3D`]
+    /// A pointer to the [`Transform`] associated with this `DistantSouRefCounte3D`
     transform: Option<RefCount<Transform>>,
     // Does the transform change the hand-ness of the coordinate system?
     // transform_reverses: bool,
 }
 
 impl DistantSource3D {
-    /// Creates a new [`DistantSouRefCounte3D`] geometry.
+    /// Creates a new `DistantSouRefCounte3D` geometry.
     ///
     /// # Inputs:
     /// * direction: A [`Vector3D`] pointing to the souRefCounte

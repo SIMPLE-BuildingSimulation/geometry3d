@@ -27,10 +27,14 @@ use crate::Float;
 use crate::Point3D;
 use std::fmt;
 
+/// A 3-dimensional Vector
 #[derive(Debug, Copy, Clone, PartialEq, Default)]
 pub struct Vector3D {
+    /// the X component
     pub x: Float,
+    /// the Y component    
     pub y: Float,
+    /// the Z component
     pub z: Float,
 }
 
@@ -41,10 +45,12 @@ impl fmt::Display for Vector3D {
 }
 
 impl Vector3D {
+    /// Creates a new vector.
     pub fn new(x: Float, y: Float, z: Float) -> Vector3D {
         Vector3D { x, y, z }
     }
-
+    
+    /// Returns a new vector, containing the absolute values of each component of `self`
     pub fn abs(&self) -> Self {
         Self {
             x: self.x.abs(),
@@ -140,10 +146,13 @@ impl Vector3D {
         Ok(ret)
     }
 
+    /// Checks whether a vector is equal (or close) to another vector
     pub fn compare(&self, p: Vector3D) -> bool {
-        (self.x - p.x).abs() < 1e-5 && (self.y - p.y).abs() < 1e-5 && (self.z - p.z).abs() < 1e-5
+        const TINY: Float = 1e-5;
+        (self.x - p.x).abs() < TINY && (self.y - p.y).abs() < TINY && (self.z - p.z).abs() < TINY
     }
 
+    /// Cross product between two vectors
     pub fn cross(&self, v: Vector3D) -> Vector3D {
         let dx = self.y * v.z - self.z * v.y;
         let dy = self.z * v.x - self.x * v.z;
@@ -152,14 +161,22 @@ impl Vector3D {
         Vector3D::new(dx, dy, dz)
     }
 
+    /// Calculates the length of a vector
     pub fn length(&self) -> Float {
         self.length_squared().sqrt()
     }
 
+    /// Calculates the length of a vector squared. 
+    /// 
+    /// Often using the squared of the length is the same as using the length of a vector
+    /// (e.g., when comparing distances, the squared lengths of vectors are sorted in the same order
+    /// as the lengths themselves). In such cases, using `length_squared()` is preferred because 
+    /// it is faster
     pub fn length_squared(&self) -> Float {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
+    /// Normalizes a Vector, mutating it.
     pub fn normalize(&mut self) {
         #[cfg(not(feature = "quick_inv_sqrt"))]
         let l = 1. / self.length();
@@ -171,20 +188,14 @@ impl Vector3D {
         self.z *= l;
     }
 
+    /// Returns a normalized version of a vector
     pub fn get_normalized(&self) -> Vector3D {
-        debug_assert!(self.length() >= 1e-9, "Length was {}", self.length());
-        #[cfg(not(feature = "quick_inv_sqrt"))]
-        let l = 1. / self.length();
-        #[cfg(feature = "quick_inv_sqrt")]
-        let l = crate::quick_inverse_sqrt::quick_inv_sqrt(self.length_squared());
-
-        Vector3D {
-            x: self.x * l,
-            y: self.y * l,
-            z: self.z * l,
-        }
+        let mut ret = *self;
+        ret.normalize();
+        ret
     }
 
+    /// Checks whether a vector is Zero
     pub fn is_zero(&self) -> bool {
         const TINY: Float = 100. * Float::EPSILON;
         self.x.abs() < TINY && self.y.abs() < TINY && self.z.abs() < TINY

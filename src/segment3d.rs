@@ -29,8 +29,11 @@ use crate::{Point3D, Vector3D};
 /// on another [`Point3D`].
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Segment3D {
+    /// The staring [`Point3D`]
     pub start: Point3D,
+    /// The ending [`Point3D`]
     pub end: Point3D,
+    /// The length
     pub length: Float,
 }
 
@@ -45,22 +48,30 @@ impl Segment3D {
         }
     }
 
+
+    /// Gets the start of the [`Segment3D`]
     pub fn start(&self) -> Point3D {
         self.start
     }
 
+    /// Gets the end of the [`Segment3D`]
     pub fn end(&self) -> Point3D {
         self.end
     }
 
+    /// Gets a [`Vector3D`] starting at the `start`
+    /// and ending at the `end`
     pub fn as_vector3d(&self) -> Vector3D {
         self.end - self.start
     }
 
+    /// Gets a [`Vector3D`] starting at the `end`
+    /// and ending at the `start`
     pub fn as_reversed_vector3d(&self) -> Vector3D {
         self.start - self.end
     }
 
+    /// Gets the length of the [`Segment3D`]
     pub fn length(&self) -> Float {
         self.length
     }

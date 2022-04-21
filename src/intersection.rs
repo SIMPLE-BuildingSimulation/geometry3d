@@ -27,8 +27,12 @@ use crate::{Float, Point3D, Ray3D, Transform, Vector3D};
 /// Is the [`Ray3D`] intersecting from the Front or Back side?
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum SurfaceSide {
+    /// The intersection happens at the front
     Front,
+    /// The intersection happens at the back
     Back,
+    /// The intersectionis not possible (e.g., the ray is parallel 
+    /// to a `Triangle3D` but it still goes through one of its vertices)
     NonApplicable,
 }
 
@@ -93,6 +97,7 @@ pub struct IntersectionInfo {
 }
 
 impl IntersectionInfo {
+    /// Creates a new `IntersectionInfo` object
     pub fn new(
         ray: &Ray3D,
         p: Point3D,
@@ -136,6 +141,8 @@ impl IntersectionInfo {
         }
     }
 
+
+    /// Applies a `Transform` to the `IntersectionInfo`, creating a new one. 
     pub fn transform(&self, transform: &Transform) -> Self {
         Self {
             p: transform.transform_pt(self.p),
@@ -150,6 +157,7 @@ impl IntersectionInfo {
         }
     }
 
+    /// Applies the inverse of a `Transform` to the `IntersectionInfo`, creating a new one.
     pub fn inv_transform(&self, transform: &Transform) -> Self {
         Self {
             p: transform.inv_transform_pt(self.p),
