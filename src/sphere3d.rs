@@ -193,7 +193,7 @@ impl Sphere3D {
         {
             panic!("After solve_quadratic in Sphere intersection: t0.as_float() = {}, t1.as_float() = {}", t0.as_float(), t1.as_float());
         }
-        debug_assert!(t1.as_float() >= t0.as_float());
+        
         // t0 < t1... so, check if they are possitive
         if t1.low <= 0.0 {
             return None;
