@@ -16,7 +16,7 @@ This library has several 3D Geometry functionalities. E.g.,
 * Triangles
 * Triangulation (e.g., sort of meshing... but not very high quality for finite element methods, probably)
 * Polygons
-* Ray-tracing intersection algorythms
+* Ray/Primitive intersection algorythms (not fast enough for rendering, though, as it uses dynamic dispatch)
 
 Check the docs [HERE](https://simple-buildingsimulation.github.io/geometry3d/)
 

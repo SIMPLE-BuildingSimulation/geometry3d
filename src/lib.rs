@@ -22,8 +22,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// #![deny(missing_docs)]
-#![feature(portable_simd)]
+#![deny(missing_docs)]
+
+//! This library has several 3D Geometry functionalities. E.g.,
+//! 
+//! * Points
+//! * Vectors
+//! * Segments
+//! * Transforms
+//! * Triangles
+//! * Triangulation (e.g., sort of meshing... but not very high quality for finite element methods, probably)
+//! * Polygons
+//! * Ray/Primitive intersection algorythms (not fast enough for rendering, though, as it uses dynamic dispatch)
+
 
 // Define whether we are working with
 // doubles (i.e., f64) or floats (i.e., f32)
@@ -49,6 +60,7 @@ type RefCount<T> = std::rc::Rc<T>;
 mod utils;
 // pub mod intersect_trait;
 
+/// Rounding Error accumulation module, based on PBRT
 pub mod round_error;
 // Objects
 mod cylinder3d;
@@ -81,6 +93,7 @@ pub use segment3d::Segment3D;
 mod sphere3d;
 pub use sphere3d::Sphere3D;
 
+/// Transforms
 pub mod transform;
 pub use transform::Transform;
 
@@ -96,11 +109,13 @@ pub use vector3d::Vector3D;
 mod bbox3d;
 pub use bbox3d::{BBox3D, BBoxAxis};
 
+/// Intersection object
 pub mod intersection;
 
 #[cfg(feature = "quick_inv_sqrt")]
 mod quick_inverse_sqrt;
 
+/// Calculates the gamma for error analysis
 #[macro_export]
 macro_rules! gamma {
     ( $n : expr ) => {{
