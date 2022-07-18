@@ -13,9 +13,7 @@ jobs:
   build:  
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3          
-      - name: Set Toolchain
-        run: rustup default nightly    
+      - uses: actions/checkout@v3                 
       - name: Update
         run: rustup update
       - name: Build Float
@@ -24,8 +22,6 @@ jobs:
     runs-on: ubuntu-latest   
     steps:
       - uses: actions/checkout@v3   
-      - name: Set Toolchain
-        run: rustup default nightly    
       - name: Update
         run: rustup update
       - name: Build Float
@@ -33,9 +29,7 @@ jobs:
   build_parallel:    
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3      
-      - name: Set Toolchain
-        run: rustup default nightly    
+      - uses: actions/checkout@v3            
       - name: Update
         run: rustup update
       - name: Build Float
@@ -44,9 +38,7 @@ jobs:
   build_quick_inv:   
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3      
-      - name: Set Toolchain
-        run: rustup default nightly    
+      - uses: actions/checkout@v3            
       - name: Update
         run: rustup update
       - name: Build Float

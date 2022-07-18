@@ -13,9 +13,7 @@ jobs:
   test:    
     runs-on: ubuntu-latest         
     steps:
-      - uses: actions/checkout@v3   
-      - name: Set Toolchain
-        run: rustup default nightly    
+      - uses: actions/checkout@v3    
       - name: Update
         run: rustup update
       - name: Run tests
@@ -24,8 +22,6 @@ jobs:
     runs-on: ubuntu-latest         
     steps:
       - uses: actions/checkout@v3   
-      - name: Set Toolchain
-        run: rustup default nightly    
       - name: Update
         run: rustup update
       - name: Run tests
@@ -34,8 +30,6 @@ jobs:
     runs-on: ubuntu-latest         
     steps:
       - uses: actions/checkout@v3   
-      - name: Set Toolchain
-        run: rustup default nightly    
       - name: Update
         run: rustup update
       - name: Run tests
@@ -43,9 +37,7 @@ jobs:
   test_quick_inv_sqrt:
     runs-on: ubuntu-latest    
     steps:     
-      - uses: actions/checkout@v3   
-      - name: Set Toolchain
-        run: rustup default nightly    
+      - uses: actions/checkout@v3    
       - name: Update
         run: rustup update
       - name: Run tests
