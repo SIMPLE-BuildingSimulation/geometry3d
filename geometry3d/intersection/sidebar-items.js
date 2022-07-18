@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["SurfaceSide","Is the [`Ray3D`] intersecting from the Front or Back side?"]],"struct":[["IntersectionInfo","Contains more detailed information about the what is happening at the surface in the intersection point"]]};
+initSidebarItems({"enum":[["SurfaceSide","Is the [`Ray3D`] intersecting from the Front or Back side?"]],"struct":[["IntersectionInfo","Contains more detailed information about the what is happening at the surface in the intersection point"]]});

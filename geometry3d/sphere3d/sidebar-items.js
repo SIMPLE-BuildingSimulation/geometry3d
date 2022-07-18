@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Sphere3D","A Full or Partial sphere in three dimensions, centered at the origin"]]};
+initSidebarItems({"struct":[["Sphere3D","A Full or Partial sphere in three dimensions, centered at the origin"]]});

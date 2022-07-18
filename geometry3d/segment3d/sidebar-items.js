@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Segment3D","An imaginary line starting at one [`Point3D`] and ending on another [`Point3D`]."]]};
+initSidebarItems({"struct":[["Segment3D","An imaginary line starting at one [`Point3D`] and ending on another [`Point3D`]."]]});

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Disk3D","A disk of radius `radius` whose normal points in the `normal` direction, located at a height `height`. Can have a"]]};
+initSidebarItems({"struct":[["Disk3D","A disk of radius `radius` whose normal points in the `normal` direction, located at a height `height`. Can have a"]]});

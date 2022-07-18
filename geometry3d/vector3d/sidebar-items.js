@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Vector3D","A 3-dimensional Vector"]]};
+initSidebarItems({"struct":[["Vector3D","A 3-dimensional Vector"]]});

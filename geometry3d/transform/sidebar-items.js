@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["mul4x4","Multiplies two 4x4 matrices, represented as `[Float; 16]`"],["mul4x4_abs",""],["mul4x4point",""],["mul4x4vec",""]],"macro":[["elem",""]],"struct":[["Transform","Represents a transformation matrix"]]};
+initSidebarItems({"fn":[["mul4x4","Multiplies two 4x4 matrices, represented as `[Float; 16]`"],["mul4x4_abs",""],["mul4x4point",""],["mul4x4vec",""]],"macro":[["elem",""]],"struct":[["Transform","Represents a transformation matrix"]]});

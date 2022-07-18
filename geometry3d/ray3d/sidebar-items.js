@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Ray3D","A simple Ray structure, consiting of an origin (i.e., [`Point3D`])  and a direction (i.e., a [`Vector3D`])"]]};
+initSidebarItems({"struct":[["Ray3D","A simple Ray structure, consiting of an origin (i.e., [`Point3D`])  and a direction (i.e., a [`Vector3D`])"]]});

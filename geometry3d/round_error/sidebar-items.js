@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["MINUS_ZERO",""],["ZERO",""]],"fn":[["max_min","Calculates the minimum and the maximum of a `&[Float; 4]`"],["next_float_down",""],["next_float_up",""]],"struct":[["ApproxFloat","Contains a `Float` value as well as an error interval."]]};
+initSidebarItems({"constant":[["MINUS_ZERO",""],["ZERO",""]],"fn":[["max_min","Calculates the minimum and the maximum of a `&[Float; 4]`"],["next_float_down",""],["next_float_up",""]],"struct":[["ApproxFloat","Contains a `Float` value as well as an error interval."]]});
