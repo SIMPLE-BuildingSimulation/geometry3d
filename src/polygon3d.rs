@@ -37,8 +37,10 @@ pub struct Polygon3D {
 
     /// A vector of inner [`Loop3D`]
     inner: Vec<Loop3D>,
-    /// The area of the `Polygon3D`
+        
+    /// The area of the `Polygon3D`    
     area: Float,
+    
     /// The normal of the `Polygon3D`, following a right-hand convention
     normal: Vector3D,
 }
@@ -390,6 +392,7 @@ mod testing {
         assert!((2. * l * 2. * l - poly.area).abs() < 1e-4);
         assert!(!poly.normal.is_zero());
     }
+
 
     #[test]
     fn test_test_cut_hole() {

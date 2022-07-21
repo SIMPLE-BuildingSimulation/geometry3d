@@ -76,6 +76,8 @@ pub struct Loop3D {
     closed: bool,
     /// The area of the [`Loop3D`], only calculated when closing it
     area: Float,
+    /// The perimeter of the loop
+    perimeter: Float,
 }
 
 impl Default for Loop3D {
@@ -109,6 +111,7 @@ impl Loop3D {
             normal: Vector3D::new(0., 0., 0.),
             closed: false,
             area: -1.0,
+            perimeter: -1.0,
         }
     }
 
@@ -284,6 +287,7 @@ impl Loop3D {
         // Close
         self.closed = true;
         self.set_area()?;
+        self.set_perimeter()?;
         Ok(())
     }
 
@@ -400,6 +404,37 @@ impl Loop3D {
         Ok(n_cross != 0 && n_cross % 2 != 0)
     } // end of test_point
 
+    /// Calculates and caches the perimeter of the [`Loop3D`]
+    fn set_perimeter(&mut self)->Result<Float,String>{
+        if !self.closed {
+            let msg = "Trying to calculate the perimeter of a Loop3D that is not closed".to_string();
+            return Err(msg);
+        }
+
+        if self.normal.is_zero() {
+            let msg = "Trying to calculate the perimeter of a Loop3D with Zero normal".to_string();
+            return Err(msg);
+        }
+
+        let n = self.vertices.len();
+        if n < 3 {
+            let msg =
+                "Trying to calculate the perimeter of a Loop3D with less than three valid vertices"
+                    .to_string();
+            return Err(msg);
+        }
+
+        let mut per = 0.0;
+        for i in 0..n{
+            per += (self.vertices[i%n] - self.vertices[(i+1)%n]).length();
+        }
+
+
+        self.perimeter = per;
+        Ok(self.perimeter)
+
+    }
+
     /// Calculates and caches the area of the [`Loop3D`]
     fn set_area(&mut self) -> Result<Float, String> {
         if !self.closed {
@@ -447,6 +482,15 @@ impl Loop3D {
             Err("Trying to get the area of an open Loop3D".to_string())
         } else {
             Ok(self.area)
+        }
+    }
+
+    /// Returns the perimeter of the [`Loop3D`]
+    pub fn perimeter(&self) -> Result<Float, String> {
+        if !self.is_closed() {
+            Err("Trying to get the perimeter of an open Loop3D".to_string())
+        } else {
+            Ok(self.perimeter)
         }
     }
 
@@ -1005,5 +1049,22 @@ mod testing {
 
         let p5 = Point3D::new(0., 5., 0.);
         assert!(outer.valid_to_add(p5).is_ok());
+    }
+
+
+    #[test]
+    fn test_perimeter() {
+        // A square with the center at the origin.
+        /*****/
+        let mut outer_loop = Loop3D::new();
+        let l = 2. as Float;
+        outer_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
+        outer_loop.push(Point3D::new(l, -l, 0.)).unwrap();
+        outer_loop.push(Point3D::new(l, l, 0.)).unwrap();
+        outer_loop.push(Point3D::new(-l, l, 0.)).unwrap();
+        outer_loop.close().unwrap();
+
+        assert_eq!(outer_loop.perimeter, 8.*l);
+        assert_eq!(outer_loop.perimeter().unwrap(), 8.*l);
     }
 }

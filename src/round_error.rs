@@ -146,12 +146,12 @@ impl ApproxFloat {
         let discr_sqrt = disc.sqrt();
 
         // Use Muller's method for making this faster...
-        let q: ApproxFloat;
-        if b.as_float() < 0. {
-            q = -(b - discr_sqrt) * 0.5;
+        
+        let q: ApproxFloat = if b.as_float() < 0. {
+            -(b - discr_sqrt) * 0.5
         } else {
-            q = -(b + discr_sqrt) * 0.5;
-        }
+            -(b + discr_sqrt) * 0.5
+        };
         let mut x1 = q / a;
         let mut x2 = c / q;
 

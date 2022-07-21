@@ -51,12 +51,13 @@ pub fn intersect_triangle(
     let f = 1. / a;
     let s = ray.origin - vertex0;
     let u = f * (s * h);
-    if u > 1. || u < 0.0 {
+    if !(0.0..=1.).contains(&u) {
         return None;
     }
     let q = s.cross(edge1);
     let v = f * (ray.direction * q);
-    if v > 1.0 || v < 0.0 {
+    
+    if !(0.0..=1.0).contains(&v) {
         return None;
     }
     let t = f * (edge2 * q);
