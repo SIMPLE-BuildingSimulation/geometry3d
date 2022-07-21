@@ -828,12 +828,12 @@ SOFTWARE.
         <span class="kw">let</span> <span class="ident">discr_sqrt</span> <span class="op">=</span> <span class="ident">disc</span>.<span class="ident">sqrt</span>();
 
         <span class="comment">// Use Muller&#39;s method for making this faster...</span>
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">ApproxFloat</span>;
-        <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">as_float</span>() <span class="op">&lt;</span> <span class="number">0.</span> {
-            <span class="ident">q</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident">b</span> <span class="op">-</span> <span class="ident">discr_sqrt</span>) <span class="op">*</span> <span class="number">0.5</span>;
+        
+        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">ApproxFloat</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">as_float</span>() <span class="op">&lt;</span> <span class="number">0.</span> {
+            <span class="op">-</span>(<span class="ident">b</span> <span class="op">-</span> <span class="ident">discr_sqrt</span>) <span class="op">*</span> <span class="number">0.5</span>
         } <span class="kw">else</span> {
-            <span class="ident">q</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident">b</span> <span class="op">+</span> <span class="ident">discr_sqrt</span>) <span class="op">*</span> <span class="number">0.5</span>;
-        }
+            <span class="op">-</span>(<span class="ident">b</span> <span class="op">+</span> <span class="ident">discr_sqrt</span>) <span class="op">*</span> <span class="number">0.5</span>
+        };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x1</span> <span class="op">=</span> <span class="ident">q</span> <span class="op">/</span> <span class="ident">a</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x2</span> <span class="op">=</span> <span class="ident">c</span> <span class="op">/</span> <span class="ident">q</span>;
 
@@ -1324,5 +1324,5 @@ SOFTWARE.
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

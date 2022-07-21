@@ -732,6 +732,9 @@
 <span id="693">693</span>
 <span id="694">694</span>
 <span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -771,8 +774,10 @@ SOFTWARE.
 
     <span class="doccomment">/// A vector of inner [`Loop3D`]</span>
     <span class="ident">inner</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Loop3D</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The area of the `Polygon3D`</span>
+        
+    <span class="doccomment">/// The area of the `Polygon3D`    </span>
     <span class="ident">area</span>: <span class="ident">Float</span>,
+    
     <span class="doccomment">/// The normal of the `Polygon3D`, following a right-hand convention</span>
     <span class="ident">normal</span>: <span class="ident">Vector3D</span>,
 }
@@ -1125,6 +1130,7 @@ SOFTWARE.
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">poly</span>.<span class="ident">normal</span>.<span class="ident">is_zero</span>());
     }
 
+
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_test_cut_hole</span>() {
         <span class="comment">// A square with the center at the origin.</span>
@@ -1428,5 +1434,5 @@ SOFTWARE.
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>
