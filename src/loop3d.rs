@@ -218,6 +218,7 @@ impl Loop3D {
         self.vertices.len()
     }
 
+
     /// Checks if a [`Segment3D`] intersects any of the other [`Segment3D`]
     /// in the [`Loop3D`] and if its midpoint is inside of it.
     ///
@@ -491,6 +492,24 @@ impl Loop3D {
             Err("Trying to get the perimeter of an open Loop3D".to_string())
         } else {
             Ok(self.perimeter)
+        }
+    }
+
+    /// Returns the centroid; i.e., the average of all vertices.
+    pub fn centroid(&self)->Result<Point3D, String>{
+        if !self.is_closed() {
+            Err("Trying to get the centroid of an open Loop3D".to_string())
+        } else {
+            let n = self.vertices.len() as Float;
+            let (mut x, mut y, mut z) = (0., 0., 0.);
+            for v in &self.vertices {
+                x += v.x;
+                y += v.y;
+                z += v.z;
+            }
+            
+            Ok(Point3D::new(x/n, y/n, z/n))
+            
         }
     }
 
@@ -1053,7 +1072,7 @@ mod testing {
 
 
     #[test]
-    fn test_perimeter() {
+    fn test_perimeter_centroid() {
         // A square with the center at the origin.
         /*****/
         let mut outer_loop = Loop3D::new();
@@ -1066,5 +1085,10 @@ mod testing {
 
         assert_eq!(outer_loop.perimeter, 8.*l);
         assert_eq!(outer_loop.perimeter().unwrap(), 8.*l);
+
+        let c = outer_loop.centroid().unwrap();
+        assert!(c.x.abs() < 1e-8);
+        assert!(c.y.abs() < 1e-8);
+        assert!(c.z.abs() < 1e-8);
     }
 }
