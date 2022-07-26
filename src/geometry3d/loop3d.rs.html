@@ -1107,6 +1107,30 @@
 <span id="1068">1068</span>
 <span id="1069">1069</span>
 <span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -1326,6 +1350,7 @@ SOFTWARE.
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_vertices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">vertices</span>.<span class="ident">len</span>()
     }
+
 
     <span class="doccomment">/// Checks if a [`Segment3D`] intersects any of the other [`Segment3D`]</span>
     <span class="doccomment">/// in the [`Loop3D`] and if its midpoint is inside of it.</span>
@@ -1600,6 +1625,24 @@ SOFTWARE.
             <span class="prelude-val">Err</span>(<span class="string">&quot;Trying to get the perimeter of an open Loop3D&quot;</span>.<span class="ident">to_string</span>())
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">perimeter</span>)
+        }
+    }
+
+    <span class="doccomment">/// Returns the centroid; i.e., the average of all vertices.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">centroid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)-&gt;<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Point3D</span>, <span class="ident">String</span><span class="op">&gt;</span>{
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_closed</span>() {
+            <span class="prelude-val">Err</span>(<span class="string">&quot;Trying to get the centroid of an open Loop3D&quot;</span>.<span class="ident">to_string</span>())
+        } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">vertices</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">Float</span>;
+            <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">x</span>, <span class="kw-2">mut</span> <span class="ident">y</span>, <span class="kw-2">mut</span> <span class="ident">z</span>) <span class="op">=</span> (<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+            <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">vertices</span> {
+                <span class="ident">x</span> <span class="op">+</span><span class="op">=</span> <span class="ident">v</span>.<span class="ident">x</span>;
+                <span class="ident">y</span> <span class="op">+</span><span class="op">=</span> <span class="ident">v</span>.<span class="ident">y</span>;
+                <span class="ident">z</span> <span class="op">+</span><span class="op">=</span> <span class="ident">v</span>.<span class="ident">z</span>;
+            }
+            
+            <span class="prelude-val">Ok</span>(<span class="ident">Point3D::new</span>(<span class="ident">x</span><span class="op">/</span><span class="ident">n</span>, <span class="ident">y</span><span class="op">/</span><span class="ident">n</span>, <span class="ident">z</span><span class="op">/</span><span class="ident">n</span>))
+            
         }
     }
 
@@ -2162,7 +2205,7 @@ SOFTWARE.
 
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_perimeter</span>() {
+    <span class="kw">fn</span> <span class="ident">test_perimeter_centroid</span>() {
         <span class="comment">// A square with the center at the origin.</span>
         <span class="comment">/*****/</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">outer_loop</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
@@ -2175,6 +2218,11 @@ SOFTWARE.
 
         <span class="macro">assert_eq!</span>(<span class="ident">outer_loop</span>.<span class="ident">perimeter</span>, <span class="number">8.</span><span class="kw-2">*</span><span class="ident">l</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">outer_loop</span>.<span class="ident">perimeter</span>().<span class="ident">unwrap</span>(), <span class="number">8.</span><span class="kw-2">*</span><span class="ident">l</span>);
+
+        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">outer_loop</span>.<span class="ident">centroid</span>().<span class="ident">unwrap</span>();
+        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">x</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-8</span>);
+        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">y</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-8</span>);
+        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">z</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-8</span>);
     }
 }
 </code></pre></div>
