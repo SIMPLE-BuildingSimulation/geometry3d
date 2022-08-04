@@ -342,7 +342,7 @@ impl Loop3D {
         let d = first_point - p;
 
         let aux = (self.normal * d).abs();
-        Ok(aux < 10. * Float::EPSILON)
+        Ok(aux < 1e-7)
     }
 
     /// Tests whether a [`Point3D`] dwells inside of the [`Loop3D`].
@@ -357,10 +357,8 @@ impl Loop3D {
             return Ok(false);
         }
 
-        // Ok, it is coplanar...
-
         // Ray cast
-        let d = (point - self.vertices[0]) * 1000000.; // Should be enough...?
+        let d = (point - self.vertices[0]) * 1000.; // Should be enough...?
         let ray = Segment3D::new(point, point + d);
 
         let mut n_cross = 0;
@@ -377,8 +375,8 @@ impl Loop3D {
 
             // Check if the ray and the segment touch. We only consider
             // touching at the start (e.g., t_a between [0 and 1) ) in
-            // order not to count vertices twice.
-            if let Some((t_a, t_b)) = segment_ab.get_intersection_pt(&ray) {
+            // order not to count vertices twice.            
+            if let Some((t_a, t_b)) = segment_ab.get_intersection_pt(&ray) {                
                 // If the ray intersects
                 if (0. ..=1.).contains(&t_b) && (0. ..=1.).contains(&t_a) {
                     if t_a < Float::EPSILON {
@@ -671,6 +669,22 @@ mod testing {
             }
             Err(e) => panic!("{}", e),
         }
+    }
+
+    #[test]
+    fn test_point_weird(){
+        let mut the_loop = Loop3D::new();        
+        the_loop.push(Point3D::new( 10., -1.2246467991473533E-15, 0.)).unwrap();
+        the_loop.push(Point3D::new(-10., 1.2246467991473533E-15, 0.)).unwrap();
+        the_loop.push(Point3D::new(-10., 1.2246467991473533E-15, 3.)).unwrap();
+        the_loop.push(Point3D::new( 10., -1.2246467991473533E-15, 3.)).unwrap();
+        the_loop.close().unwrap();
+
+        let a = Point3D::new(-10.,  1.2246467991473533E-15, 0.);
+        let b = Point3D::new( 10., -1.2246467991473533E-15, 3.);
+        let mid = (a + b)/2.;
+        let r = the_loop.test_point(mid).unwrap();
+        assert!(r);
     }
 
     #[test]

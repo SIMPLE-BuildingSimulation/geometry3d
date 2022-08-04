@@ -190,29 +190,27 @@ impl Segment3D {
         if delta.cross(normal).is_zero() {
             return None;
         }
-
-        // They are coplanar... check for intersection
-        let t_a: Float;
-        let t_b: Float;
-        let det: Float;
-
+        
         // Check for intersection.
-        if normal.z.abs() > Float::EPSILON {
-            det = a.y * b.x - a.x * b.y;
-
-            t_a = (b.y * delta.x - b.x * delta.y) / det;
-            t_b = (a.y * delta.x - a.x * delta.y) / det;
-        } else if normal.x.abs() > Float::EPSILON {
-            det = a.y * b.z - a.z * b.y;
-            t_a = (b.y * delta.z - b.z * delta.y) / det;
-            t_b = (a.y * delta.z - a.z * delta.y) / det;
-        } else if normal.y.abs() > Float::EPSILON {
-            det = a.x * b.z - a.z * b.x;
-            t_a = (b.x * delta.z - b.z * delta.x) / det;
-            t_b = (a.x * delta.z - a.z * delta.x) / det;
+        const TINY : Float = 1e-5;
+        let (t_a, t_b) = if normal.z.abs() > TINY {
+            let det = a.y * b.x - a.x * b.y;
+            let t_a = (b.y * delta.x - b.x * delta.y) / det;
+            let t_b = (a.y * delta.x - a.x * delta.y) / det;
+            (t_a, t_b)
+        } else if normal.x.abs() > TINY {
+            let det = a.y * b.z - a.z * b.y;
+            let t_a = (b.y * delta.z - b.z * delta.y) / det;
+            let t_b = (a.y * delta.z - a.z * delta.y) / det;
+            (t_a, t_b)
+        } else if normal.y.abs() > TINY {
+            let det = a.x * b.z - a.z * b.x;
+            let t_a = (b.x * delta.z - b.z * delta.x) / det;
+            let t_b = (a.x * delta.z - a.z * delta.x) / det;
+            (t_a, t_b)
         } else {
             return None;
-        }
+        };
         Some((t_a, t_b))
     }
 
