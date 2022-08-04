@@ -568,8 +568,6 @@
 <span id="529">529</span>
 <span id="530">530</span>
 <span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -762,29 +760,27 @@ SOFTWARE.
         <span class="kw">if</span> <span class="ident">delta</span>.<span class="ident">cross</span>(<span class="ident">normal</span>).<span class="ident">is_zero</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
-
-        <span class="comment">// They are coplanar... check for intersection</span>
-        <span class="kw">let</span> <span class="ident">t_a</span>: <span class="ident">Float</span>;
-        <span class="kw">let</span> <span class="ident">t_b</span>: <span class="ident">Float</span>;
-        <span class="kw">let</span> <span class="ident">det</span>: <span class="ident">Float</span>;
-
+        
         <span class="comment">// Check for intersection.</span>
-        <span class="kw">if</span> <span class="ident">normal</span>.<span class="ident">z</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">Float::EPSILON</span> {
-            <span class="ident">det</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">b</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">b</span>.<span class="ident">y</span>;
-
-            <span class="ident">t_a</span> <span class="op">=</span> (<span class="ident">b</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">b</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">y</span>) <span class="op">/</span> <span class="ident">det</span>;
-            <span class="ident">t_b</span> <span class="op">=</span> (<span class="ident">a</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">y</span>) <span class="op">/</span> <span class="ident">det</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">normal</span>.<span class="ident">x</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">Float::EPSILON</span> {
-            <span class="ident">det</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">b</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">b</span>.<span class="ident">y</span>;
-            <span class="ident">t_a</span> <span class="op">=</span> (<span class="ident">b</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">b</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">y</span>) <span class="op">/</span> <span class="ident">det</span>;
-            <span class="ident">t_b</span> <span class="op">=</span> (<span class="ident">a</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">y</span>) <span class="op">/</span> <span class="ident">det</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">normal</span>.<span class="ident">y</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">Float::EPSILON</span> {
-            <span class="ident">det</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">b</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">b</span>.<span class="ident">x</span>;
-            <span class="ident">t_a</span> <span class="op">=</span> (<span class="ident">b</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">b</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">x</span>) <span class="op">/</span> <span class="ident">det</span>;
-            <span class="ident">t_b</span> <span class="op">=</span> (<span class="ident">a</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">x</span>) <span class="op">/</span> <span class="ident">det</span>;
+        <span class="kw">const</span> <span class="ident">TINY</span> : <span class="ident">Float</span> <span class="op">=</span> <span class="number">1e-5</span>;
+        <span class="kw">let</span> (<span class="ident">t_a</span>, <span class="ident">t_b</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">normal</span>.<span class="ident">z</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">TINY</span> {
+            <span class="kw">let</span> <span class="ident">det</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">b</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">b</span>.<span class="ident">y</span>;
+            <span class="kw">let</span> <span class="ident">t_a</span> <span class="op">=</span> (<span class="ident">b</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">b</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">y</span>) <span class="op">/</span> <span class="ident">det</span>;
+            <span class="kw">let</span> <span class="ident">t_b</span> <span class="op">=</span> (<span class="ident">a</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">y</span>) <span class="op">/</span> <span class="ident">det</span>;
+            (<span class="ident">t_a</span>, <span class="ident">t_b</span>)
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">normal</span>.<span class="ident">x</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">TINY</span> {
+            <span class="kw">let</span> <span class="ident">det</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">b</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">b</span>.<span class="ident">y</span>;
+            <span class="kw">let</span> <span class="ident">t_a</span> <span class="op">=</span> (<span class="ident">b</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">b</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">y</span>) <span class="op">/</span> <span class="ident">det</span>;
+            <span class="kw">let</span> <span class="ident">t_b</span> <span class="op">=</span> (<span class="ident">a</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">y</span>) <span class="op">/</span> <span class="ident">det</span>;
+            (<span class="ident">t_a</span>, <span class="ident">t_b</span>)
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">normal</span>.<span class="ident">y</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">TINY</span> {
+            <span class="kw">let</span> <span class="ident">det</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">b</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">b</span>.<span class="ident">x</span>;
+            <span class="kw">let</span> <span class="ident">t_a</span> <span class="op">=</span> (<span class="ident">b</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">b</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">x</span>) <span class="op">/</span> <span class="ident">det</span>;
+            <span class="kw">let</span> <span class="ident">t_b</span> <span class="op">=</span> (<span class="ident">a</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">delta</span>.<span class="ident">x</span>) <span class="op">/</span> <span class="ident">det</span>;
+            (<span class="ident">t_a</span>, <span class="ident">t_b</span>)
         } <span class="kw">else</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
-        }
+        };
         <span class="prelude-val">Some</span>((<span class="ident">t_a</span>, <span class="ident">t_b</span>))
     }
 
