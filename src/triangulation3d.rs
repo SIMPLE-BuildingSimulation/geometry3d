@@ -263,7 +263,10 @@ impl Triangulation3D {
         let mut t = Triangulation3D::with_capacity(the_loop.n_vertices() - 2);
 
         let mut anchor = 0;
+        let mut count = 0;
         loop {
+            assert!(count < 1000, "Excessive number of iteration when triangulating polygon");
+            count += 1;
             let n = the_loop.n_vertices();
             let count = t.n_triangles();
             if n == 2 {
