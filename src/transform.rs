@@ -37,6 +37,7 @@ macro_rules! elem {
 }
 
 /// Represents a transformation matrix
+#[derive(Debug, Clone)]
 pub struct Transform {
     elements: [Float; 16],
     inv_elements: [Float; 16],

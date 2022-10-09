@@ -22,6 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+use serde::{Serialize, Deserialize, Deserializer};
+use serde_json::Value;
+
 use crate::Float;
 use crate::{Point3D, Segment3D, Vector3D};
 
@@ -66,18 +69,76 @@ use crate::{Point3D, Segment3D, Vector3D};
 /// assert_eq!(the_loop[1], collinear);
 /// ```
 /// 
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Loop3D {
     /// The points of the [`Loop3D`]
     vertices: Vec<Point3D>,
+
+    #[serde(skip)]
     /// The normal, following a right-hand-side convention
     normal: Vector3D,
+
+    #[serde(skip)]
     /// A flag indicating whether the [`Loop3D`] is considered finished or not.
     closed: bool,
+
+    #[serde(skip)]
     /// The area of the [`Loop3D`], only calculated when closing it
     area: Float,
+
+    #[serde(skip)]
     /// The perimeter of the loop
     perimeter: Float,
+}
+
+impl<'de> Deserialize<'de> for Loop3D {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let data: Value = Deserialize::deserialize(deserializer)?;
+        let mut ret = Self::new();
+
+        if let Value::Array(a) = data {
+            println!(" len = {}", a.len());
+
+            let mut it = a.iter();
+            
+            
+            while let Some(x) = it.next() {
+                
+                let x = match x{
+                    Value::Number(x)=>x.as_f64().unwrap() as Float,
+                    _ => panic!("Expecting Polygon3D to be an array of numbers")
+                };
+                println!(" x = {:?}", x);
+
+                let y = it.next();
+                let y = match y{
+                    Some(Value::Number(y))=>y.as_f64().unwrap() as Float,
+                    _ => panic!("Expecting Polygon3D to be an array of numbers")
+                };
+                println!(" y = {:?}", y);
+
+                let z = it.next();
+                let z = match z{
+                    Some(Value::Number(z))=>z.as_f64().unwrap() as Float,
+                    _ => panic!("Expecting Polygon3D to be an array of numbers")
+                };
+                println!(" z = {:?}\n====", z);
+
+                ret.push(Point3D { x, y, z }).unwrap();
+                println!("len = {}", ret.vertices.len());
+            
+            }
+        
+        }
+
+        ret.close().unwrap();
+
+
+        Ok(ret)
+    }
 }
 
 impl Default for Loop3D {
@@ -536,7 +597,30 @@ impl Loop3D {
 
 #[cfg(test)]
 mod testing {
+    
     use super::*;
+
+    #[test]
+    fn serde_ok(){
+        let a = "[ 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 2.0, 3.0, -1.0]";
+
+        let p: Loop3D = serde_json::from_str(a).unwrap();
+        assert!(p.closed);
+        assert_eq!(p.vertices.len(), 3);
+
+        assert_eq!(p.vertices[0].x, 0.);
+        assert_eq!(p.vertices[0].y, 0.);
+        assert_eq!(p.vertices[0].z, 0.);
+
+        assert_eq!(p.vertices[1].x, 1.);
+        assert_eq!(p.vertices[1].y, 1.);
+        assert_eq!(p.vertices[1].z, 1.);
+
+        assert_eq!(p.vertices[2].x, 2.);
+        assert_eq!(p.vertices[2].y, 3.);
+        assert_eq!(p.vertices[2].z, -1.);
+
+    }
 
     #[test]
     fn test_new() {

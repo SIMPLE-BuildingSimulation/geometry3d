@@ -71,6 +71,7 @@ impl std::ops::Add<usize> for Edge {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 struct TriPiece {
     triangle: Triangle3D,
 
@@ -106,6 +107,7 @@ struct TriPiece {
 
 /// A set of [`Triangle3D`] that, together, cover completely
 /// a [`Polygon3D`].
+#[derive(Debug, Clone)]
 pub struct Triangulation3D {
     /// The triangles
     triangles: Vec<TriPiece>,

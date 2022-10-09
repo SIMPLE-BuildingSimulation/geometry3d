@@ -68,7 +68,7 @@ pub fn intersect_triangle(
 }
 
 /// A simple 3-dimentional Triangle.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Triangle3D {
     /// First vertex
     a: Point3D,

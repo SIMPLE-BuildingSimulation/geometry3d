@@ -22,13 +22,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::Float;
 
 use crate::Point3D;
 use std::fmt;
 
 /// A 3-dimensional Vector
-#[derive(Debug, Copy, Clone, PartialEq, Default)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Vector3D {
     /// the X component
     pub x: Float,

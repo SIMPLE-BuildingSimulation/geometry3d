@@ -34,6 +34,7 @@ use crate::{Point3D, Ray3D, Vector3D};
 /// 0 = Ax+By+Cz+D
 /// ```
 /// Where $`A = \vec{N}_x`$, $`B = \vec{N}_y`$, $`C = \vec{N}_z`$ and $`D = \vec{N}\cdot\vec{P}`$,
+#[derive(Clone, Debug)]
 pub struct Plane3D {
     // A point contained in the plane
     //point: Point3D,

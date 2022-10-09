@@ -22,12 +22,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::Float;
 
 use crate::Vector3D;
 
 /// A very simple implementation of a 3D-Point
-#[derive(Debug, Copy, Clone, PartialEq, Default)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Point3D {
     /// The X component
     pub x: Float,

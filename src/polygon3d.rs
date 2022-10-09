@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+use serde::{Serialize, Deserialize};
+
 use crate::Float;
 use crate::{Loop3D, Point3D, Segment3D, Vector3D};
 
@@ -30,7 +32,7 @@ use crate::{Loop3D, Point3D, Segment3D, Vector3D};
 /// 
 /// It is a structure containing several [`Loop3D`]. One of them is 
 /// the `outer` [`Loop3D`], and there there can be several `inner` [`Loop3D`].
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Polygon3D {
     /// The outer [`Loop3D`]
     outer: Loop3D,

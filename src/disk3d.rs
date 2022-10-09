@@ -32,7 +32,7 @@ use crate::{BBox3D, Plane3D, Point3D, Ray3D, Transform, Vector3D};
 
 /// A disk of radius `radius` whose normal points in the
 /// `normal` direction, located at a height `height`. Can have a
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Disk3D {
     /// The location of the center of the [`Disk3D`]
     centre: Point3D,
