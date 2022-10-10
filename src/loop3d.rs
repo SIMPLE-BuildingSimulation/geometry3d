@@ -22,10 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+use serde::ser::SerializeSeq;
 use serde::{Serialize, Deserialize, Deserializer};
 use serde_json::Value;
 
-use crate::Float;
+use crate::{Float};
 use crate::{Point3D, Segment3D, Vector3D};
 
 /// A set of [`Point3D`] in sequence, forming a closed loop.
@@ -69,26 +70,47 @@ use crate::{Point3D, Segment3D, Vector3D};
 /// assert_eq!(the_loop[1], collinear);
 /// ```
 /// 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct Loop3D {
     /// The points of the [`Loop3D`]
     vertices: Vec<Point3D>,
-
-    #[serde(skip)]
+    
     /// The normal, following a right-hand-side convention
     normal: Vector3D,
-
-    #[serde(skip)]
+    
     /// A flag indicating whether the [`Loop3D`] is considered finished or not.
     closed: bool,
-
-    #[serde(skip)]
+    
     /// The area of the [`Loop3D`], only calculated when closing it
     area: Float,
 
-    #[serde(skip)]
     /// The perimeter of the loop
     perimeter: Float,
+}
+
+
+impl std::iter::IntoIterator for Loop3D{
+    type Item = Point3D;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.vertices.into_iter()
+    }
+}
+
+impl Serialize for Loop3D{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: serde::Serializer {
+            
+            let mut seq  = serializer.serialize_seq(Some(3 * self.vertices.len()))?;
+            for Point3D{x, y, z } in self.vertices.iter(){
+                seq.serialize_element(x)?;
+                seq.serialize_element(y)?;
+                seq.serialize_element(z)?;
+            }
+
+            seq.end()
+    }
 }
 
 impl<'de> Deserialize<'de> for Loop3D {
@@ -99,9 +121,7 @@ impl<'de> Deserialize<'de> for Loop3D {
         let data: Value = Deserialize::deserialize(deserializer)?;
         let mut ret = Self::new();
 
-        if let Value::Array(a) = data {
-            println!(" len = {}", a.len());
-
+        if let Value::Array(a) = data { 
             let mut it = a.iter();
             
             
@@ -110,25 +130,18 @@ impl<'de> Deserialize<'de> for Loop3D {
                 let x = match x{
                     Value::Number(x)=>x.as_f64().unwrap() as Float,
                     _ => panic!("Expecting Polygon3D to be an array of numbers")
-                };
-                println!(" x = {:?}", x);
-
+                };                
                 let y = it.next();
                 let y = match y{
                     Some(Value::Number(y))=>y.as_f64().unwrap() as Float,
                     _ => panic!("Expecting Polygon3D to be an array of numbers")
-                };
-                println!(" y = {:?}", y);
-
+                };                
                 let z = it.next();
                 let z = match z{
                     Some(Value::Number(z))=>z.as_f64().unwrap() as Float,
                     _ => panic!("Expecting Polygon3D to be an array of numbers")
-                };
-                println!(" z = {:?}\n====", z);
-
-                ret.push(Point3D { x, y, z }).unwrap();
-                println!("len = {}", ret.vertices.len());
+                };                
+                ret.push(Point3D { x, y, z }).unwrap();                
             
             }
         
@@ -275,7 +288,13 @@ impl Loop3D {
     }
 
     /// Counts the vertices in the [`Loop3D`]
+    #[deprecated="Use len() instead"]
     pub fn n_vertices(&self) -> usize {
+        self.vertices.len()
+    }
+
+    /// Counts the vertices in the [`Loop3D`]    
+    pub fn len(&self) -> usize {
         self.vertices.len()
     }
 
@@ -289,7 +308,7 @@ impl Loop3D {
     /// will be considered a diagonal... be careful with this
     pub fn is_diagonal(&self, s: Segment3D) -> bool {
         let mut inter = Point3D::new(0., 0., 0.);
-        let n = self.n_vertices();
+        let n = self.len();
         // It cannot intercept any
         for i in 0..=n {
             let a = self.vertices[i % n];
@@ -318,7 +337,7 @@ impl Loop3D {
     pub fn close(&mut self) -> Result<(), String> {
         // Check if we can try to close now...
         if self.vertices.len() < 3 {
-            return Err("Trying to close a Loop3D with less than 3 vertices".to_string());
+            return Err(format!("Loops need at least 3 vertices\n{:?}", self.vertices).to_string());
         }
 
         // Check the last vertex for collinearity
@@ -602,7 +621,11 @@ mod testing {
 
     #[test]
     fn serde_ok(){
-        let a = "[ 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 2.0, 3.0, -1.0]";
+        let a = "[
+            0.0,0,0,  
+            1.0,1,1,  
+            2,3,-1
+        ]";
 
         let p: Loop3D = serde_json::from_str(a).unwrap();
         assert!(p.closed);
@@ -619,6 +642,8 @@ mod testing {
         assert_eq!(p.vertices[2].x, 2.);
         assert_eq!(p.vertices[2].y, 3.);
         assert_eq!(p.vertices[2].z, -1.);
+
+        println!("{}", serde_json::to_string(&p).unwrap());
 
     }
 
@@ -648,10 +673,10 @@ mod testing {
         assert_eq!(l[0], Point3D::new(1., 2., 3.));
 
         // n_vertices
-        assert_eq!(l.n_vertices(), 1);
+        assert_eq!(l.len(), 1);
 
         l.push(Point3D::new(4., 5., 6.)).unwrap();
-        assert_eq!(l.n_vertices(), 2);
+        assert_eq!(l.len(), 2);
         assert_eq!(l[1], Point3D::new(4., 5., 6.));
 
         // Collinear point in the middle
@@ -664,11 +689,11 @@ mod testing {
         l.push(Point3D::new(2., -2., 0.)).unwrap(); // 2
         assert_eq!(2, l.vertices.len());
         l.push(Point3D::new(2., 2., 0.)).unwrap(); // 3
-        assert_eq!(l.n_vertices(), 3);
+        assert_eq!(l.len(), 3);
         l.push(Point3D::new(-2., 2., 0.)).unwrap(); // 4
-        assert_eq!(l.n_vertices(), 4);
+        assert_eq!(l.len(), 4);
         l.close().unwrap();
-        assert_eq!(l.n_vertices(), 4);
+        assert_eq!(l.len(), 4);
         assert!((l.area - 16.).abs() < 1e-4);
 
         assert_eq!(l[0], Point3D::new(-2., -2., 0.));
@@ -684,13 +709,13 @@ mod testing {
         l.push(Point3D::new(2., -2., 0.)).unwrap(); // 1
         assert_eq!(2, l.vertices.len());
         l.push(Point3D::new(2., 2., 0.)).unwrap(); // 2
-        assert_eq!(l.n_vertices(), 3);
+        assert_eq!(l.len(), 3);
         l.push(Point3D::new(-2., 2., 0.)).unwrap(); // 3
-        assert_eq!(l.n_vertices(), 4);
+        assert_eq!(l.len(), 4);
         l.push(Point3D::new(-2., 0., 0.)).unwrap(); // 4 -- collinear point... will be removed when closing
         assert_eq!(5, l.vertices.len());
         l.close().unwrap();
-        assert_eq!(l.n_vertices(), 4);
+        assert_eq!(l.len(), 4);
         assert!((l.area - 16.).abs() < 1e-4);
         assert_eq!(l[0], Point3D::new(-2., -2., 0.));
         assert_eq!(l[1], Point3D::new(2., -2., 0.));
@@ -705,13 +730,13 @@ mod testing {
         l.push(Point3D::new(2., -2., 0.)).unwrap(); // 1
         assert_eq!(2, l.vertices.len());
         l.push(Point3D::new(2., 2., 0.)).unwrap(); // 2
-        assert_eq!(l.n_vertices(), 3);
+        assert_eq!(l.len(), 3);
         l.push(Point3D::new(-2., 2., 0.)).unwrap(); // 3
-        assert_eq!(l.n_vertices(), 4);
+        assert_eq!(l.len(), 4);
         l.push(Point3D::new(-2., -2., 0.)).unwrap(); // 4
         assert_eq!(5, l.vertices.len());
         l.close().unwrap();
-        assert_eq!(l.n_vertices(), 4);
+        assert_eq!(l.len(), 4);
         assert!((l.area - 16.).abs() < 1e-4);
         assert_eq!(l[0], Point3D::new(2., -2., 0.));
         assert_eq!(l[1], Point3D::new(2., 2., 0.));

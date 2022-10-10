@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use serde::{Serialize, Deserialize};
+use serde::{Serialize, Deserialize, Deserializer};
 
 use crate::Float;
 use crate::{Loop3D, Point3D, Segment3D, Vector3D};
@@ -32,7 +32,7 @@ use crate::{Loop3D, Point3D, Segment3D, Vector3D};
 /// 
 /// It is a structure containing several [`Loop3D`]. One of them is 
 /// the `outer` [`Loop3D`], and there there can be several `inner` [`Loop3D`].
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Polygon3D {
     /// The outer [`Loop3D`]
     outer: Loop3D,
@@ -46,6 +46,43 @@ pub struct Polygon3D {
     /// The normal of the `Polygon3D`, following a right-hand convention
     normal: Vector3D,
 }
+
+
+impl std::convert::From<Loop3D> for Polygon3D {
+    fn from(outer: Loop3D) -> Self {
+        let area = outer.area().expect("Trying to convert a non-closed Loop3D into a Polygon3D");
+        let normal = outer.normal();
+
+        Self { 
+            outer,
+            inner: Vec::with_capacity(0),
+            area,
+            normal,
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for Polygon3D {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let data: Loop3D = Deserialize::deserialize(deserializer)?;        
+
+        Ok(data.into())
+    }
+}
+
+
+
+impl Serialize for Polygon3D{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: serde::Serializer {            
+            self.outer.serialize(serializer)            
+    }
+}
+
 
 impl Polygon3D {
     /// Creates a new [`Loop3D`] without any holes
@@ -82,7 +119,7 @@ impl Polygon3D {
         for v in outer.vertices() {
             centroid += *v;
         }
-        centroid / (outer.n_vertices() as Float)
+        centroid / (outer.len() as Float)
     }
 
     /// Borrows the Outer [`Loop3D`]
@@ -221,7 +258,7 @@ impl Polygon3D {
             let mut min_ext_vertex_id = 0;
             //let mut min_int_vertex_id = 0;
 
-            let n_ext_vertices = ret_loop.n_vertices();
+            let n_ext_vertices = ret_loop.len();
             for j in 0..n_ext_vertices {
                 let ext_vertex = ret_loop[j];
 
@@ -232,7 +269,7 @@ impl Polygon3D {
                     }
 
                     let inner_loop = &self.inner[k];
-                    let n_inner_vertices = inner_loop.n_vertices();
+                    let n_inner_vertices = inner_loop.len();
                     for l in 0..n_inner_vertices {
                         let inner_vertex = inner_loop[l];
 
@@ -268,7 +305,7 @@ impl Polygon3D {
                 if i == min_ext_vertex_id {
                     // add the interior loop... adding the first
                     // point twice (hence the +1)
-                    let n_inner_loop_vertices = self.inner[min_inner_loop_id].n_vertices();
+                    let n_inner_loop_vertices = self.inner[min_inner_loop_id].len();
                     let inner_normal = self.inner[min_inner_loop_id].normal();
 
                     for j in 0..n_inner_loop_vertices + 1 {
@@ -325,6 +362,36 @@ impl Polygon3D {
 #[cfg(test)]
 mod testing {
     use super::*;
+
+    #[test]
+    fn serde_ok(){
+        let a = "[
+            0.0,0,0,  
+            1.0,1,1,  
+            2,3,-1
+        ]";
+
+        let pol: Polygon3D = serde_json::from_str(a).unwrap();
+        let p = &pol.outer;
+                
+        assert_eq!(p.len(), 3);
+
+        assert_eq!(p[0].x, 0.);
+        assert_eq!(p[0].y, 0.);
+        assert_eq!(p[0].z, 0.);
+
+        assert_eq!(p[1].x, 1.);
+        assert_eq!(p[1].y, 1.);
+        assert_eq!(p[1].z, 1.);
+
+        assert_eq!(p[2].x, 2.);
+        assert_eq!(p[2].y, 3.);
+        assert_eq!(p[2].z, -1.);
+
+        println!("{}", serde_json::to_string(&pol).unwrap());
+
+    }
+
 
     // use crate::vector3d::Vector3D;
 
@@ -510,7 +577,7 @@ mod testing {
 
         let closed = p.get_closed_loop();
 
-        assert_eq!(closed.n_vertices(), 10);
+        assert_eq!(closed.len(), 10);
 
         // 0
         let p = closed[0];
@@ -578,7 +645,7 @@ mod testing {
 
         let closed = p.get_closed_loop();
 
-        assert_eq!(closed.n_vertices(), 10);
+        assert_eq!(closed.len(), 10);
 
         // 0
         let p = closed[0];
