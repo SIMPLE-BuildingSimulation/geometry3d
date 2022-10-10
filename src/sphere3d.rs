@@ -35,7 +35,7 @@ use crate::{BBox3D, Point3D, Ray3D, Transform, Vector3D};
 /// Everything is in Local coordinates. Where $`\phi`$ describes the
 /// longitude (i.e., it goes from 0 to 360 degrees); and
 /// $`\theta`$ defines the latitude (i.e., it goes from 0 to 190 degrees).
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Sphere3D {
     /// The radius of the `Sphere3D`
     pub radius: Float,
@@ -193,7 +193,7 @@ impl Sphere3D {
         {
             panic!("After solve_quadratic in Sphere intersection: t0.as_float() = {}, t1.as_float() = {}", t0.as_float(), t1.as_float());
         }
-        
+
         // t0 < t1... so, check if they are possitive
         if t1.low <= 0.0 {
             return None;
@@ -213,7 +213,7 @@ impl Sphere3D {
             // Calculate point of intersection.
             let mut phit = ray.project(thit.as_float());
             // refine in order to avoid error accumulation
-            let aux : Vector3D = phit.into();
+            let aux: Vector3D = phit.into();
             phit *= self.radius / aux.length();
 
             // Avoid a singularity on top of the sphere

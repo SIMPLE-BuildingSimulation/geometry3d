@@ -146,7 +146,7 @@ impl ApproxFloat {
         let discr_sqrt = disc.sqrt();
 
         // Use Muller's method for making this faster...
-        
+
         let q: ApproxFloat = if b.as_float() < 0. {
             -(b - discr_sqrt) * 0.5
         } else {
@@ -217,9 +217,9 @@ impl std::ops::Sub<Float> for ApproxFloat {
 pub fn max_min(aux: &[Float; 4]) -> (Float, Float) {
     // let v = std::simd::Simd::from(*aux);
     // (v.reduce_max(), v.reduce_min())
-    let mut max=aux[0];
+    let mut max = aux[0];
     let mut min = aux[0];
-    for v in aux.iter().skip(1){
+    for v in aux.iter().skip(1) {
         if *v > max {
             max = *v
         }
@@ -227,7 +227,7 @@ pub fn max_min(aux: &[Float; 4]) -> (Float, Float) {
             min = *v
         }
     }
-    (max,min)
+    (max, min)
 }
 
 impl std::ops::Mul for ApproxFloat {

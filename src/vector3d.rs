@@ -22,13 +22,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::Float;
 
 use crate::Point3D;
 use std::fmt;
 
 /// A 3-dimensional Vector
-#[derive(Debug, Copy, Clone, PartialEq, Default)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Vector3D {
     /// the X component
     pub x: Float,
@@ -44,12 +47,18 @@ impl fmt::Display for Vector3D {
     }
 }
 
+impl std::convert::From<Point3D> for Vector3D {
+    fn from(v: Point3D) -> Vector3D {
+        Vector3D::new(v.x, v.y, v.z)
+    }
+}
+
 impl Vector3D {
     /// Creates a new vector.
     pub fn new(x: Float, y: Float, z: Float) -> Vector3D {
         Vector3D { x, y, z }
     }
-    
+
     /// Returns a new vector, containing the absolute values of each component of `self`
     pub fn abs(&self) -> Self {
         Self {
@@ -166,11 +175,11 @@ impl Vector3D {
         self.length_squared().sqrt()
     }
 
-    /// Calculates the length of a vector squared. 
-    /// 
+    /// Calculates the length of a vector squared.
+    ///
     /// Often using the squared of the length is the same as using the length of a vector
     /// (e.g., when comparing distances, the squared lengths of vectors are sorted in the same order
-    /// as the lengths themselves). In such cases, using `length_squared()` is preferred because 
+    /// as the lengths themselves). In such cases, using `length_squared()` is preferred because
     /// it is faster
     pub fn length_squared(&self) -> Float {
         self.x * self.x + self.y * self.y + self.z * self.z

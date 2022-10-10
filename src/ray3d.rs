@@ -26,7 +26,7 @@ use crate::{Point3D, Vector3D};
 
 use crate::Float;
 
-/// A simple Ray structure, consiting of an origin (i.e., [`Point3D`]) 
+/// A simple Ray structure, consiting of an origin (i.e., [`Point3D`])
 /// and a direction (i.e., a [`Vector3D`])
 #[derive(Debug, Copy, Clone)]
 pub struct Ray3D {

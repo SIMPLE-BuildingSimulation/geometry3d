@@ -56,7 +56,7 @@ pub fn intersect_triangle(
     }
     let q = s.cross(edge1);
     let v = f * (ray.direction * q);
-    
+
     if !(0.0..=1.0).contains(&v) {
         return None;
     }
@@ -68,7 +68,7 @@ pub fn intersect_triangle(
 }
 
 /// A simple 3-dimentional Triangle.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Triangle3D {
     /// First vertex
     a: Point3D,
@@ -252,8 +252,7 @@ impl Triangle3D {
         Point3D::new(dx / 3., dy / 3., dz / 3.)
     }
 
-    
-    /// Gets  a specific vertex. Returns an error if the number 
+    /// Gets  a specific vertex. Returns an error if the number
     /// of the vertex is greater than 2 (i.e., valid vertices are 0, 1, 2)
     pub fn vertex(&self, i: usize) -> Result<Point3D, String> {
         match i {

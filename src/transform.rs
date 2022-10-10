@@ -37,6 +37,7 @@ macro_rules! elem {
 }
 
 /// Represents a transformation matrix
+#[derive(Debug, Clone)]
 pub struct Transform {
     elements: [Float; 16],
     inv_elements: [Float; 16],
@@ -98,7 +99,6 @@ fn mul4x4_abs(matrix: &[Float; 16], x: Float, y: Float, z: Float) -> Point3D {
 
     Point3D::new(err_x, err_y, err_z)
 }
-
 
 /// Multiplies two 4x4 matrices, represented as `[Float; 16]`
 pub fn mul4x4(m1: &[Float; 16], m2: &[Float; 16]) -> [Float; 16] {
@@ -574,7 +574,6 @@ impl Transform {
         );
         ret
     }
-
 
     /// Applies the inverse of a transform to a [`BBox3D`] object
     pub fn inv_transform_bbox(&self, bbox: BBox3D) -> BBox3D {

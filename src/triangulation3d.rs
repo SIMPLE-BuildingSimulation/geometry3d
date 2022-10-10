@@ -71,6 +71,7 @@ impl std::ops::Add<usize> for Edge {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 struct TriPiece {
     triangle: Triangle3D,
 
@@ -106,6 +107,7 @@ struct TriPiece {
 
 /// A set of [`Triangle3D`] that, together, cover completely
 /// a [`Polygon3D`].
+#[derive(Debug, Clone)]
 pub struct Triangulation3D {
     /// The triangles
     triangles: Vec<TriPiece>,
@@ -260,14 +262,17 @@ impl Triangulation3D {
         let mut the_loop = poly.get_closed_loop();
         the_loop.close().unwrap();
         // This is a theorem, apparently.
-        let mut t = Triangulation3D::with_capacity(the_loop.n_vertices() - 2);
+        let mut t = Triangulation3D::with_capacity(the_loop.len() - 2);
 
         let mut anchor = 0;
         let mut count = 0;
         loop {
-            assert!(count < 1000, "Excessive number of iteration when triangulating polygon");
+            assert!(
+                count < 1000,
+                "Excessive number of iteration when triangulating polygon"
+            );
             count += 1;
-            let n = the_loop.n_vertices();
+            let n = the_loop.len();
             let count = t.n_triangles();
             if n == 2 {
                 // return
@@ -1189,7 +1194,7 @@ mod testing {
 
                 // Go through outer loop.
                 let outer = p.outer();
-                let n_out = outer.n_vertices();
+                let n_out = outer.len();
                 for j in 0..n_out {
                     let a = outer[j];
                     let b = outer[(j + 1) % n_out];
@@ -1208,7 +1213,7 @@ mod testing {
                 // Go through inner loops.
                 for l_i in 0..p.n_inner_loops() {
                     let inner = p.inner(l_i).unwrap();
-                    let n_in = inner.n_vertices();
+                    let n_in = inner.len();
 
                     for j in 0..n_in {
                         let a = inner[j];
@@ -2286,7 +2291,7 @@ mod testing {
         outer.push(p4).unwrap();
         outer.push(p5).unwrap();
         outer.close().unwrap();
-        assert_eq!(6, outer.n_vertices());
+        assert_eq!(6, outer.len());
 
         let poly = Polygon3D::new(outer).unwrap();
         let max_area = 0.1;
