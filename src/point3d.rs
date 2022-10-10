@@ -46,24 +46,17 @@ impl std::fmt::Display for Point3D {
     }
 }
 
-impl std::convert::From<Vector3D> for Point3D{
+impl std::convert::From<Vector3D> for Point3D {
     fn from(v: Vector3D) -> Self {
         Point3D::new(v.x, v.y, v.z)
     }
 }
 
-impl std::convert::Into<Vector3D> for Point3D{
-    fn into(self) -> Vector3D {
-        Vector3D::new(self.x, self.y, self.z)
-    }
-}
-
 impl Point3D {
-
     /// Creates a new [`Point3D`]
     /// ```
     /// # use geometry3d::Point3D;
-    /// 
+    ///
     /// let pt = Point3D::new(0., 1., 2.);
     /// ```
     pub fn new(x: Float, y: Float, z: Float) -> Point3D {
@@ -73,7 +66,7 @@ impl Point3D {
     /// Checks whether the [`Point3D`] is located at the origin
     /// ```
     /// # use geometry3d::Point3D;
-    /// 
+    ///
     /// let pt = Point3D::new(0., 0., 0.);
     /// assert!(pt.is_zero());
     /// ```
@@ -82,12 +75,11 @@ impl Point3D {
         self.x.abs() < TINY && self.y.abs() < TINY && self.z.abs() < TINY
     }
 
-    
     /// Calculates the square of the distance between two [`Point3D`]
     /// This is faster than calculating the `distance()`
     /// ```
     /// # use geometry3d::Point3D;
-    /// 
+    ///
     /// let a = Point3D::new(0., 0., 0.);
     /// let b = Point3D::new(2., 0., 0.);
     /// assert_eq!(a.squared_distance(b), 4.);
@@ -102,7 +94,7 @@ impl Point3D {
     /// Calculates the distance between two [`Point3D`]
     /// ```
     /// # use geometry3d::Point3D;
-    /// 
+    ///
     /// let a = Point3D::new(0., 0., 0.);
     /// let b = Point3D::new(2., 0., 0.);
     /// assert_eq!(a.distance(b), 2.);
@@ -115,7 +107,7 @@ impl Point3D {
     /// Checks if two [`Point3D`] are sifnificantly close
     /// ```
     /// # use geometry3d::Point3D;
-    /// 
+    ///
     /// let a = Point3D::new(0., 0., 0.);
     /// let b = Point3D::new(2., 0., 0.);
     /// assert!(!a.compare(b));
@@ -126,7 +118,7 @@ impl Point3D {
         (self.x - p.x).abs() < EPS && (self.y - p.y).abs() < EPS && (self.z - p.z).abs() < EPS
     }
 
-    /// Checks if a certain [`Point3D`] is collinear with two 
+    /// Checks if a certain [`Point3D`] is collinear with two
     /// other [`Point3D`]. Will return an error if the two other
     /// points are the same
     pub fn is_collinear(self, b: Point3D, c: Point3D) -> Result<bool, String> {
@@ -482,7 +474,7 @@ mod testing {
         let z = 9123.2;
 
         let p = Point3D::new(x, y, z);
-        let v : Vector3D = p.into();
+        let v: Vector3D = p.into();
 
         assert_eq!(x, v.x);
         assert_eq!(y, v.y);

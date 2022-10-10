@@ -48,7 +48,6 @@ impl Segment3D {
         }
     }
 
-
     /// Gets the start of the [`Segment3D`]
     pub fn start(&self) -> Point3D {
         self.start
@@ -190,9 +189,9 @@ impl Segment3D {
         if delta.cross(normal).is_zero() {
             return None;
         }
-        
+
         // Check for intersection.
-        const TINY : Float = 1e-5;
+        const TINY: Float = 1e-5;
         let (t_a, t_b) = if normal.z.abs() > TINY {
             let det = a.y * b.x - a.x * b.y;
             let t_a = (b.y * delta.x - b.x * delta.y) / det;

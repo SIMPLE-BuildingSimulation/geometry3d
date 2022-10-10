@@ -193,7 +193,7 @@ impl Sphere3D {
         {
             panic!("After solve_quadratic in Sphere intersection: t0.as_float() = {}, t1.as_float() = {}", t0.as_float(), t1.as_float());
         }
-        
+
         // t0 < t1... so, check if they are possitive
         if t1.low <= 0.0 {
             return None;
@@ -213,7 +213,7 @@ impl Sphere3D {
             // Calculate point of intersection.
             let mut phit = ray.project(thit.as_float());
             // refine in order to avoid error accumulation
-            let aux : Vector3D = phit.into();
+            let aux: Vector3D = phit.into();
             phit *= self.radius / aux.length();
 
             // Avoid a singularity on top of the sphere

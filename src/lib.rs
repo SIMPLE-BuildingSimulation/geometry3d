@@ -25,7 +25,7 @@ SOFTWARE.
 #![deny(missing_docs)]
 
 //! This library has several 3D Geometry functionalities. E.g.,
-//! 
+//!
 //! * Points
 //! * Vectors
 //! * Segments
@@ -34,7 +34,6 @@ SOFTWARE.
 //! * Triangulation (e.g., sort of meshing... but not very high quality for finite element methods, probably)
 //! * Polygons
 //! * Ray/Primitive intersection algorythms (not fast enough for rendering, though, as it uses dynamic dispatch)
-
 
 // Define whether we are working with
 // doubles (i.e., f64) or floats (i.e., f32)

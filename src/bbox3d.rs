@@ -242,12 +242,12 @@ impl BBox3D {
     /// ```
     pub fn intersect(&self, ray: &Ray3D, inv_dir: &Vector3D) -> bool {
         /* THIS REQUIRES SIMD */
-            // let mut mins_maxes = std::simd::Simd::from([self.min.x, self.max.x, self.min.y, self.max.y]);
-            // let aux1 = std::simd::Simd::from([ray.origin.x, ray.origin.x, ray.origin.y, ray.origin.y]);
-            // mins_maxes -= aux1;
-            // let aux2 = std::simd::Simd::from([inv_dir.x, inv_dir.x, inv_dir.y, inv_dir.y]);
-            // mins_maxes *= aux2;
-            // let [mut tx_min, mut tx_max, mut ty_min, mut ty_max] = *mins_maxes.as_array();
+        // let mut mins_maxes = std::simd::Simd::from([self.min.x, self.max.x, self.min.y, self.max.y]);
+        // let aux1 = std::simd::Simd::from([ray.origin.x, ray.origin.x, ray.origin.y, ray.origin.y]);
+        // mins_maxes -= aux1;
+        // let aux2 = std::simd::Simd::from([inv_dir.x, inv_dir.x, inv_dir.y, inv_dir.y]);
+        // mins_maxes *= aux2;
+        // let [mut tx_min, mut tx_max, mut ty_min, mut ty_max] = *mins_maxes.as_array();
         /* END OF THE SIMD DEPENDENCY */
 
         /* ELSE, NOT SIMD */

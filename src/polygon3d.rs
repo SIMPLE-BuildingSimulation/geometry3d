@@ -22,15 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use serde::{Serialize, Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::Float;
 use crate::{Loop3D, Point3D, Segment3D, Vector3D};
 
-
 /// A 3-dimensional Polygon which can contain holes.
-/// 
-/// It is a structure containing several [`Loop3D`]. One of them is 
+///
+/// It is a structure containing several [`Loop3D`]. One of them is
 /// the `outer` [`Loop3D`], and there there can be several `inner` [`Loop3D`].
 #[derive(Debug, Clone)]
 pub struct Polygon3D {
@@ -39,21 +38,22 @@ pub struct Polygon3D {
 
     /// A vector of inner [`Loop3D`]
     inner: Vec<Loop3D>,
-        
+
     /// The area of the `Polygon3D`    
     area: Float,
-    
+
     /// The normal of the `Polygon3D`, following a right-hand convention
     normal: Vector3D,
 }
 
-
 impl std::convert::From<Loop3D> for Polygon3D {
     fn from(outer: Loop3D) -> Self {
-        let area = outer.area().expect("Trying to convert a non-closed Loop3D into a Polygon3D");
+        let area = outer
+            .area()
+            .expect("Trying to convert a non-closed Loop3D into a Polygon3D");
         let normal = outer.normal();
 
-        Self { 
+        Self {
             outer,
             inner: Vec::with_capacity(0),
             area,
@@ -67,22 +67,20 @@ impl<'de> Deserialize<'de> for Polygon3D {
     where
         D: Deserializer<'de>,
     {
-        let data: Loop3D = Deserialize::deserialize(deserializer)?;        
+        let data: Loop3D = Deserialize::deserialize(deserializer)?;
 
         Ok(data.into())
     }
 }
 
-
-
-impl Serialize for Polygon3D{
+impl Serialize for Polygon3D {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: serde::Serializer {            
-            self.outer.serialize(serializer)            
+    where
+        S: serde::Serializer,
+    {
+        self.outer.serialize(serializer)
     }
 }
-
 
 impl Polygon3D {
     /// Creates a new [`Loop3D`] without any holes
@@ -364,7 +362,7 @@ mod testing {
     use super::*;
 
     #[test]
-    fn serde_ok(){
+    fn serde_ok() {
         let a = "[
             0.0,0,0,  
             1.0,1,1,  
@@ -373,7 +371,7 @@ mod testing {
 
         let pol: Polygon3D = serde_json::from_str(a).unwrap();
         let p = &pol.outer;
-                
+
         assert_eq!(p.len(), 3);
 
         assert_eq!(p[0].x, 0.);
@@ -389,9 +387,7 @@ mod testing {
         assert_eq!(p[2].z, -1.);
 
         println!("{}", serde_json::to_string(&pol).unwrap());
-
     }
-
 
     // use crate::vector3d::Vector3D;
 
@@ -461,7 +457,6 @@ mod testing {
         assert!((2. * l * 2. * l - poly.area).abs() < 1e-4);
         assert!(!poly.normal.is_zero());
     }
-
 
     #[test]
     fn test_test_cut_hole() {

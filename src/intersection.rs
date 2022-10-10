@@ -25,13 +25,13 @@ SOFTWARE.
 use crate::{Float, Point3D, Ray3D, Transform, Vector3D};
 
 /// Is the [`Ray3D`] intersecting from the Front or Back side?
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum SurfaceSide {
     /// The intersection happens at the front
     Front,
     /// The intersection happens at the back
     Back,
-    /// The intersectionis not possible (e.g., the ray is parallel 
+    /// The intersectionis not possible (e.g., the ray is parallel
     /// to a `Triangle3D` but it still goes through one of its vertices)
     NonApplicable,
 }
@@ -63,7 +63,7 @@ impl std::default::Default for SurfaceSide {
 
 /// Contains more detailed information about the
 /// what is happening at the surface in the intersection point
-#[derive( Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct IntersectionInfo {
     /// The point of intersection
     pub p: Point3D,
@@ -97,7 +97,8 @@ pub struct IntersectionInfo {
 }
 
 impl IntersectionInfo {
-    /// Creates a new `IntersectionInfo` object
+    /// Creates a new `IntersectionInfo` object    
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         ray: &Ray3D,
         p: Point3D,
@@ -141,8 +142,7 @@ impl IntersectionInfo {
         }
     }
 
-
-    /// Applies a `Transform` to the `IntersectionInfo`, creating a new one. 
+    /// Applies a `Transform` to the `IntersectionInfo`, creating a new one.
     pub fn transform(&self, transform: &Transform) -> Self {
         Self {
             p: transform.transform_pt(self.p),

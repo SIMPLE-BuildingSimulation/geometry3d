@@ -267,7 +267,10 @@ impl Triangulation3D {
         let mut anchor = 0;
         let mut count = 0;
         loop {
-            assert!(count < 1000, "Excessive number of iteration when triangulating polygon");
+            assert!(
+                count < 1000,
+                "Excessive number of iteration when triangulating polygon"
+            );
             count += 1;
             let n = the_loop.len();
             let count = t.n_triangles();
