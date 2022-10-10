@@ -689,6 +689,12 @@
 <span id="655">655</span>
 <span id="656">656</span>
 <span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -738,12 +744,18 @@ SOFTWARE.
     }
 }
 
+<span class="kw">impl</span> <span class="ident">std::convert::From</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">Vector3D</span> {
+        <span class="ident">Vector3D::new</span>(<span class="ident">v</span>.<span class="ident">x</span>, <span class="ident">v</span>.<span class="ident">y</span>, <span class="ident">v</span>.<span class="ident">z</span>)
+    }
+}
+
 <span class="kw">impl</span> <span class="ident">Vector3D</span> {
     <span class="doccomment">/// Creates a new vector.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">Float</span>, <span class="ident">y</span>: <span class="ident">Float</span>, <span class="ident">z</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Vector3D</span> {
         <span class="ident">Vector3D</span> { <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span> }
     }
-    
+
     <span class="doccomment">/// Returns a new vector, containing the absolute values of each component of `self`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
@@ -860,11 +872,11 @@ SOFTWARE.
         <span class="self">self</span>.<span class="ident">length_squared</span>().<span class="ident">sqrt</span>()
     }
 
-    <span class="doccomment">/// Calculates the length of a vector squared. </span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">/// Calculates the length of a vector squared.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// Often using the squared of the length is the same as using the length of a vector</span>
     <span class="doccomment">/// (e.g., when comparing distances, the squared lengths of vectors are sorted in the same order</span>
-    <span class="doccomment">/// as the lengths themselves). In such cases, using `length_squared()` is preferred because </span>
+    <span class="doccomment">/// as the lengths themselves). In such cases, using `length_squared()` is preferred because</span>
     <span class="doccomment">/// it is faster</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length_squared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
         <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">z</span>

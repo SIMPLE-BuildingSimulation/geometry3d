@@ -1245,10 +1245,6 @@
 <span id="1211">1211</span>
 <span id="1212">1212</span>
 <span id="1213">1213</span>
-<span id="1214">1214</span>
-<span id="1215">1215</span>
-<span id="1216">1216</span>
-<span id="1217">1217</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -1274,15 +1270,15 @@ SOFTWARE.
 */</span>
 
 <span class="kw">use</span> <span class="ident">serde::ser::SerializeSeq</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>};
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Float</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Point3D</span>, <span class="ident">Segment3D</span>, <span class="ident">Vector3D</span>};
 
 <span class="doccomment">/// A set of [`Point3D`] in sequence, forming a closed loop.</span>
-<span class="doccomment">/// It has some particularities. </span>
-<span class="doccomment">/// </span>
+<span class="doccomment">/// It has some particularities.</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use geometry3d::{Loop3D, Point3D};</span>
 <span class="doccomment">/// let mut the_loop = Loop3D::new();</span>
@@ -1302,36 +1298,36 @@ SOFTWARE.
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # Note:</span>
 <span class="doccomment">/// It has some peculiarities. For instance, it attempts</span>
-<span class="doccomment">/// to reduce the number of points on a [`Loop3D`]. This is done by </span>
+<span class="doccomment">/// to reduce the number of points on a [`Loop3D`]. This is done by</span>
 <span class="doccomment">/// identifying when a colinear [`Point3D`] is to be added and, instead</span>
 <span class="doccomment">/// of extending the [`Loop3D`], replacing the last element.</span>
-<span class="doccomment">/// </span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use geometry3d::{Loop3D, Point3D};</span>
 <span class="doccomment">/// let mut the_loop = Loop3D::new();</span>
-<span class="doccomment">/// </span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// the_loop.push(Point3D::new(0., 0., 0.)).unwrap();</span>
 <span class="doccomment">/// the_loop.push(Point3D::new(1., 1., 0.)).unwrap();</span>
 <span class="doccomment">/// assert_eq!(2, the_loop.n_vertices());</span>
-<span class="doccomment">/// </span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// // Adding a collinear point will not extend.</span>
 <span class="doccomment">/// let collinear = Point3D::new(2., 2., 0.);</span>
 <span class="doccomment">/// the_loop.push(collinear).unwrap();</span>
 <span class="doccomment">/// assert_eq!(2, the_loop.n_vertices());</span>
 <span class="doccomment">/// assert_eq!(the_loop[1], collinear);</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// </span>
+<span class="doccomment">///</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Loop3D</span> {
     <span class="doccomment">/// The points of the [`Loop3D`]</span>
     <span class="ident">vertices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span>,
-    
+
     <span class="doccomment">/// The normal, following a right-hand-side convention</span>
     <span class="ident">normal</span>: <span class="ident">Vector3D</span>,
-    
+
     <span class="doccomment">/// A flag indicating whether the [`Loop3D`] is considered finished or not.</span>
     <span class="ident">closed</span>: <span class="ident">bool</span>,
-    
+
     <span class="doccomment">/// The area of the [`Loop3D`], only calculated when closing it</span>
     <span class="ident">area</span>: <span class="ident">Float</span>,
 
@@ -1339,8 +1335,7 @@ SOFTWARE.
     <span class="ident">perimeter</span>: <span class="ident">Float</span>,
 }
 
-
-<span class="kw">impl</span> <span class="ident">std::iter::IntoIterator</span> <span class="kw">for</span> <span class="ident">Loop3D</span>{
+<span class="kw">impl</span> <span class="ident">std::iter::IntoIterator</span> <span class="kw">for</span> <span class="ident">Loop3D</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Point3D</span>;
     <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">std::vec::IntoIter</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
@@ -1348,19 +1343,19 @@ SOFTWARE.
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Loop3D</span>{
+<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Loop3D</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">S</span>: <span class="ident">serde::Serializer</span> {
-            
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span>  <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="number">3</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">vertices</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
-            <span class="kw">for</span> <span class="ident">Point3D</span>{<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span> } <span class="kw">in</span> <span class="self">self</span>.<span class="ident">vertices</span>.<span class="ident">iter</span>(){
-                <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">x</span>)<span class="question-mark">?</span>;
-                <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">y</span>)<span class="question-mark">?</span>;
-                <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">z</span>)<span class="question-mark">?</span>;
-            }
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="number">3</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">vertices</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
+        <span class="kw">for</span> <span class="ident">Point3D</span> { <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span> } <span class="kw">in</span> <span class="self">self</span>.<span class="ident">vertices</span>.<span class="ident">iter</span>() {
+            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">x</span>)<span class="question-mark">?</span>;
+            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">y</span>)<span class="question-mark">?</span>;
+            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">z</span>)<span class="question-mark">?</span>;
+        }
 
-            <span class="ident">seq</span>.<span class="ident">end</span>()
+        <span class="ident">seq</span>.<span class="ident">end</span>()
     }
 }
 
@@ -1372,34 +1367,29 @@ SOFTWARE.
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">Deserialize::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Value::Array</span>(<span class="ident">a</span>) <span class="op">=</span> <span class="ident">data</span> { 
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Value::Array</span>(<span class="ident">a</span>) <span class="op">=</span> <span class="ident">data</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">it</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">iter</span>();
-            
-            
+
             <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">it</span>.<span class="ident">next</span>() {
-                
-                <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">x</span>{
-                    <span class="ident">Value::Number</span>(<span class="ident">x</span>)=&gt;<span class="ident">x</span>.<span class="ident">as_f64</span>().<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="ident">Float</span>,
-                    <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expecting Polygon3D to be an array of numbers&quot;</span>)
-                };                
+                <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">x</span> {
+                    <span class="ident">Value::Number</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">as_f64</span>().<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="ident">Float</span>,
+                    <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expecting Polygon3D to be an array of numbers&quot;</span>),
+                };
                 <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">it</span>.<span class="ident">next</span>();
-                <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">y</span>{
-                    <span class="prelude-val">Some</span>(<span class="ident">Value::Number</span>(<span class="ident">y</span>))=&gt;<span class="ident">y</span>.<span class="ident">as_f64</span>().<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="ident">Float</span>,
-                    <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expecting Polygon3D to be an array of numbers&quot;</span>)
-                };                
+                <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">y</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">Value::Number</span>(<span class="ident">y</span>)) =&gt; <span class="ident">y</span>.<span class="ident">as_f64</span>().<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="ident">Float</span>,
+                    <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expecting Polygon3D to be an array of numbers&quot;</span>),
+                };
                 <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">it</span>.<span class="ident">next</span>();
-                <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">z</span>{
-                    <span class="prelude-val">Some</span>(<span class="ident">Value::Number</span>(<span class="ident">z</span>))=&gt;<span class="ident">z</span>.<span class="ident">as_f64</span>().<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="ident">Float</span>,
-                    <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expecting Polygon3D to be an array of numbers&quot;</span>)
-                };                
-                <span class="ident">ret</span>.<span class="ident">push</span>(<span class="ident">Point3D</span> { <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span> }).<span class="ident">unwrap</span>();                
-            
+                <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">z</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">Value::Number</span>(<span class="ident">z</span>)) =&gt; <span class="ident">z</span>.<span class="ident">as_f64</span>().<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="ident">Float</span>,
+                    <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expecting Polygon3D to be an array of numbers&quot;</span>),
+                };
+                <span class="ident">ret</span>.<span class="ident">push</span>(<span class="ident">Point3D</span> { <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span> }).<span class="ident">unwrap</span>();
             }
-        
         }
 
         <span class="ident">ret</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
-
 
         <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
     }
@@ -1441,10 +1431,9 @@ SOFTWARE.
     }
 
     <span class="doccomment">/// Checks if the [`Loop3D`] has Zero vertices</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)-&gt;<span class="ident">bool</span>{
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">vertices</span>.<span class="ident">is_empty</span>()
     }
-    
 
     <span class="doccomment">/// Borrows the vertices</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">vertices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Point3D</span>] {
@@ -1539,7 +1528,7 @@ SOFTWARE.
     }
 
     <span class="doccomment">/// Counts the vertices in the [`Loop3D`]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span><span class="op">=</span><span class="string">&quot;Use len() instead&quot;</span>]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Use len() instead&quot;</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_vertices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">vertices</span>.<span class="ident">len</span>()
     }
@@ -1548,7 +1537,6 @@ SOFTWARE.
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">vertices</span>.<span class="ident">len</span>()
     }
-
 
     <span class="doccomment">/// Checks if a [`Segment3D`] intersects any of the other [`Segment3D`]</span>
     <span class="doccomment">/// in the [`Loop3D`] and if its midpoint is inside of it.</span>
@@ -1588,7 +1576,7 @@ SOFTWARE.
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// Check if we can try to close now...</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">vertices</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">3</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Loops need at least 3 vertices\n{:?}&quot;</span>, <span class="self">self</span>.<span class="ident">vertices</span>).<span class="ident">to_string</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Loops need at least 3 vertices&quot;</span>.<span class="ident">to_string</span>());
         }
 
         <span class="comment">// Check the last vertex for collinearity</span>
@@ -1706,8 +1694,8 @@ SOFTWARE.
 
             <span class="comment">// Check if the ray and the segment touch. We only consider</span>
             <span class="comment">// touching at the start (e.g., t_a between [0 and 1) ) in</span>
-            <span class="comment">// order not to count vertices twice.            </span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">t_a</span>, <span class="ident">t_b</span>)) <span class="op">=</span> <span class="ident">segment_ab</span>.<span class="ident">get_intersection_pt</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>) {                
+            <span class="comment">// order not to count vertices twice.</span>
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">t_a</span>, <span class="ident">t_b</span>)) <span class="op">=</span> <span class="ident">segment_ab</span>.<span class="ident">get_intersection_pt</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>) {
                 <span class="comment">// If the ray intersects</span>
                 <span class="kw">if</span> (<span class="number">0.</span> ..<span class="op">=</span><span class="number">1.</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">t_b</span>) <span class="op">&amp;&amp;</span> (<span class="number">0.</span> ..<span class="op">=</span><span class="number">1.</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">t_a</span>) {
                     <span class="kw">if</span> <span class="ident">t_a</span> <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span> {
@@ -1735,9 +1723,10 @@ SOFTWARE.
     } <span class="comment">// end of test_point</span>
 
     <span class="doccomment">/// Calculates and caches the perimeter of the [`Loop3D`]</span>
-    <span class="kw">fn</span> <span class="ident">set_perimeter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>)-&gt;<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Float</span>,<span class="ident">String</span><span class="op">&gt;</span>{
+    <span class="kw">fn</span> <span class="ident">set_perimeter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Float</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">closed</span> {
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Trying to calculate the perimeter of a Loop3D that is not closed&quot;</span>.<span class="ident">to_string</span>();
+            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span>
+                <span class="string">&quot;Trying to calculate the perimeter of a Loop3D that is not closed&quot;</span>.<span class="ident">to_string</span>();
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>);
         }
 
@@ -1755,14 +1744,12 @@ SOFTWARE.
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">per</span> <span class="op">=</span> <span class="number">0.0</span>;
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span>{
-            <span class="ident">per</span> <span class="op">+</span><span class="op">=</span> (<span class="self">self</span>.<span class="ident">vertices</span>[<span class="ident">i</span><span class="op">%</span><span class="ident">n</span>] <span class="op">-</span> <span class="self">self</span>.<span class="ident">vertices</span>[(<span class="ident">i</span><span class="op">+</span><span class="number">1</span>)<span class="op">%</span><span class="ident">n</span>]).<span class="ident">length</span>();
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
+            <span class="ident">per</span> <span class="op">+</span><span class="op">=</span> (<span class="self">self</span>.<span class="ident">vertices</span>[<span class="ident">i</span> <span class="op">%</span> <span class="ident">n</span>] <span class="op">-</span> <span class="self">self</span>.<span class="ident">vertices</span>[(<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">%</span> <span class="ident">n</span>]).<span class="ident">length</span>();
         }
-
 
         <span class="self">self</span>.<span class="ident">perimeter</span> <span class="op">=</span> <span class="ident">per</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">perimeter</span>)
-
     }
 
     <span class="doccomment">/// Calculates and caches the area of the [`Loop3D`]</span>
@@ -1790,8 +1777,8 @@ SOFTWARE.
 
         <span class="comment">// We need to go around from 0 to N vertices,</span>
         <span class="comment">// ... so, n+1 valid vertices.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> : <span class="ident">Vector3D</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">vertices</span>[<span class="number">0</span>].<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v_p1</span> : <span class="ident">Vector3D</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">vertices</span>[<span class="number">1</span>].<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span>: <span class="ident">Vector3D</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">vertices</span>[<span class="number">0</span>].<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v_p1</span>: <span class="ident">Vector3D</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">vertices</span>[<span class="number">1</span>].<span class="ident">into</span>();
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">2</span>..<span class="ident">n</span> <span class="op">+</span> <span class="number">2</span> {
             <span class="ident">rhs</span> <span class="op">+</span><span class="op">=</span> <span class="ident">v</span>.<span class="ident">cross</span>(<span class="ident">v_p1</span>);
             <span class="ident">v</span> <span class="op">=</span> <span class="ident">v_p1</span>;
@@ -1825,7 +1812,7 @@ SOFTWARE.
     }
 
     <span class="doccomment">/// Returns the centroid; i.e., the average of all vertices.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">centroid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)-&gt;<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Point3D</span>, <span class="ident">String</span><span class="op">&gt;</span>{
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">centroid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Point3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_closed</span>() {
             <span class="prelude-val">Err</span>(<span class="string">&quot;Trying to get the centroid of an open Loop3D&quot;</span>.<span class="ident">to_string</span>())
         } <span class="kw">else</span> {
@@ -1836,9 +1823,8 @@ SOFTWARE.
                 <span class="ident">y</span> <span class="op">+</span><span class="op">=</span> <span class="ident">v</span>.<span class="ident">y</span>;
                 <span class="ident">z</span> <span class="op">+</span><span class="op">=</span> <span class="ident">v</span>.<span class="ident">z</span>;
             }
-            
-            <span class="prelude-val">Ok</span>(<span class="ident">Point3D::new</span>(<span class="ident">x</span><span class="op">/</span><span class="ident">n</span>, <span class="ident">y</span><span class="op">/</span><span class="ident">n</span>, <span class="ident">z</span><span class="op">/</span><span class="ident">n</span>))
-            
+
+            <span class="prelude-val">Ok</span>(<span class="ident">Point3D::new</span>(<span class="ident">x</span> <span class="op">/</span> <span class="ident">n</span>, <span class="ident">y</span> <span class="op">/</span> <span class="ident">n</span>, <span class="ident">z</span> <span class="op">/</span> <span class="ident">n</span>))
         }
     }
 
@@ -1867,11 +1853,11 @@ SOFTWARE.
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">testing</span> {
-    
+
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serde_ok</span>(){
+    <span class="kw">fn</span> <span class="ident">serde_ok</span>() {
         <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="string">&quot;[
             0.0,0,0,  
             1.0,1,1,  
@@ -1895,7 +1881,6 @@ SOFTWARE.
         <span class="macro">assert_eq!</span>(<span class="ident">p</span>.<span class="ident">vertices</span>[<span class="number">2</span>].<span class="ident">z</span>, <span class="op">-</span><span class="number">1.</span>);
 
         <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>).<span class="ident">unwrap</span>());
-
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -2032,17 +2017,25 @@ SOFTWARE.
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_point_weird</span>(){
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">the_loop</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();        
-        <span class="ident">the_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>( <span class="number">10.</span>, <span class="op">-</span><span class="number">1.2246467991473533E-15</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">the_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">10.</span>, <span class="number">1.2246467991473533E-15</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">the_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">10.</span>, <span class="number">1.2246467991473533E-15</span>, <span class="number">3.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">the_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>( <span class="number">10.</span>, <span class="op">-</span><span class="number">1.2246467991473533E-15</span>, <span class="number">3.</span>)).<span class="ident">unwrap</span>();
+    <span class="kw">fn</span> <span class="ident">test_point_weird</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">the_loop</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
+        <span class="ident">the_loop</span>
+            .<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">10.</span>, <span class="op">-</span><span class="number">1.2246467991473533E-15</span>, <span class="number">0.</span>))
+            .<span class="ident">unwrap</span>();
+        <span class="ident">the_loop</span>
+            .<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">10.</span>, <span class="number">1.2246467991473533E-15</span>, <span class="number">0.</span>))
+            .<span class="ident">unwrap</span>();
+        <span class="ident">the_loop</span>
+            .<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">10.</span>, <span class="number">1.2246467991473533E-15</span>, <span class="number">3.</span>))
+            .<span class="ident">unwrap</span>();
+        <span class="ident">the_loop</span>
+            .<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">10.</span>, <span class="op">-</span><span class="number">1.2246467991473533E-15</span>, <span class="number">3.</span>))
+            .<span class="ident">unwrap</span>();
         <span class="ident">the_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">10.</span>,  <span class="number">1.2246467991473533E-15</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Point3D::new</span>( <span class="number">10.</span>, <span class="op">-</span><span class="number">1.2246467991473533E-15</span>, <span class="number">3.</span>);
-        <span class="kw">let</span> <span class="ident">mid</span> <span class="op">=</span> (<span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>)<span class="op">/</span><span class="number">2.</span>;
+        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">10.</span>, <span class="number">1.2246467991473533E-15</span>, <span class="number">0.</span>);
+        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">10.</span>, <span class="op">-</span><span class="number">1.2246467991473533E-15</span>, <span class="number">3.</span>);
+        <span class="kw">let</span> <span class="ident">mid</span> <span class="op">=</span> (<span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>) <span class="op">/</span> <span class="number">2.</span>;
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">the_loop</span>.<span class="ident">test_point</span>(<span class="ident">mid</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert!</span>(<span class="ident">r</span>);
     }
@@ -2190,7 +2183,7 @@ SOFTWARE.
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_point_concave_loop_interior_with_clean</span>() {
         <span class="comment">//Vector3D normal = Vector3D(0, 0, 1);</span>
-        
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">the_loop</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
         <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">1.</span> <span class="op">/</span> (<span class="number">2</span> <span class="kw">as</span> <span class="ident">Float</span>).<span class="ident">sqrt</span>();
         <span class="kw">let</span> <span class="ident">bigl</span> <span class="op">=</span> <span class="number">2.</span> <span class="op">/</span> (<span class="number">2</span> <span class="kw">as</span> <span class="ident">Float</span>).<span class="ident">sqrt</span>();
@@ -2444,7 +2437,6 @@ SOFTWARE.
         <span class="macro">assert!</span>(<span class="ident">outer</span>.<span class="ident">valid_to_add</span>(<span class="ident">p5</span>).<span class="ident">is_ok</span>());
     }
 
-
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_perimeter_centroid</span>() {
         <span class="comment">// A square with the center at the origin.</span>
@@ -2457,8 +2449,8 @@ SOFTWARE.
         <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span>, <span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
         <span class="ident">outer_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">outer_loop</span>.<span class="ident">perimeter</span>, <span class="number">8.</span><span class="kw-2">*</span><span class="ident">l</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">outer_loop</span>.<span class="ident">perimeter</span>().<span class="ident">unwrap</span>(), <span class="number">8.</span><span class="kw-2">*</span><span class="ident">l</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">outer_loop</span>.<span class="ident">perimeter</span>, <span class="number">8.</span> <span class="op">*</span> <span class="ident">l</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">outer_loop</span>.<span class="ident">perimeter</span>().<span class="ident">unwrap</span>(), <span class="number">8.</span> <span class="op">*</span> <span class="ident">l</span>);
 
         <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">outer_loop</span>.<span class="ident">centroid</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">x</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-8</span>);

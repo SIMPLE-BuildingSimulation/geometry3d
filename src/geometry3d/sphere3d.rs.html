@@ -921,7 +921,7 @@ SOFTWARE.
         {
             <span class="macro">panic!</span>(<span class="string">&quot;After solve_quadratic in Sphere intersection: t0.as_float() = {}, t1.as_float() = {}&quot;</span>, <span class="ident">t0</span>.<span class="ident">as_float</span>(), <span class="ident">t1</span>.<span class="ident">as_float</span>());
         }
-        
+
         <span class="comment">// t0 &lt; t1... so, check if they are possitive</span>
         <span class="kw">if</span> <span class="ident">t1</span>.<span class="ident">low</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
@@ -941,7 +941,7 @@ SOFTWARE.
             <span class="comment">// Calculate point of intersection.</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">phit</span> <span class="op">=</span> <span class="ident">ray</span>.<span class="ident">project</span>(<span class="ident">thit</span>.<span class="ident">as_float</span>());
             <span class="comment">// refine in order to avoid error accumulation</span>
-            <span class="kw">let</span> <span class="ident">aux</span> : <span class="ident">Vector3D</span> <span class="op">=</span> <span class="ident">phit</span>.<span class="ident">into</span>();
+            <span class="kw">let</span> <span class="ident">aux</span>: <span class="ident">Vector3D</span> <span class="op">=</span> <span class="ident">phit</span>.<span class="ident">into</span>();
             <span class="ident">phit</span> <span class="kw-2">*</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">radius</span> <span class="op">/</span> <span class="ident">aux</span>.<span class="ident">length</span>();
 
             <span class="comment">// Avoid a singularity on top of the sphere</span>
