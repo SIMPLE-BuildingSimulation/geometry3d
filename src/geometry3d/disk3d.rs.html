@@ -356,6 +356,11 @@
 <span id="322">322</span>
 <span id="323">323</span>
 <span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -536,8 +541,8 @@ SOFTWARE.
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">phit</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">centre</span>;
         <span class="kw">let</span> <span class="ident">rhit</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">length</span>();
         <span class="comment">// Calculate (u,v)</span>
-        <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">phi</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">phi_max</span>;
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">radius</span> <span class="op">-</span> <span class="ident">rhit</span>) <span class="op">/</span> (<span class="self">self</span>.<span class="ident">radius</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">inner_radius</span>);
+        <span class="kw">let</span> <span class="ident">_u</span> <span class="op">=</span> <span class="ident">phi</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">phi_max</span>;
+        <span class="kw">let</span> <span class="ident">_v</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">radius</span> <span class="op">-</span> <span class="ident">rhit</span>) <span class="op">/</span> (<span class="self">self</span>.<span class="ident">radius</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">inner_radius</span>);
 
         <span class="comment">// Calcuate first derivatives</span>
         <span class="kw">let</span> <span class="ident">zxn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">phi_zero</span>.<span class="ident">cross</span>(<span class="self">self</span>.<span class="ident">normal</span>);
@@ -559,9 +564,14 @@ SOFTWARE.
             <span class="ident">dpdv</span>,
             <span class="ident">normal</span>,
             <span class="ident">side</span>,
-            <span class="ident">u</span>,
-            <span class="ident">v</span>,
+
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
+            <span class="ident">u</span>: <span class="ident">_u</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
+            <span class="ident">v</span>: <span class="ident">_v</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
             <span class="ident">dndu</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
             <span class="ident">dndv</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
         })
     }
