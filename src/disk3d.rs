@@ -178,8 +178,8 @@ impl Disk3D {
         let r = phit - self.centre;
         let rhit = r.length();
         // Calculate (u,v)
-        let u = phi / self.phi_max;
-        let v = (self.radius - rhit) / (self.radius - self.inner_radius);
+        let _u = phi / self.phi_max;
+        let _v = (self.radius - rhit) / (self.radius - self.inner_radius);
 
         // Calcuate first derivatives
         let zxn = self.phi_zero.cross(self.normal);
@@ -201,9 +201,14 @@ impl Disk3D {
             dpdv,
             normal,
             side,
-            u,
-            v,
+
+            #[cfg(feature = "textures")]
+            u: _u,
+            #[cfg(feature = "textures")]
+            v: _v,
+            #[cfg(feature = "textures")]
             dndu: Vector3D::new(0., 0., 0.),
+            #[cfg(feature = "textures")]
             dndv: Vector3D::new(0., 0., 0.),
         })
     }

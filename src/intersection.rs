@@ -84,16 +84,42 @@ pub struct IntersectionInfo {
     pub dpdv: Vector3D,
 
     /// Partial derivative of the normal `n` with respect to u    
+    #[cfg(feature = "textures")]
     pub dndu: Vector3D,
 
     /// Partial derivative of the normal `n` with respect to v    
+    #[cfg(feature = "textures")]
     pub dndv: Vector3D,
 
     /// The position `u` of the intersection point
+    #[cfg(feature = "textures")]
     pub u: Float,
 
     /// The position `v` of the intersection point
+    #[cfg(feature = "textures")]
     pub v: Float,
+}
+
+
+impl std::default::Default for IntersectionInfo {
+    fn default()->Self{
+        Self{            
+            p: Point3D::new(0., 0., 0.),
+            normal: Vector3D::new(0., 0., 0.),            
+            side: SurfaceSide::default(),
+            dpdu: Vector3D::new(0., 0., 0.),
+            dpdv: Vector3D::new(0., 0., 0.),
+
+            #[cfg(feature = "textures")]
+            dndu: Vector3D::new(0., 0., 0.),
+            #[cfg(feature = "textures")]
+            dndv: Vector3D::new(0., 0., 0.),
+            #[cfg(feature = "textures")]
+            u: 0.0,
+            #[cfg(feature = "textures")]
+            v: 0.0,
+        }
+    }
 }
 
 impl IntersectionInfo {
@@ -102,8 +128,8 @@ impl IntersectionInfo {
     pub fn new(
         ray: &Ray3D,
         p: Point3D,
-        u: Float,
-        v: Float,
+        _u: Float,
+        _v: Float,
         dpdu: Vector3D,
         dpdv: Vector3D,
         d2p_duu: Vector3D,
@@ -123,9 +149,9 @@ impl IntersectionInfo {
         let g = normal * d2p_dvv;
 
         let inv_big_egf2 = 1. / (big_e * big_g - big_f * big_f);
-        let dndu = dpdu * ((f * big_f - e * big_g) * inv_big_egf2)
+        let _dndu = dpdu * ((f * big_f - e * big_g) * inv_big_egf2)
             + dpdv * ((e * big_f - f * big_e) * inv_big_egf2);
-        let dndv = dpdu * ((g * big_f - f * big_g) * inv_big_egf2)
+        let _dndv = dpdu * ((g * big_f - f * big_g) * inv_big_egf2)
             + dpdv * ((f * big_f - g * big_e) * inv_big_egf2);
 
         // return
@@ -135,10 +161,14 @@ impl IntersectionInfo {
             side,
             dpdu,
             dpdv,
-            dndu,
-            dndv,
-            u,
-            v,
+            #[cfg(feature = "textures")]
+            dndu: _dndu,
+            #[cfg(feature = "textures")]
+            dndv: _dndv,
+            #[cfg(feature = "textures")]
+            u: _u,
+            #[cfg(feature = "textures")]
+            v: _v,
         }
     }
 
@@ -150,9 +180,13 @@ impl IntersectionInfo {
             dpdv: transform.transform_vec(self.dpdv),
             normal: transform.transform_normal(self.normal),
             side: self.side,
+            #[cfg(feature = "textures")]
             u: self.u,
+            #[cfg(feature = "textures")]
             v: self.v,
+            #[cfg(feature = "textures")]
             dndu: transform.transform_vec(self.dndu),
+            #[cfg(feature = "textures")]
             dndv: transform.transform_vec(self.dndv),
         }
     }
@@ -165,9 +199,13 @@ impl IntersectionInfo {
             dpdv: transform.inv_transform_vec(self.dpdv),
             normal: transform.inv_transform_normal(self.normal),
             side: self.side,
+            #[cfg(feature = "textures")]
             u: self.u,
+            #[cfg(feature = "textures")]
             v: self.v,
+            #[cfg(feature = "textures")]
             dndu: transform.inv_transform_vec(self.dndu),
+            #[cfg(feature = "textures")]
             dndv: transform.inv_transform_vec(self.dndv),
         }
     }
