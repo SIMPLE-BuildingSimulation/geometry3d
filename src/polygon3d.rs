@@ -78,7 +78,8 @@ impl Serialize for Polygon3D {
     where
         S: serde::Serializer,
     {
-        self.outer.serialize(serializer)
+        let l = self.get_closed_loop();
+        l.serialize(serializer)
     }
 }
 
