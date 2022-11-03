@@ -794,6 +794,7 @@
 <span id="760">760</span>
 <span id="761">761</span>
 <span id="762">762</span>
+<span id="763">763</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -874,7 +875,8 @@ SOFTWARE.
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
     {
-        <span class="self">self</span>.<span class="ident">outer</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_closed_loop</span>();
+        <span class="ident">l</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
 
