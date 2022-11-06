@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/intersection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>intersection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/intersection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>intersection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>
 <script>
   "use strict";
@@ -309,238 +309,238 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/</span>
+*/
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Float</span>, <span class="ident">Point3D</span>, <span class="ident">Ray3D</span>, <span class="ident">Transform</span>, <span class="ident">Vector3D</span>};
+</span><span class="kw">use crate</span>::{Float, Point3D, Ray3D, Transform, Vector3D};
 
-<span class="doccomment">/// Is the [`Ray3D`] intersecting from the Front or Back side?</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SurfaceSide</span> {
-    <span class="doccomment">/// The intersection happens at the front</span>
-    <span class="ident">Front</span>,
-    <span class="doccomment">/// The intersection happens at the back</span>
-    <span class="ident">Back</span>,
-    <span class="doccomment">/// The intersectionis not possible (e.g., the ray is parallel</span>
-    <span class="doccomment">/// to a `Triangle3D` but it still goes through one of its vertices)</span>
-    <span class="ident">NonApplicable</span>,
+<span class="doccomment">/// Is the [`Ray3D`] intersecting from the Front or Back side?
+</span><span class="attribute">#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>SurfaceSide {
+    <span class="doccomment">/// The intersection happens at the front
+    </span>Front,
+    <span class="doccomment">/// The intersection happens at the back
+    </span>Back,
+    <span class="doccomment">/// The intersectionis not possible (e.g., the ray is parallel
+    /// to a `Triangle3D` but it still goes through one of its vertices)
+    </span>NonApplicable,
 }
 
-<span class="kw">impl</span> <span class="ident">SurfaceSide</span> {
-    <span class="doccomment">/// Given a `normal` at the intersection point, this function</span>
-    <span class="doccomment">/// checks whether a [`Ray3D`] is arriving from the front or the back</span>
-    <span class="doccomment">/// of the surface</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_side</span>(<span class="ident">normal</span>: <span class="ident">Vector3D</span>, <span class="ident">ray_dir</span>: <span class="ident">Vector3D</span>) -&gt; (<span class="ident">Vector3D</span>, <span class="self">Self</span>) {
-        <span class="macro">debug_assert!</span>(<span class="ident">normal</span>.<span class="ident">length</span>().<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="number">0.00000001</span>);
-        <span class="comment">// eprintln!(&quot;raydir = {}&quot;, ray_dir);</span>
-        <span class="kw">let</span> <span class="ident">dot</span> <span class="op">=</span> <span class="ident">normal</span> <span class="op">*</span> <span class="ident">ray_dir</span>;
+<span class="kw">impl </span>SurfaceSide {
+    <span class="doccomment">/// Given a `normal` at the intersection point, this function
+    /// checks whether a [`Ray3D`] is arriving from the front or the back
+    /// of the surface
+    </span><span class="kw">pub fn </span>get_side(normal: Vector3D, ray_dir: Vector3D) -&gt; (Vector3D, <span class="self">Self</span>) {
+        <span class="macro">debug_assert!</span>(normal.length().abs() &gt; <span class="number">0.00000001</span>);
+        <span class="comment">// eprintln!(&quot;raydir = {}&quot;, ray_dir);
+        </span><span class="kw">let </span>dot = normal * ray_dir;
 
-        <span class="kw">if</span> <span class="ident">dot</span> <span class="op">&lt;</span> <span class="number">0.</span> {
-            (<span class="ident">normal</span>, <span class="ident"><span class="self">Self</span>::Front</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">dot</span> <span class="op">&gt;</span> <span class="number">0.</span> {
-            (<span class="ident">normal</span> <span class="op">*</span> <span class="op">-</span><span class="number">1.</span>, <span class="ident"><span class="self">Self</span>::Back</span>)
-        } <span class="kw">else</span> {
-            (<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>), <span class="ident"><span class="self">Self</span>::NonApplicable</span>)
+        <span class="kw">if </span>dot &lt; <span class="number">0. </span>{
+            (normal, <span class="self">Self</span>::Front)
+        } <span class="kw">else if </span>dot &gt; <span class="number">0. </span>{
+            (normal * -<span class="number">1.</span>, <span class="self">Self</span>::Back)
+        } <span class="kw">else </span>{
+            (Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>), <span class="self">Self</span>::NonApplicable)
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::default::Default</span> <span class="kw">for</span> <span class="ident">SurfaceSide</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::NonApplicable</span>
+<span class="kw">impl </span>std::default::Default <span class="kw">for </span>SurfaceSide {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::NonApplicable
     }
 }
 
-<span class="doccomment">/// Contains more detailed information about the</span>
-<span class="doccomment">/// what is happening at the surface in the intersection point</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntersectionInfo</span> {
-    <span class="doccomment">/// The point of intersection</span>
-    <span class="kw">pub</span> <span class="ident">p</span>: <span class="ident">Point3D</span>,
+<span class="doccomment">/// Contains more detailed information about the
+/// what is happening at the surface in the intersection point
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>IntersectionInfo {
+    <span class="doccomment">/// The point of intersection
+    </span><span class="kw">pub </span>p: Point3D,
 
-    <span class="comment">// pub perror: Point3D,</span>
-    <span class="doccomment">/// The normal [`Vector3D`] at the interaction.</span>
-    <span class="doccomment">/// Must have the value of (dpdu x dpdv).normalize() ... use</span>
-    <span class="doccomment">/// ShadingInfo::new(..) and this is done automatically</span>
-    <span class="kw">pub</span> <span class="ident">normal</span>: <span class="ident">Vector3D</span>,
+    <span class="comment">// pub perror: Point3D,
+    </span><span class="doccomment">/// The normal [`Vector3D`] at the interaction.
+    /// Must have the value of (dpdu x dpdv).normalize() ... use
+    /// ShadingInfo::new(..) and this is done automatically
+    </span><span class="kw">pub </span>normal: Vector3D,
 
-    <span class="doccomment">/// The side in which the ray intersected</span>
-    <span class="kw">pub</span> <span class="ident">side</span>: <span class="ident">SurfaceSide</span>,
+    <span class="doccomment">/// The side in which the ray intersected
+    </span><span class="kw">pub </span>side: SurfaceSide,
 
-    <span class="doccomment">/// Partial derivative of the position `p` with respect to `u`</span>
-    <span class="kw">pub</span> <span class="ident">dpdu</span>: <span class="ident">Vector3D</span>,
+    <span class="doccomment">/// Partial derivative of the position `p` with respect to `u`
+    </span><span class="kw">pub </span>dpdu: Vector3D,
 
-    <span class="doccomment">/// Partial derivative of the position `p` with respect to `v`</span>
-    <span class="kw">pub</span> <span class="ident">dpdv</span>: <span class="ident">Vector3D</span>,
+    <span class="doccomment">/// Partial derivative of the position `p` with respect to `v`
+    </span><span class="kw">pub </span>dpdv: Vector3D,
 
-    <span class="doccomment">/// Partial derivative of the normal `n` with respect to u    </span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">dndu</span>: <span class="ident">Vector3D</span>,
+    <span class="doccomment">/// Partial derivative of the normal `n` with respect to u    
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+    </span><span class="kw">pub </span>dndu: Vector3D,
 
-    <span class="doccomment">/// Partial derivative of the normal `n` with respect to v    </span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">dndv</span>: <span class="ident">Vector3D</span>,
+    <span class="doccomment">/// Partial derivative of the normal `n` with respect to v    
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+    </span><span class="kw">pub </span>dndv: Vector3D,
 
-    <span class="doccomment">/// The position `u` of the intersection point</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">u</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// The position `u` of the intersection point
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+    </span><span class="kw">pub </span>u: Float,
 
-    <span class="doccomment">/// The position `v` of the intersection point</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">v</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// The position `v` of the intersection point
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+    </span><span class="kw">pub </span>v: Float,
 }
 
 
-<span class="kw">impl</span> <span class="ident">std::default::Default</span> <span class="kw">for</span> <span class="ident">IntersectionInfo</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>()-&gt;<span class="self">Self</span>{
+<span class="kw">impl </span>std::default::Default <span class="kw">for </span>IntersectionInfo {
+    <span class="kw">fn </span>default()-&gt;<span class="self">Self</span>{
         <span class="self">Self</span>{            
-            <span class="ident">p</span>: <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
-            <span class="ident">normal</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),            
-            <span class="ident">side</span>: <span class="ident">SurfaceSide::default</span>(),
-            <span class="ident">dpdu</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
-            <span class="ident">dpdv</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+            p: Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+            normal: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),            
+            side: SurfaceSide::default(),
+            dpdu: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+            dpdv: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">dndu</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">dndv</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">u</span>: <span class="number">0.0</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">v</span>: <span class="number">0.0</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>dndu: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>dndv: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>u: <span class="number">0.0</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>v: <span class="number">0.0</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntersectionInfo</span> {
-    <span class="doccomment">/// Creates a new `IntersectionInfo` object    </span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
-        <span class="ident">p</span>: <span class="ident">Point3D</span>,
-        <span class="ident">_u</span>: <span class="ident">Float</span>,
-        <span class="ident">_v</span>: <span class="ident">Float</span>,
-        <span class="ident">dpdu</span>: <span class="ident">Vector3D</span>,
-        <span class="ident">dpdv</span>: <span class="ident">Vector3D</span>,
-        <span class="ident">d2p_duu</span>: <span class="ident">Vector3D</span>,
-        <span class="ident">d2p_dvv</span>: <span class="ident">Vector3D</span>,
-        <span class="ident">d2p_duv</span>: <span class="ident">Vector3D</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="ident">dpdv</span>.<span class="ident">cross</span>(<span class="ident">dpdu</span>).<span class="ident">get_normalized</span>();
-        <span class="kw">let</span> (<span class="ident">normal</span>, <span class="ident">side</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">ray</span>.<span class="ident">direction</span>);
+<span class="kw">impl </span>IntersectionInfo {
+    <span class="doccomment">/// Creates a new `IntersectionInfo` object    
+    </span><span class="attribute">#[allow(clippy::too_many_arguments)]
+    </span><span class="kw">pub fn </span>new(
+        ray: <span class="kw-2">&amp;</span>Ray3D,
+        p: Point3D,
+        _u: Float,
+        _v: Float,
+        dpdu: Vector3D,
+        dpdv: Vector3D,
+        d2p_duu: Vector3D,
+        d2p_dvv: Vector3D,
+        d2p_duv: Vector3D,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>normal = dpdv.cross(dpdu).get_normalized();
+        <span class="kw">let </span>(normal, side) = SurfaceSide::get_side(normal, ray.direction);
 
-        <span class="comment">/* Weingarten equations */</span>
-        <span class="kw">let</span> <span class="ident">big_e</span> <span class="op">=</span> <span class="ident">dpdu</span> <span class="op">*</span> <span class="ident">dpdu</span>;
-        <span class="kw">let</span> <span class="ident">big_f</span> <span class="op">=</span> <span class="ident">dpdu</span> <span class="op">*</span> <span class="ident">dpdv</span>;
-        <span class="kw">let</span> <span class="ident">big_g</span> <span class="op">=</span> <span class="ident">dpdv</span> <span class="op">*</span> <span class="ident">dpdv</span>;
+        <span class="comment">/* Weingarten equations */
+        </span><span class="kw">let </span>big_e = dpdu * dpdu;
+        <span class="kw">let </span>big_f = dpdu * dpdv;
+        <span class="kw">let </span>big_g = dpdv * dpdv;
 
-        <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">normal</span> <span class="op">*</span> <span class="ident">d2p_duu</span>;
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">normal</span> <span class="op">*</span> <span class="ident">d2p_duv</span>;
-        <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">normal</span> <span class="op">*</span> <span class="ident">d2p_dvv</span>;
+        <span class="kw">let </span>e = normal * d2p_duu;
+        <span class="kw">let </span>f = normal * d2p_duv;
+        <span class="kw">let </span>g = normal * d2p_dvv;
 
-        <span class="kw">let</span> <span class="ident">inv_big_egf2</span> <span class="op">=</span> <span class="number">1.</span> <span class="op">/</span> (<span class="ident">big_e</span> <span class="op">*</span> <span class="ident">big_g</span> <span class="op">-</span> <span class="ident">big_f</span> <span class="op">*</span> <span class="ident">big_f</span>);
-        <span class="kw">let</span> <span class="ident">_dndu</span> <span class="op">=</span> <span class="ident">dpdu</span> <span class="op">*</span> ((<span class="ident">f</span> <span class="op">*</span> <span class="ident">big_f</span> <span class="op">-</span> <span class="ident">e</span> <span class="op">*</span> <span class="ident">big_g</span>) <span class="op">*</span> <span class="ident">inv_big_egf2</span>)
-            <span class="op">+</span> <span class="ident">dpdv</span> <span class="op">*</span> ((<span class="ident">e</span> <span class="op">*</span> <span class="ident">big_f</span> <span class="op">-</span> <span class="ident">f</span> <span class="op">*</span> <span class="ident">big_e</span>) <span class="op">*</span> <span class="ident">inv_big_egf2</span>);
-        <span class="kw">let</span> <span class="ident">_dndv</span> <span class="op">=</span> <span class="ident">dpdu</span> <span class="op">*</span> ((<span class="ident">g</span> <span class="op">*</span> <span class="ident">big_f</span> <span class="op">-</span> <span class="ident">f</span> <span class="op">*</span> <span class="ident">big_g</span>) <span class="op">*</span> <span class="ident">inv_big_egf2</span>)
-            <span class="op">+</span> <span class="ident">dpdv</span> <span class="op">*</span> ((<span class="ident">f</span> <span class="op">*</span> <span class="ident">big_f</span> <span class="op">-</span> <span class="ident">g</span> <span class="op">*</span> <span class="ident">big_e</span>) <span class="op">*</span> <span class="ident">inv_big_egf2</span>);
+        <span class="kw">let </span>inv_big_egf2 = <span class="number">1. </span>/ (big_e * big_g - big_f * big_f);
+        <span class="kw">let </span>_dndu = dpdu * ((f * big_f - e * big_g) * inv_big_egf2)
+            + dpdv * ((e * big_f - f * big_e) * inv_big_egf2);
+        <span class="kw">let </span>_dndv = dpdu * ((g * big_f - f * big_g) * inv_big_egf2)
+            + dpdv * ((f * big_f - g * big_e) * inv_big_egf2);
 
-        <span class="comment">// return</span>
-        <span class="self">Self</span> {
-            <span class="ident">p</span>,
-            <span class="ident">normal</span>,
-            <span class="ident">side</span>,
-            <span class="ident">dpdu</span>,
-            <span class="ident">dpdv</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">dndu</span>: <span class="ident">_dndu</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">dndv</span>: <span class="ident">_dndv</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">u</span>: <span class="ident">_u</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">v</span>: <span class="ident">_v</span>,
+        <span class="comment">// return
+        </span><span class="self">Self </span>{
+            p,
+            normal,
+            side,
+            dpdu,
+            dpdv,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>dndu: _dndu,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>dndv: _dndv,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>u: _u,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>v: _v,
         }
     }
 
-    <span class="doccomment">/// Applies a `Transform` to the `IntersectionInfo`, creating a new one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">transform</span>: <span class="kw-2">&amp;</span><span class="ident">Transform</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">p</span>: <span class="ident">transform</span>.<span class="ident">transform_pt</span>(<span class="self">self</span>.<span class="ident">p</span>),
-            <span class="ident">dpdu</span>: <span class="ident">transform</span>.<span class="ident">transform_vec</span>(<span class="self">self</span>.<span class="ident">dpdu</span>),
-            <span class="ident">dpdv</span>: <span class="ident">transform</span>.<span class="ident">transform_vec</span>(<span class="self">self</span>.<span class="ident">dpdv</span>),
-            <span class="ident">normal</span>: <span class="ident">transform</span>.<span class="ident">transform_normal</span>(<span class="self">self</span>.<span class="ident">normal</span>),
-            <span class="ident">side</span>: <span class="self">self</span>.<span class="ident">side</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">u</span>: <span class="self">self</span>.<span class="ident">u</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">v</span>: <span class="self">self</span>.<span class="ident">v</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">dndu</span>: <span class="ident">transform</span>.<span class="ident">transform_vec</span>(<span class="self">self</span>.<span class="ident">dndu</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">dndv</span>: <span class="ident">transform</span>.<span class="ident">transform_vec</span>(<span class="self">self</span>.<span class="ident">dndv</span>),
+    <span class="doccomment">/// Applies a `Transform` to the `IntersectionInfo`, creating a new one.
+    </span><span class="kw">pub fn </span>transform(<span class="kw-2">&amp;</span><span class="self">self</span>, transform: <span class="kw-2">&amp;</span>Transform) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            p: transform.transform_pt(<span class="self">self</span>.p),
+            dpdu: transform.transform_vec(<span class="self">self</span>.dpdu),
+            dpdv: transform.transform_vec(<span class="self">self</span>.dpdv),
+            normal: transform.transform_normal(<span class="self">self</span>.normal),
+            side: <span class="self">self</span>.side,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>u: <span class="self">self</span>.u,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>v: <span class="self">self</span>.v,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>dndu: transform.transform_vec(<span class="self">self</span>.dndu),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>dndv: transform.transform_vec(<span class="self">self</span>.dndv),
         }
     }
 
-    <span class="doccomment">/// Applies the inverse of a `Transform` to the `IntersectionInfo`, creating a new one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inv_transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">transform</span>: <span class="kw-2">&amp;</span><span class="ident">Transform</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">p</span>: <span class="ident">transform</span>.<span class="ident">inv_transform_pt</span>(<span class="self">self</span>.<span class="ident">p</span>),
-            <span class="ident">dpdu</span>: <span class="ident">transform</span>.<span class="ident">inv_transform_vec</span>(<span class="self">self</span>.<span class="ident">dpdu</span>),
-            <span class="ident">dpdv</span>: <span class="ident">transform</span>.<span class="ident">inv_transform_vec</span>(<span class="self">self</span>.<span class="ident">dpdv</span>),
-            <span class="ident">normal</span>: <span class="ident">transform</span>.<span class="ident">inv_transform_normal</span>(<span class="self">self</span>.<span class="ident">normal</span>),
-            <span class="ident">side</span>: <span class="self">self</span>.<span class="ident">side</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">u</span>: <span class="self">self</span>.<span class="ident">u</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">v</span>: <span class="self">self</span>.<span class="ident">v</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">dndu</span>: <span class="ident">transform</span>.<span class="ident">inv_transform_vec</span>(<span class="self">self</span>.<span class="ident">dndu</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">dndv</span>: <span class="ident">transform</span>.<span class="ident">inv_transform_vec</span>(<span class="self">self</span>.<span class="ident">dndv</span>),
+    <span class="doccomment">/// Applies the inverse of a `Transform` to the `IntersectionInfo`, creating a new one.
+    </span><span class="kw">pub fn </span>inv_transform(<span class="kw-2">&amp;</span><span class="self">self</span>, transform: <span class="kw-2">&amp;</span>Transform) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            p: transform.inv_transform_pt(<span class="self">self</span>.p),
+            dpdu: transform.inv_transform_vec(<span class="self">self</span>.dpdu),
+            dpdv: transform.inv_transform_vec(<span class="self">self</span>.dpdv),
+            normal: transform.inv_transform_normal(<span class="self">self</span>.normal),
+            side: <span class="self">self</span>.side,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>u: <span class="self">self</span>.u,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>v: <span class="self">self</span>.v,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>dndu: transform.inv_transform_vec(<span class="self">self</span>.dndu),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>dndv: transform.inv_transform_vec(<span class="self">self</span>.dndv),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">testing</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>testing {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_get_side</span>() {
-        <span class="comment">// Normal points up</span>
-        <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_get_side() {
+        <span class="comment">// Normal points up
+        </span><span class="kw">let </span>normal = Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>);
 
-        <span class="comment">// Test 1: Hitting from above (should return front)</span>
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>);
-        <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">normal</span>, <span class="ident">SurfaceSide::Front</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">v</span>) {
-            <span class="macro">assert_eq!</span>(<span class="ident">normal</span>, <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>));
-        } <span class="kw">else</span> {
+        <span class="comment">// Test 1: Hitting from above (should return front)
+        </span><span class="kw">let </span>v = Vector3D::new(-<span class="number">1.</span>, <span class="number">0.</span>, -<span class="number">1.</span>);
+        <span class="kw">if let </span>(normal, SurfaceSide::Front) = SurfaceSide::get_side(normal, v) {
+            <span class="macro">assert_eq!</span>(normal, Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>));
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;Expecting ray to come from the Front!&quot;</span>)
         }
 
-        <span class="comment">// Test 2: Hitting from below (should return Back)</span>
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>, <span class="number">1.</span>);
-        <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">normal</span>, <span class="ident">SurfaceSide::Back</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">v</span>) {
-            <span class="macro">assert_eq!</span>(<span class="ident">normal</span>, <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>));
-        } <span class="kw">else</span> {
+        <span class="comment">// Test 2: Hitting from below (should return Back)
+        </span><span class="kw">let </span>v = Vector3D::new(-<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">1.</span>);
+        <span class="kw">if let </span>(normal, SurfaceSide::Back) = SurfaceSide::get_side(normal, v) {
+            <span class="macro">assert_eq!</span>(normal, Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, -<span class="number">1.</span>));
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;Expecting ray to come from the Back!&quot;</span>)
         }
 
-        <span class="comment">// Test 3: Hitting NORMAL from above (should return front)</span>
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>);
-        <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">_normal</span>, <span class="ident">SurfaceSide::Front</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">v</span>) {
-            <span class="macro">assert_eq!</span>(<span class="ident">normal</span>, <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>));
-        } <span class="kw">else</span> {
+        <span class="comment">// Test 3: Hitting NORMAL from above (should return front)
+        </span><span class="kw">let </span>v = Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, -<span class="number">1.</span>);
+        <span class="kw">if let </span>(_normal, SurfaceSide::Front) = SurfaceSide::get_side(normal, v) {
+            <span class="macro">assert_eq!</span>(normal, Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>));
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;Expecting ray to come from the Front!&quot;</span>)
         }
 
-        <span class="comment">// Test 4: Hitting NORMAL from below (should return Back)</span>
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>);
-        <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">normal</span>, <span class="ident">SurfaceSide::Back</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">v</span>) {
-            <span class="macro">assert_eq!</span>(<span class="ident">normal</span>, <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>));
-        } <span class="kw">else</span> {
+        <span class="comment">// Test 4: Hitting NORMAL from below (should return Back)
+        </span><span class="kw">let </span>v = Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>);
+        <span class="kw">if let </span>(normal, SurfaceSide::Back) = SurfaceSide::get_side(normal, v) {
+            <span class="macro">assert_eq!</span>(normal, Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, -<span class="number">1.</span>));
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;Expecting ray to come from the Front!&quot;</span>)
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

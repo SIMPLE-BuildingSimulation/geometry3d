@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/bbox3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bbox3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/bbox3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bbox3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>
 <script>
   "use strict";
@@ -853,782 +853,782 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/</span>
+*/
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gamma</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Point3D</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Ray3D</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Vector3D</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::gamma;
+<span class="kw">use </span><span class="kw">crate</span>::Float;
+<span class="kw">use </span><span class="kw">crate</span>::Point3D;
+<span class="kw">use </span><span class="kw">crate</span>::Ray3D;
+<span class="kw">use </span><span class="kw">crate</span>::Vector3D;
 
-<span class="comment">// use crate::round_error::gamma;</span>
+<span class="comment">// use crate::round_error::gamma;
 
-<span class="doccomment">/// Represents one dimension of the `BBox3D`</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BBoxAxis</span> {
-    <span class="doccomment">/// the X dimension</span>
-    <span class="ident">X</span>,
-    <span class="doccomment">/// the Y dimension</span>
-    <span class="ident">Y</span>,
-    <span class="doccomment">/// the Z dimension</span>
-    <span class="ident">Z</span>,
+</span><span class="doccomment">/// Represents one dimension of the `BBox3D`
+</span><span class="attribute">#[repr(u8)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>BBoxAxis {
+    <span class="doccomment">/// the X dimension
+    </span>X,
+    <span class="doccomment">/// the Y dimension
+    </span>Y,
+    <span class="doccomment">/// the Z dimension
+    </span>Z,
 }
 
-<span class="doccomment">/// An Axis-aligned Bounding Box, represented by</span>
-<span class="doccomment">/// two corners (i.e., by two `Point3D` objects)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BBox3D</span> {
-    <span class="doccomment">/// The lower corner</span>
-    <span class="kw">pub</span> <span class="ident">min</span>: <span class="ident">Point3D</span>,
+<span class="doccomment">/// An Axis-aligned Bounding Box, represented by
+/// two corners (i.e., by two `Point3D` objects)
+</span><span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>BBox3D {
+    <span class="doccomment">/// The lower corner
+    </span><span class="kw">pub </span>min: Point3D,
 
-    <span class="doccomment">/// Higher corner</span>
-    <span class="kw">pub</span> <span class="ident">max</span>: <span class="ident">Point3D</span>,
+    <span class="doccomment">/// Higher corner
+    </span><span class="kw">pub </span>max: Point3D,
 }
 
-<span class="doccomment">/// Identifies the minimum and maximum `x`, `y`, `z`</span>
-<span class="kw">fn</span> <span class="ident">get_mins_maxs</span>(
-    <span class="kw-2">mut</span> <span class="ident">x1</span>: <span class="ident">Float</span>,
-    <span class="kw-2">mut</span> <span class="ident">y1</span>: <span class="ident">Float</span>,
-    <span class="kw-2">mut</span> <span class="ident">z1</span>: <span class="ident">Float</span>,
-    <span class="kw-2">mut</span> <span class="ident">x2</span>: <span class="ident">Float</span>,
-    <span class="kw-2">mut</span> <span class="ident">y2</span>: <span class="ident">Float</span>,
-    <span class="kw-2">mut</span> <span class="ident">z2</span>: <span class="ident">Float</span>,
-) -&gt; (<span class="ident">Float</span>, <span class="ident">Float</span>, <span class="ident">Float</span>, <span class="ident">Float</span>, <span class="ident">Float</span>, <span class="ident">Float</span>) {
-    <span class="kw">if</span> <span class="ident">x1</span> <span class="op">&gt;</span> <span class="ident">x2</span> {
-        <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">x1</span>, <span class="kw-2">&amp;mut</span> <span class="ident">x2</span>);
+<span class="doccomment">/// Identifies the minimum and maximum `x`, `y`, `z`
+</span><span class="kw">fn </span>get_mins_maxs(
+    <span class="kw-2">mut </span>x1: Float,
+    <span class="kw-2">mut </span>y1: Float,
+    <span class="kw-2">mut </span>z1: Float,
+    <span class="kw-2">mut </span>x2: Float,
+    <span class="kw-2">mut </span>y2: Float,
+    <span class="kw-2">mut </span>z2: Float,
+) -&gt; (Float, Float, Float, Float, Float, Float) {
+    <span class="kw">if </span>x1 &gt; x2 {
+        std::mem::swap(<span class="kw-2">&amp;mut </span>x1, <span class="kw-2">&amp;mut </span>x2);
     }
 
-    <span class="kw">if</span> <span class="ident">y1</span> <span class="op">&gt;</span> <span class="ident">y2</span> {
-        <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">y1</span>, <span class="kw-2">&amp;mut</span> <span class="ident">y2</span>);
+    <span class="kw">if </span>y1 &gt; y2 {
+        std::mem::swap(<span class="kw-2">&amp;mut </span>y1, <span class="kw-2">&amp;mut </span>y2);
     }
 
-    <span class="kw">if</span> <span class="ident">z1</span> <span class="op">&gt;</span> <span class="ident">z2</span> {
-        <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z1</span>, <span class="kw-2">&amp;mut</span> <span class="ident">z2</span>);
+    <span class="kw">if </span>z1 &gt; z2 {
+        std::mem::swap(<span class="kw-2">&amp;mut </span>z1, <span class="kw-2">&amp;mut </span>z2);
     }
 
-    (<span class="ident">x1</span>, <span class="ident">y1</span>, <span class="ident">z1</span>, <span class="ident">x2</span>, <span class="ident">y2</span>, <span class="ident">z2</span>)
+    (x1, y1, z1, x2, y2, z2)
 }
 
-<span class="kw">impl</span> <span class="ident">BBox3D</span> {
-    <span class="doccomment">/// Creates a new `BBox3D` from two points. The points</span>
-    <span class="doccomment">/// will be all scrambled up in order to find the minimum</span>
-    <span class="doccomment">/// `x`, `y` and `z`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">a</span>: <span class="ident">Point3D</span>, <span class="ident">b</span>: <span class="ident">Point3D</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">min_x</span>, <span class="ident">min_y</span>, <span class="ident">min_z</span>, <span class="ident">max_x</span>, <span class="ident">max_y</span>, <span class="ident">max_z</span>) <span class="op">=</span>
-            <span class="ident">get_mins_maxs</span>(<span class="ident">a</span>.<span class="ident">x</span>, <span class="ident">a</span>.<span class="ident">y</span>, <span class="ident">a</span>.<span class="ident">z</span>, <span class="ident">b</span>.<span class="ident">x</span>, <span class="ident">b</span>.<span class="ident">y</span>, <span class="ident">b</span>.<span class="ident">z</span>);
+<span class="kw">impl </span>BBox3D {
+    <span class="doccomment">/// Creates a new `BBox3D` from two points. The points
+    /// will be all scrambled up in order to find the minimum
+    /// `x`, `y` and `z`.
+    </span><span class="kw">pub fn </span>new(a: Point3D, b: Point3D) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(min_x, min_y, min_z, max_x, max_y, max_z) =
+            get_mins_maxs(a.x, a.y, a.z, b.x, b.y, b.z);
 
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">min_x</span>, <span class="ident">min_y</span>, <span class="ident">min_z</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">max_x</span>, <span class="ident">max_y</span>, <span class="ident">max_z</span>);
-        <span class="self">Self</span> { <span class="ident">min</span>, <span class="ident">max</span> }
+        <span class="kw">let </span>min = Point3D::new(min_x, min_y, min_z);
+        <span class="kw">let </span>max = Point3D::new(max_x, max_y, max_z);
+        <span class="self">Self </span>{ min, max }
     }
 
-    <span class="doccomment">/// Creates a `BBox3D` that contains a single point, thus</span>
-    <span class="doccomment">/// its `min` and its `max` values are equal</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_point</span>(<span class="ident">p</span>: <span class="ident">Point3D</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">min</span>: <span class="ident">p</span>, <span class="ident">max</span>: <span class="ident">p</span> }
+    <span class="doccomment">/// Creates a `BBox3D` that contains a single point, thus
+    /// its `min` and its `max` values are equal
+    </span><span class="kw">pub fn </span>from_point(p: Point3D) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ min: p, max: p }
     }
 
-    <span class="doccomment">/// Creates a new `BBox3D` that contains an existing `BBox3D`</span>
-    <span class="doccomment">/// and a `Point3D`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_union_point</span>(<span class="ident">bbox</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">pt</span>: <span class="ident">Point3D</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">min_x</span>, <span class="ident">min_y</span>, <span class="ident">min_z</span>, ..) <span class="op">=</span>
-            <span class="ident">get_mins_maxs</span>(<span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">x</span>, <span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">y</span>, <span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">z</span>, <span class="ident">pt</span>.<span class="ident">x</span>, <span class="ident">pt</span>.<span class="ident">y</span>, <span class="ident">pt</span>.<span class="ident">z</span>);
-        <span class="kw">let</span> (.., <span class="ident">max_x</span>, <span class="ident">max_y</span>, <span class="ident">max_z</span>) <span class="op">=</span>
-            <span class="ident">get_mins_maxs</span>(<span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">x</span>, <span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">y</span>, <span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">z</span>, <span class="ident">pt</span>.<span class="ident">x</span>, <span class="ident">pt</span>.<span class="ident">y</span>, <span class="ident">pt</span>.<span class="ident">z</span>);
+    <span class="doccomment">/// Creates a new `BBox3D` that contains an existing `BBox3D`
+    /// and a `Point3D`
+    </span><span class="kw">pub fn </span>from_union_point(bbox: <span class="kw-2">&amp;</span><span class="self">Self</span>, pt: Point3D) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(min_x, min_y, min_z, ..) =
+            get_mins_maxs(bbox.min.x, bbox.min.y, bbox.min.z, pt.x, pt.y, pt.z);
+        <span class="kw">let </span>(.., max_x, max_y, max_z) =
+            get_mins_maxs(bbox.max.x, bbox.max.y, bbox.max.z, pt.x, pt.y, pt.z);
 
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">min_x</span>, <span class="ident">min_y</span>, <span class="ident">min_z</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">max_x</span>, <span class="ident">max_y</span>, <span class="ident">max_z</span>);
-        <span class="self">Self</span> { <span class="ident">min</span>, <span class="ident">max</span> }
+        <span class="kw">let </span>min = Point3D::new(min_x, min_y, min_z);
+        <span class="kw">let </span>max = Point3D::new(max_x, max_y, max_z);
+        <span class="self">Self </span>{ min, max }
     }
 
-    <span class="doccomment">/// Creates a new `BBox3D` that contains two existing `BBox3D`    </span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_union</span>(<span class="ident">bbox1</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">bbox2</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">min_x</span>, <span class="ident">min_y</span>, <span class="ident">min_z</span>, ..) <span class="op">=</span> <span class="ident">get_mins_maxs</span>(
-            <span class="ident">bbox1</span>.<span class="ident">min</span>.<span class="ident">x</span>,
-            <span class="ident">bbox1</span>.<span class="ident">min</span>.<span class="ident">y</span>,
-            <span class="ident">bbox1</span>.<span class="ident">min</span>.<span class="ident">z</span>,
-            <span class="ident">bbox2</span>.<span class="ident">min</span>.<span class="ident">x</span>,
-            <span class="ident">bbox2</span>.<span class="ident">min</span>.<span class="ident">y</span>,
-            <span class="ident">bbox2</span>.<span class="ident">min</span>.<span class="ident">z</span>,
+    <span class="doccomment">/// Creates a new `BBox3D` that contains two existing `BBox3D`    
+    </span><span class="kw">pub fn </span>from_union(bbox1: <span class="kw-2">&amp;</span><span class="self">Self</span>, bbox2: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(min_x, min_y, min_z, ..) = get_mins_maxs(
+            bbox1.min.x,
+            bbox1.min.y,
+            bbox1.min.z,
+            bbox2.min.x,
+            bbox2.min.y,
+            bbox2.min.z,
         );
-        <span class="kw">let</span> (.., <span class="ident">max_x</span>, <span class="ident">max_y</span>, <span class="ident">max_z</span>) <span class="op">=</span> <span class="ident">get_mins_maxs</span>(
-            <span class="ident">bbox1</span>.<span class="ident">max</span>.<span class="ident">x</span>,
-            <span class="ident">bbox1</span>.<span class="ident">max</span>.<span class="ident">y</span>,
-            <span class="ident">bbox1</span>.<span class="ident">max</span>.<span class="ident">z</span>,
-            <span class="ident">bbox2</span>.<span class="ident">max</span>.<span class="ident">x</span>,
-            <span class="ident">bbox2</span>.<span class="ident">max</span>.<span class="ident">y</span>,
-            <span class="ident">bbox2</span>.<span class="ident">max</span>.<span class="ident">z</span>,
-        );
-
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">min_x</span>, <span class="ident">min_y</span>, <span class="ident">min_z</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">max_x</span>, <span class="ident">max_y</span>, <span class="ident">max_z</span>);
-        <span class="self">Self</span> { <span class="ident">min</span>, <span class="ident">max</span> }
-    }
-
-    <span class="doccomment">/// Creates a new `BBox3D` that contains the intersection of two existing `BBox3D`    </span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_intersection</span>(<span class="ident">bbox1</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">bbox2</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (.., <span class="ident">min_x</span>, <span class="ident">min_y</span>, <span class="ident">min_z</span>) <span class="op">=</span> <span class="ident">get_mins_maxs</span>(
-            <span class="ident">bbox1</span>.<span class="ident">min</span>.<span class="ident">x</span>,
-            <span class="ident">bbox1</span>.<span class="ident">min</span>.<span class="ident">y</span>,
-            <span class="ident">bbox1</span>.<span class="ident">min</span>.<span class="ident">z</span>,
-            <span class="ident">bbox2</span>.<span class="ident">min</span>.<span class="ident">x</span>,
-            <span class="ident">bbox2</span>.<span class="ident">min</span>.<span class="ident">y</span>,
-            <span class="ident">bbox2</span>.<span class="ident">min</span>.<span class="ident">z</span>,
-        );
-        <span class="kw">let</span> (<span class="ident">max_x</span>, <span class="ident">max_y</span>, <span class="ident">max_z</span>, ..) <span class="op">=</span> <span class="ident">get_mins_maxs</span>(
-            <span class="ident">bbox1</span>.<span class="ident">max</span>.<span class="ident">x</span>,
-            <span class="ident">bbox1</span>.<span class="ident">max</span>.<span class="ident">y</span>,
-            <span class="ident">bbox1</span>.<span class="ident">max</span>.<span class="ident">z</span>,
-            <span class="ident">bbox2</span>.<span class="ident">max</span>.<span class="ident">x</span>,
-            <span class="ident">bbox2</span>.<span class="ident">max</span>.<span class="ident">y</span>,
-            <span class="ident">bbox2</span>.<span class="ident">max</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>(.., max_x, max_y, max_z) = get_mins_maxs(
+            bbox1.max.x,
+            bbox1.max.y,
+            bbox1.max.z,
+            bbox2.max.x,
+            bbox2.max.y,
+            bbox2.max.z,
         );
 
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">min_x</span>, <span class="ident">min_y</span>, <span class="ident">min_z</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">max_x</span>, <span class="ident">max_y</span>, <span class="ident">max_z</span>);
-        <span class="self">Self</span> { <span class="ident">min</span>, <span class="ident">max</span> }
+        <span class="kw">let </span>min = Point3D::new(min_x, min_y, min_z);
+        <span class="kw">let </span>max = Point3D::new(max_x, max_y, max_z);
+        <span class="self">Self </span>{ min, max }
     }
 
-    <span class="doccomment">/// Checks if a `BBox3D` overlaps with another one</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">overlaps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">max</span>.<span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">min</span>.<span class="ident">x</span>) <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">min</span>.<span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">max</span>.<span class="ident">x</span>);
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">max</span>.<span class="ident">y</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">min</span>.<span class="ident">y</span>) <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">min</span>.<span class="ident">y</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">max</span>.<span class="ident">y</span>);
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">max</span>.<span class="ident">z</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">min</span>.<span class="ident">z</span>) <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">min</span>.<span class="ident">z</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">max</span>.<span class="ident">z</span>);
-        <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="ident">y</span> <span class="op">&amp;&amp;</span> <span class="ident">z</span>
+    <span class="doccomment">/// Creates a new `BBox3D` that contains the intersection of two existing `BBox3D`    
+    </span><span class="kw">pub fn </span>from_intersection(bbox1: <span class="kw-2">&amp;</span><span class="self">Self</span>, bbox2: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(.., min_x, min_y, min_z) = get_mins_maxs(
+            bbox1.min.x,
+            bbox1.min.y,
+            bbox1.min.z,
+            bbox2.min.x,
+            bbox2.min.y,
+            bbox2.min.z,
+        );
+        <span class="kw">let </span>(max_x, max_y, max_z, ..) = get_mins_maxs(
+            bbox1.max.x,
+            bbox1.max.y,
+            bbox1.max.z,
+            bbox2.max.x,
+            bbox2.max.y,
+            bbox2.max.z,
+        );
+
+        <span class="kw">let </span>min = Point3D::new(min_x, min_y, min_z);
+        <span class="kw">let </span>max = Point3D::new(max_x, max_y, max_z);
+        <span class="self">Self </span>{ min, max }
     }
 
-    <span class="doccomment">/// Checks if a `Point3D` is inside this `BBox3D`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">point_inside</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pt</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">pt</span>.<span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">min</span>.<span class="ident">x</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">pt</span>.<span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">x</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">pt</span>.<span class="ident">y</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">min</span>.<span class="ident">y</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">pt</span>.<span class="ident">y</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">y</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">pt</span>.<span class="ident">z</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">min</span>.<span class="ident">z</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">pt</span>.<span class="ident">z</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">z</span>
+    <span class="doccomment">/// Checks if a `BBox3D` overlaps with another one
+    </span><span class="kw">pub fn </span>overlaps(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">let </span>x = (<span class="self">self</span>.max.x &gt;= other.min.x) &amp;&amp; (<span class="self">self</span>.min.x &lt;= other.max.x);
+        <span class="kw">let </span>y = (<span class="self">self</span>.max.y &gt;= other.min.y) &amp;&amp; (<span class="self">self</span>.min.y &lt;= other.max.y);
+        <span class="kw">let </span>z = (<span class="self">self</span>.max.z &gt;= other.min.z) &amp;&amp; (<span class="self">self</span>.min.z &lt;= other.max.z);
+        x &amp;&amp; y &amp;&amp; z
     }
 
-    <span class="doccomment">/// Checks if a `Point3D` is inside this `BBox3D` but any</span>
-    <span class="doccomment">/// `Point3D` located in the upper boundary is considered</span>
-    <span class="doccomment">/// to be outside</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">point_inside_exclusive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pt</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">pt</span>.<span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">min</span>.<span class="ident">x</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">pt</span>.<span class="ident">x</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">x</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">pt</span>.<span class="ident">y</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">min</span>.<span class="ident">y</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">pt</span>.<span class="ident">y</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">y</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">pt</span>.<span class="ident">z</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">min</span>.<span class="ident">z</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">pt</span>.<span class="ident">z</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">z</span>
+    <span class="doccomment">/// Checks if a `Point3D` is inside this `BBox3D`
+    </span><span class="kw">pub fn </span>point_inside(<span class="kw-2">&amp;</span><span class="self">self</span>, pt: Point3D) -&gt; bool {
+        pt.x &gt;= <span class="self">self</span>.min.x
+            &amp;&amp; pt.x &lt;= <span class="self">self</span>.max.x
+            &amp;&amp; pt.y &gt;= <span class="self">self</span>.min.y
+            &amp;&amp; pt.y &lt;= <span class="self">self</span>.max.y
+            &amp;&amp; pt.z &gt;= <span class="self">self</span>.min.z
+            &amp;&amp; pt.z &lt;= <span class="self">self</span>.max.z
     }
 
-    <span class="doccomment">/// Returns the dimension in which the `BBox3D` is longest</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_extent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BBoxAxis</span> {
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">min</span>;
-        <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">x</span> <span class="op">&gt;</span> <span class="ident">d</span>.<span class="ident">y</span> <span class="op">&amp;&amp;</span> <span class="ident">d</span>.<span class="ident">x</span> <span class="op">&gt;</span> <span class="ident">d</span>.<span class="ident">z</span> {
-            <span class="ident">BBoxAxis::X</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">y</span> <span class="op">&gt;</span> <span class="ident">d</span>.<span class="ident">z</span> {
-            <span class="ident">BBoxAxis::Y</span>
-        } <span class="kw">else</span> {
-            <span class="ident">BBoxAxis::Z</span>
+    <span class="doccomment">/// Checks if a `Point3D` is inside this `BBox3D` but any
+    /// `Point3D` located in the upper boundary is considered
+    /// to be outside
+    </span><span class="kw">pub fn </span>point_inside_exclusive(<span class="kw-2">&amp;</span><span class="self">self</span>, pt: Point3D) -&gt; bool {
+        pt.x &gt;= <span class="self">self</span>.min.x
+            &amp;&amp; pt.x &lt; <span class="self">self</span>.max.x
+            &amp;&amp; pt.y &gt;= <span class="self">self</span>.min.y
+            &amp;&amp; pt.y &lt; <span class="self">self</span>.max.y
+            &amp;&amp; pt.z &gt;= <span class="self">self</span>.min.z
+            &amp;&amp; pt.z &lt; <span class="self">self</span>.max.z
+    }
+
+    <span class="doccomment">/// Returns the dimension in which the `BBox3D` is longest
+    </span><span class="kw">pub fn </span>max_extent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BBoxAxis {
+        <span class="kw">let </span>d = <span class="self">self</span>.max - <span class="self">self</span>.min;
+        <span class="kw">if </span>d.x &gt; d.y &amp;&amp; d.x &gt; d.z {
+            BBoxAxis::X
+        } <span class="kw">else if </span>d.y &gt; d.z {
+            BBoxAxis::Y
+        } <span class="kw">else </span>{
+            BBoxAxis::Z
         }
     }
 
-    <span class="doccomment">/// Returns the total surface area of all the walls in this `BBox3D`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">surface_area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">min</span>;
-        <span class="number">2.</span> <span class="op">*</span> (<span class="ident">d</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">d</span>.<span class="ident">y</span> <span class="op">+</span> <span class="ident">d</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">d</span>.<span class="ident">z</span> <span class="op">+</span> <span class="ident">d</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">d</span>.<span class="ident">z</span>)
+    <span class="doccomment">/// Returns the total surface area of all the walls in this `BBox3D`
+    </span><span class="kw">pub fn </span>surface_area(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Float {
+        <span class="kw">let </span>d = <span class="self">self</span>.max - <span class="self">self</span>.min;
+        <span class="number">2. </span>* (d.x * d.y + d.x * d.z + d.y * d.z)
     }
 
-    <span class="doccomment">/// Checks if a ray intersects a BBox3D</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function intersects the ray with 6 axis-aligned planes:</span>
-    <span class="doccomment">/// 2 whose normal is `Vector3D(1., 0., 0.)`, 2 whose normal is `Vector3D(0., 1., 0.)`</span>
-    <span class="doccomment">/// and 2 whose normal is `Vector3D(0., 0., 1.)`. That is to way, we calculate</span>
-    <span class="doccomment">/// the time that the ray spends within the boundaries of the `BBox3D` in each</span>
-    <span class="doccomment">/// dimension, and then find the intersection of those times. If there is no</span>
-    <span class="doccomment">/// intersection, then the ray was never inside of the box.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, lets say that we realize that a ray spends `t=[0., 3.]` inside</span>
-    <span class="doccomment">/// of the boundaries of the `BBox3D` in the `X` dimension; `t=[0.2, 5.]` in the `Y`</span>
-    <span class="doccomment">/// dimension; and `t=[-20., 1.]` in the `Z` dimension. The intersection of these</span>
-    <span class="doccomment">/// ranges is `t=[0.2, 1.]`, which works and thus the ray went through the box.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Now let&#39;s take an example in which the ray does not go through the `BBox3D`.</span>
-    <span class="doccomment">/// For example, one in which a ray spends `t=[0., 3.]` inside</span>
-    <span class="doccomment">/// of the boundaries of the `BBox3D` in the `X` dimension; `t=[0.2, 5.]` in the `Y`</span>
-    <span class="doccomment">/// dimension; and `t=[6., 12.]` in the `Z` dimension. The intersection of these</span>
-    <span class="doccomment">/// ranges is `t=[6, 3.]`, which does not make any sense and thus the ray never went</span>
-    <span class="doccomment">/// inside of the `BBox3D`.    </span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use geometry3d::{BBox3D, Vector3D, Point3D, Ray3D};</span>
-    <span class="doccomment">/// let min = Point3D::new(0., 0., 0.);</span>
-    <span class="doccomment">/// let max = Point3D::new(1., 1., 1.);</span>
-    <span class="doccomment">/// let bbox = BBox3D::new(min, max);</span>
-    <span class="doccomment">/// let ray = Ray3D {</span>
-    <span class="doccomment">///     origin: Point3D::new(0.5, 0.5, 0.5),</span>
-    <span class="doccomment">///     direction: Vector3D::new(0., 0., 1.)</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">/// let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    </span>
-    <span class="doccomment">/// assert!(bbox.intersect(&amp;ray, &amp;inv_dir));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>, <span class="ident">inv_dir</span>: <span class="kw-2">&amp;</span><span class="ident">Vector3D</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">/* THIS REQUIRES SIMD */</span>
-        <span class="comment">// let mut mins_maxes = std::simd::Simd::from([self.min.x, self.max.x, self.min.y, self.max.y]);</span>
-        <span class="comment">// let aux1 = std::simd::Simd::from([ray.origin.x, ray.origin.x, ray.origin.y, ray.origin.y]);</span>
-        <span class="comment">// mins_maxes -= aux1;</span>
-        <span class="comment">// let aux2 = std::simd::Simd::from([inv_dir.x, inv_dir.x, inv_dir.y, inv_dir.y]);</span>
-        <span class="comment">// mins_maxes *= aux2;</span>
-        <span class="comment">// let [mut tx_min, mut tx_max, mut ty_min, mut ty_max] = *mins_maxes.as_array();</span>
-        <span class="comment">/* END OF THE SIMD DEPENDENCY */</span>
+    <span class="doccomment">/// Checks if a ray intersects a BBox3D
+    ///
+    /// This function intersects the ray with 6 axis-aligned planes:
+    /// 2 whose normal is `Vector3D(1., 0., 0.)`, 2 whose normal is `Vector3D(0., 1., 0.)`
+    /// and 2 whose normal is `Vector3D(0., 0., 1.)`. That is to way, we calculate
+    /// the time that the ray spends within the boundaries of the `BBox3D` in each
+    /// dimension, and then find the intersection of those times. If there is no
+    /// intersection, then the ray was never inside of the box.
+    ///
+    /// For example, lets say that we realize that a ray spends `t=[0., 3.]` inside
+    /// of the boundaries of the `BBox3D` in the `X` dimension; `t=[0.2, 5.]` in the `Y`
+    /// dimension; and `t=[-20., 1.]` in the `Z` dimension. The intersection of these
+    /// ranges is `t=[0.2, 1.]`, which works and thus the ray went through the box.
+    ///
+    /// Now let&#39;s take an example in which the ray does not go through the `BBox3D`.
+    /// For example, one in which a ray spends `t=[0., 3.]` inside
+    /// of the boundaries of the `BBox3D` in the `X` dimension; `t=[0.2, 5.]` in the `Y`
+    /// dimension; and `t=[6., 12.]` in the `Z` dimension. The intersection of these
+    /// ranges is `t=[6, 3.]`, which does not make any sense and thus the ray never went
+    /// inside of the `BBox3D`.    
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use geometry3d::{BBox3D, Vector3D, Point3D, Ray3D};
+    /// let min = Point3D::new(0., 0., 0.);
+    /// let max = Point3D::new(1., 1., 1.);
+    /// let bbox = BBox3D::new(min, max);
+    /// let ray = Ray3D {
+    ///     origin: Point3D::new(0.5, 0.5, 0.5),
+    ///     direction: Vector3D::new(0., 0., 1.)
+    /// };
+    /// let inv_dir = Vector3D::new(1./ray.direction.x, 1./ray.direction.y, 1./ray.direction.z);    
+    /// assert!(bbox.intersect(&amp;ray, &amp;inv_dir));
+    /// ```
+    </span><span class="kw">pub fn </span>intersect(<span class="kw-2">&amp;</span><span class="self">self</span>, ray: <span class="kw-2">&amp;</span>Ray3D, inv_dir: <span class="kw-2">&amp;</span>Vector3D) -&gt; bool {
+        <span class="comment">/* THIS REQUIRES SIMD */
+        // let mut mins_maxes = std::simd::Simd::from([self.min.x, self.max.x, self.min.y, self.max.y]);
+        // let aux1 = std::simd::Simd::from([ray.origin.x, ray.origin.x, ray.origin.y, ray.origin.y]);
+        // mins_maxes -= aux1;
+        // let aux2 = std::simd::Simd::from([inv_dir.x, inv_dir.x, inv_dir.y, inv_dir.y]);
+        // mins_maxes *= aux2;
+        // let [mut tx_min, mut tx_max, mut ty_min, mut ty_max] = *mins_maxes.as_array();
+        /* END OF THE SIMD DEPENDENCY */
 
-        <span class="comment">/* ELSE, NOT SIMD */</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx_min</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">min</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">ray</span>.<span class="ident">origin</span>.<span class="ident">x</span>) <span class="op">*</span> <span class="ident">inv_dir</span>.<span class="ident">x</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx_max</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">max</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">ray</span>.<span class="ident">origin</span>.<span class="ident">x</span>) <span class="op">*</span> <span class="ident">inv_dir</span>.<span class="ident">x</span>;
-        <span class="comment">/* END OF NON_SIMD */</span>
+        /* ELSE, NOT SIMD */
+        </span><span class="kw">let </span><span class="kw-2">mut </span>tx_min = (<span class="self">self</span>.min.x - ray.origin.x) * inv_dir.x;
+        <span class="kw">let </span><span class="kw-2">mut </span>tx_max = (<span class="self">self</span>.max.x - ray.origin.x) * inv_dir.x;
+        <span class="comment">/* END OF NON_SIMD */
 
-        <span class="kw">if</span> <span class="ident">tx_min</span> <span class="op">&gt;</span> <span class="ident">tx_max</span> {
-            <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tx_min</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tx_max</span>);
+        </span><span class="kw">if </span>tx_min &gt; tx_max {
+            std::mem::swap(<span class="kw-2">&amp;mut </span>tx_min, <span class="kw-2">&amp;mut </span>tx_max);
         }
-        <span class="kw">if</span> <span class="ident">tx_max</span> <span class="op">&lt;</span> <span class="number">0.</span> {
-            <span class="comment">// We are running away from the box in the X component</span>
-            <span class="kw">return</span> <span class="bool-val">false</span>;
-        }
-
-        <span class="comment">/* ALSO NON_SIMD */</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ty_min</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">min</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">ray</span>.<span class="ident">origin</span>.<span class="ident">y</span>) <span class="op">*</span> <span class="ident">inv_dir</span>.<span class="ident">y</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ty_max</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">max</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">ray</span>.<span class="ident">origin</span>.<span class="ident">y</span>) <span class="op">*</span> <span class="ident">inv_dir</span>.<span class="ident">y</span>;
-        <span class="comment">/* END OF NON-SIMD */</span>
-
-        <span class="kw">if</span> <span class="ident">ty_min</span> <span class="op">&gt;</span> <span class="ident">ty_max</span> {
-            <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ty_min</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ty_max</span>);
-        }
-        <span class="kw">if</span> <span class="ident">ty_max</span> <span class="op">&lt;</span> <span class="number">0.</span> {
-            <span class="comment">// We are running away from the box in the Y component</span>
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>tx_max &lt; <span class="number">0. </span>{
+            <span class="comment">// We are running away from the box in the X component
+            </span><span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="comment">// // Update _tMax_ and _tyMax_ to ensure robust bounds intersection</span>
-        <span class="ident">tx_max</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">1.</span> <span class="op">+</span> <span class="number">2.</span> <span class="op">*</span> <span class="macro">gamma!</span>(<span class="number">3.</span>);
-        <span class="ident">ty_max</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">1.</span> <span class="op">+</span> <span class="number">2.</span> <span class="op">*</span> <span class="macro">gamma!</span>(<span class="number">3.</span>);
-        <span class="kw">if</span> <span class="ident">tx_min</span> <span class="op">&gt;</span> <span class="ident">ty_max</span> <span class="op">|</span><span class="op">|</span> <span class="ident">ty_min</span> <span class="op">&gt;</span> <span class="ident">tx_max</span> {
-            <span class="comment">// The times do not intersect</span>
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="comment">/* ALSO NON_SIMD */
+        </span><span class="kw">let </span><span class="kw-2">mut </span>ty_min = (<span class="self">self</span>.min.y - ray.origin.y) * inv_dir.y;
+        <span class="kw">let </span><span class="kw-2">mut </span>ty_max = (<span class="self">self</span>.max.y - ray.origin.y) * inv_dir.y;
+        <span class="comment">/* END OF NON-SIMD */
+
+        </span><span class="kw">if </span>ty_min &gt; ty_max {
+            std::mem::swap(<span class="kw-2">&amp;mut </span>ty_min, <span class="kw-2">&amp;mut </span>ty_max);
         }
-        <span class="comment">// Narrow down the intersection... Now t_min and t_max</span>
-        <span class="comment">// represent the intersection between the X an Y dimensions.</span>
-        <span class="kw">if</span> <span class="ident">ty_min</span> <span class="op">&gt;</span> <span class="ident">tx_min</span> {
-            <span class="ident">tx_min</span> <span class="op">=</span> <span class="ident">ty_min</span>;
-        }
-        <span class="kw">if</span> <span class="ident">ty_max</span> <span class="op">&lt;</span> <span class="ident">tx_max</span> {
-            <span class="ident">tx_max</span> <span class="op">=</span> <span class="ident">ty_max</span>;
+        <span class="kw">if </span>ty_max &lt; <span class="number">0. </span>{
+            <span class="comment">// We are running away from the box in the Y component
+            </span><span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tz_min</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">min</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">ray</span>.<span class="ident">origin</span>.<span class="ident">z</span>) <span class="op">*</span> <span class="ident">inv_dir</span>.<span class="ident">z</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tz_max</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">max</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">ray</span>.<span class="ident">origin</span>.<span class="ident">z</span>) <span class="op">*</span> <span class="ident">inv_dir</span>.<span class="ident">z</span>;
-        <span class="kw">if</span> <span class="ident">tz_min</span> <span class="op">&gt;</span> <span class="ident">tz_max</span> {
-            <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tz_min</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tz_max</span>);
+        <span class="comment">// // Update _tMax_ and _tyMax_ to ensure robust bounds intersection
+        </span>tx_max <span class="kw-2">*</span>= <span class="number">1. </span>+ <span class="number">2. </span>* <span class="macro">gamma!</span>(<span class="number">3.</span>);
+        ty_max <span class="kw-2">*</span>= <span class="number">1. </span>+ <span class="number">2. </span>* <span class="macro">gamma!</span>(<span class="number">3.</span>);
+        <span class="kw">if </span>tx_min &gt; ty_max || ty_min &gt; tx_max {
+            <span class="comment">// The times do not intersect
+            </span><span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="kw">if</span> <span class="ident">tz_max</span> <span class="op">&lt;</span> <span class="number">0.</span> {
-            <span class="comment">// We are running away from the box in the Z component</span>
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="comment">// Narrow down the intersection... Now t_min and t_max
+        // represent the intersection between the X an Y dimensions.
+        </span><span class="kw">if </span>ty_min &gt; tx_min {
+            tx_min = ty_min;
         }
-
-        <span class="comment">// // Update _tzMax_ to ensure robust bounds intersection</span>
-        <span class="ident">tz_max</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">1.</span> <span class="op">+</span> <span class="number">2.</span> <span class="op">*</span> <span class="macro">gamma!</span>(<span class="number">3.</span>);
-        <span class="kw">if</span> <span class="ident">tx_min</span> <span class="op">&gt;</span> <span class="ident">tz_max</span> <span class="op">|</span><span class="op">|</span> <span class="ident">tz_min</span> <span class="op">&gt;</span> <span class="ident">tx_max</span> {
-            <span class="comment">// No intersection</span>
-            <span class="kw">return</span> <span class="bool-val">false</span>;
-        }
-        <span class="comment">// Narrow down intersection</span>
-        <span class="kw">if</span> <span class="ident">tz_min</span> <span class="op">&gt;</span> <span class="ident">tx_min</span> {
-            <span class="ident">tx_min</span> <span class="op">=</span> <span class="ident">tz_min</span>;
-        }
-        <span class="kw">if</span> <span class="ident">tz_max</span> <span class="op">&lt;</span> <span class="ident">tx_max</span> {
-            <span class="ident">tx_max</span> <span class="op">=</span> <span class="ident">tz_max</span>;
+        <span class="kw">if </span>ty_max &lt; tx_max {
+            tx_max = ty_max;
         }
 
-        <span class="comment">// return</span>
-        <span class="ident">tx_max</span> <span class="op">&gt;</span> <span class="ident">tx_min</span> <span class="op">&amp;&amp;</span> <span class="ident">tx_max</span> <span class="op">&gt;</span> <span class="number">0.</span>
-    }
+        <span class="kw">let </span><span class="kw-2">mut </span>tz_min = (<span class="self">self</span>.min.z - ray.origin.z) * inv_dir.z;
+        <span class="kw">let </span><span class="kw-2">mut </span>tz_max = (<span class="self">self</span>.max.z - ray.origin.z) * inv_dir.z;
+        <span class="kw">if </span>tz_min &gt; tz_max {
+            std::mem::swap(<span class="kw-2">&amp;mut </span>tz_min, <span class="kw-2">&amp;mut </span>tz_max);
+        }
+        <span class="kw">if </span>tz_max &lt; <span class="number">0. </span>{
+            <span class="comment">// We are running away from the box in the Z component
+            </span><span class="kw">return </span><span class="bool-val">false</span>;
+        }
+
+        <span class="comment">// // Update _tzMax_ to ensure robust bounds intersection
+        </span>tz_max <span class="kw-2">*</span>= <span class="number">1. </span>+ <span class="number">2. </span>* <span class="macro">gamma!</span>(<span class="number">3.</span>);
+        <span class="kw">if </span>tx_min &gt; tz_max || tz_min &gt; tx_max {
+            <span class="comment">// No intersection
+            </span><span class="kw">return </span><span class="bool-val">false</span>;
+        }
+        <span class="comment">// Narrow down intersection
+        </span><span class="kw">if </span>tz_min &gt; tx_min {
+            tx_min = tz_min;
+        }
+        <span class="kw">if </span>tz_max &lt; tx_max {
+            tx_max = tz_max;
+        }
+
+        <span class="comment">// return
+        </span>tx_max &gt; tx_min &amp;&amp; tx_max &gt; <span class="number">0.
+    </span>}
 }
 
-<span class="comment">/***********/</span>
-<span class="comment">/* TESTING */</span>
-<span class="comment">/***********/</span>
+<span class="comment">/***********/
+/* TESTING */
+/***********/
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">testing</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Vector3D</span>;
+</span><span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>testing {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::Vector3D;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_get_mins_maxs</span>() {
-        <span class="kw">let</span> <span class="ident">min_x</span> <span class="op">=</span> <span class="number">1.</span>;
-        <span class="kw">let</span> <span class="ident">max_x</span> <span class="op">=</span> <span class="number">41.</span>;
-        <span class="kw">let</span> <span class="ident">min_y</span> <span class="op">=</span> <span class="op">-</span><span class="number">10.</span>;
-        <span class="kw">let</span> <span class="ident">max_y</span> <span class="op">=</span> <span class="number">1.</span>;
-        <span class="kw">let</span> <span class="ident">min_z</span> <span class="op">=</span> <span class="number">0.2</span>;
-        <span class="kw">let</span> <span class="ident">max_z</span> <span class="op">=</span> <span class="number">1.23</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_get_mins_maxs() {
+        <span class="kw">let </span>min_x = <span class="number">1.</span>;
+        <span class="kw">let </span>max_x = <span class="number">41.</span>;
+        <span class="kw">let </span>min_y = -<span class="number">10.</span>;
+        <span class="kw">let </span>max_y = <span class="number">1.</span>;
+        <span class="kw">let </span>min_z = <span class="number">0.2</span>;
+        <span class="kw">let </span>max_z = <span class="number">1.23</span>;
 
-        <span class="kw">let</span> (<span class="ident">x1</span>, <span class="ident">y1</span>, <span class="ident">z1</span>, <span class="ident">x2</span>, <span class="ident">y2</span>, <span class="ident">z2</span>) <span class="op">=</span> <span class="ident">get_mins_maxs</span>(<span class="ident">min_x</span>, <span class="ident">min_y</span>, <span class="ident">min_z</span>, <span class="ident">max_x</span>, <span class="ident">max_y</span>, <span class="ident">max_z</span>);
-        <span class="macro">assert!</span>((<span class="ident">x1</span> <span class="op">-</span> <span class="ident">min_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">x2</span> <span class="op">-</span> <span class="ident">max_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">y1</span> <span class="op">-</span> <span class="ident">min_y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">y2</span> <span class="op">-</span> <span class="ident">max_y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">z1</span> <span class="op">-</span> <span class="ident">min_z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">z2</span> <span class="op">-</span> <span class="ident">max_z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="kw">let </span>(x1, y1, z1, x2, y2, z2) = get_mins_maxs(min_x, min_y, min_z, max_x, max_y, max_z);
+        <span class="macro">assert!</span>((x1 - min_x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((x2 - max_x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((y1 - min_y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((y2 - max_y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((z1 - min_z).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((z2 - max_z).abs() &lt; <span class="number">1e-15</span>);
 
-        <span class="kw">let</span> (<span class="ident">x1</span>, <span class="ident">y1</span>, <span class="ident">z1</span>, <span class="ident">x2</span>, <span class="ident">y2</span>, <span class="ident">z2</span>) <span class="op">=</span> <span class="ident">get_mins_maxs</span>(<span class="ident">max_x</span>, <span class="ident">max_y</span>, <span class="ident">max_z</span>, <span class="ident">min_x</span>, <span class="ident">min_y</span>, <span class="ident">min_z</span>);
-        <span class="macro">assert!</span>((<span class="ident">x1</span> <span class="op">-</span> <span class="ident">min_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">x2</span> <span class="op">-</span> <span class="ident">max_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">y1</span> <span class="op">-</span> <span class="ident">min_y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">y2</span> <span class="op">-</span> <span class="ident">max_y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">z1</span> <span class="op">-</span> <span class="ident">min_z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">z2</span> <span class="op">-</span> <span class="ident">max_z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="kw">let </span>(x1, y1, z1, x2, y2, z2) = get_mins_maxs(max_x, max_y, max_z, min_x, min_y, min_z);
+        <span class="macro">assert!</span>((x1 - min_x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((x2 - max_x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((y1 - min_y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((y2 - max_y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((z1 - min_z).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((z2 - max_z).abs() &lt; <span class="number">1e-15</span>);
 
-        <span class="kw">let</span> (<span class="ident">x1</span>, <span class="ident">y1</span>, <span class="ident">z1</span>, <span class="ident">x2</span>, <span class="ident">y2</span>, <span class="ident">z2</span>) <span class="op">=</span> <span class="ident">get_mins_maxs</span>(<span class="ident">min_x</span>, <span class="ident">max_y</span>, <span class="ident">min_z</span>, <span class="ident">max_x</span>, <span class="ident">min_y</span>, <span class="ident">max_z</span>);
-        <span class="macro">assert!</span>((<span class="ident">x1</span> <span class="op">-</span> <span class="ident">min_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">x2</span> <span class="op">-</span> <span class="ident">max_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">y1</span> <span class="op">-</span> <span class="ident">min_y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">y2</span> <span class="op">-</span> <span class="ident">max_y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">z1</span> <span class="op">-</span> <span class="ident">min_z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">z2</span> <span class="op">-</span> <span class="ident">max_z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="kw">let </span>(x1, y1, z1, x2, y2, z2) = get_mins_maxs(min_x, max_y, min_z, max_x, min_y, max_z);
+        <span class="macro">assert!</span>((x1 - min_x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((x2 - max_x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((y1 - min_y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((y2 - max_y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((z1 - min_z).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((z2 - max_z).abs() &lt; <span class="number">1e-15</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="number">2.</span>, <span class="number">3.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">30.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>a = Point3D::new(-<span class="number">1.</span>, <span class="number">2.</span>, <span class="number">3.</span>);
+        <span class="kw">let </span>b = Point3D::new(<span class="number">1.</span>, -<span class="number">2.</span>, <span class="number">30.</span>);
 
-        <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>);
+        <span class="kw">let </span>bbox = BBox3D::new(a, b);
 
-        <span class="macro">assert!</span>((<span class="ident">a</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">b</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((a.x - bbox.min.x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((b.x - bbox.max.x).abs() &lt; <span class="number">1e-15</span>);
 
-        <span class="macro">assert!</span>((<span class="ident">b</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">a</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((b.y - bbox.min.y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((a.y - bbox.max.y).abs() &lt; <span class="number">1e-15</span>);
 
-        <span class="macro">assert!</span>((<span class="ident">a</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">b</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((a.z - bbox.min.z).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((b.z - bbox.max.z).abs() &lt; <span class="number">1e-15</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_from_point</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">123.</span>, <span class="number">1.</span>, <span class="number">231.</span>);
-        <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::from_point</span>(<span class="ident">a</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_from_point() {
+        <span class="kw">let </span>a = Point3D::new(<span class="number">123.</span>, <span class="number">1.</span>, <span class="number">231.</span>);
+        <span class="kw">let </span>bbox = BBox3D::from_point(a);
 
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.min.x - a.x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.min.y - a.y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.min.z - a.z).abs() &lt; <span class="number">1e-15</span>);
 
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">a</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.max.x - a.x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.max.y - a.y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.max.z - a.z).abs() &lt; <span class="number">1e-15</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_from_union_point</span>() {
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_from_union_point() {
+        <span class="kw">let </span>min = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>max = Point3D::new(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
 
-        <span class="kw">let</span> <span class="ident">bbox1</span> <span class="op">=</span> <span class="ident">BBox3D::from_point</span>(<span class="ident">min</span>);
-        <span class="kw">let</span> <span class="ident">bbox2</span> <span class="op">=</span> <span class="ident">BBox3D::from_union_point</span>(<span class="kw-2">&amp;</span><span class="ident">bbox1</span>, <span class="ident">max</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox2</span>.<span class="ident">min</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">min</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox2</span>.<span class="ident">min</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">min</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox2</span>.<span class="ident">min</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">min</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="kw">let </span>bbox1 = BBox3D::from_point(min);
+        <span class="kw">let </span>bbox2 = BBox3D::from_union_point(<span class="kw-2">&amp;</span>bbox1, max);
+        <span class="macro">assert!</span>((bbox2.min.x - min.x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox2.min.y - min.y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox2.min.z - min.z).abs() &lt; <span class="number">1e-15</span>);
 
-        <span class="macro">assert!</span>((<span class="ident">bbox2</span>.<span class="ident">max</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">max</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox2</span>.<span class="ident">max</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">max</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox2</span>.<span class="ident">max</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">max</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox2.max.x - max.x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox2.max.y - max.y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox2.max.z - max.z).abs() &lt; <span class="number">1e-15</span>);
 
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>);
-        <span class="kw">let</span> <span class="ident">bbox2</span> <span class="op">=</span> <span class="ident">BBox3D::from_union_point</span>(<span class="kw-2">&amp;</span><span class="ident">bbox2</span>, <span class="ident">min</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox2</span>.<span class="ident">min</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">min</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox2</span>.<span class="ident">min</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">min</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox2</span>.<span class="ident">min</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">min</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="kw">let </span>min = Point3D::new(-<span class="number">1.</span>, -<span class="number">1.</span>, -<span class="number">1.</span>);
+        <span class="kw">let </span>bbox2 = BBox3D::from_union_point(<span class="kw-2">&amp;</span>bbox2, min);
+        <span class="macro">assert!</span>((bbox2.min.x - min.x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox2.min.y - min.y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox2.min.z - min.z).abs() &lt; <span class="number">1e-15</span>);
 
-        <span class="macro">assert!</span>((<span class="ident">bbox2</span>.<span class="ident">max</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">max</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox2</span>.<span class="ident">max</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">max</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox2</span>.<span class="ident">max</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">max</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox2.max.x - max.x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox2.max.y - max.y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox2.max.z - max.z).abs() &lt; <span class="number">1e-15</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_from_union_box</span>() {
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">3.</span>, <span class="op">-</span><span class="number">5.</span>, <span class="op">-</span><span class="number">7.</span>);
-        <span class="kw">let</span> <span class="ident">center</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_from_union_box() {
+        <span class="kw">let </span>min = Point3D::new(-<span class="number">3.</span>, -<span class="number">5.</span>, -<span class="number">7.</span>);
+        <span class="kw">let </span>center = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>max = Point3D::new(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
 
-        <span class="kw">let</span> <span class="ident">bbox1</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">min</span>, <span class="ident">center</span>);
-        <span class="kw">let</span> <span class="ident">bbox2</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">center</span>, <span class="ident">max</span>);
-        <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::from_union</span>(<span class="kw-2">&amp;</span><span class="ident">bbox1</span>, <span class="kw-2">&amp;</span><span class="ident">bbox2</span>);
+        <span class="kw">let </span>bbox1 = BBox3D::new(min, center);
+        <span class="kw">let </span>bbox2 = BBox3D::new(center, max);
+        <span class="kw">let </span>bbox = BBox3D::from_union(<span class="kw-2">&amp;</span>bbox1, <span class="kw-2">&amp;</span>bbox2);
 
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">min</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">min</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">min</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.min.x - min.x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.min.y - min.y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.min.z - min.z).abs() &lt; <span class="number">1e-15</span>);
 
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">max</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">max</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">max</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.max.x - max.x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.max.y - max.y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.max.z - max.z).abs() &lt; <span class="number">1e-15</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_from_intersection</span>() {
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">3.</span>, <span class="op">-</span><span class="number">5.</span>, <span class="op">-</span><span class="number">7.</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_from_intersection() {
+        <span class="kw">let </span>min = Point3D::new(-<span class="number">3.</span>, -<span class="number">5.</span>, -<span class="number">7.</span>);
+        <span class="kw">let </span>max = Point3D::new(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
 
-        <span class="kw">let</span> <span class="ident">bbox1</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">min</span>, <span class="ident">Point3D::new</span>(<span class="number">999.</span>, <span class="number">999.</span>, <span class="number">999.</span>));
-        <span class="kw">let</span> <span class="ident">bbox2</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">999.</span>, <span class="op">-</span><span class="number">999.</span>, <span class="op">-</span><span class="number">999.</span>), <span class="ident">max</span>);
-        <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::from_intersection</span>(<span class="kw-2">&amp;</span><span class="ident">bbox1</span>, <span class="kw-2">&amp;</span><span class="ident">bbox2</span>);
+        <span class="kw">let </span>bbox1 = BBox3D::new(min, Point3D::new(<span class="number">999.</span>, <span class="number">999.</span>, <span class="number">999.</span>));
+        <span class="kw">let </span>bbox2 = BBox3D::new(Point3D::new(-<span class="number">999.</span>, -<span class="number">999.</span>, -<span class="number">999.</span>), max);
+        <span class="kw">let </span>bbox = BBox3D::from_intersection(<span class="kw-2">&amp;</span>bbox1, <span class="kw-2">&amp;</span>bbox2);
 
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">min</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">min</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">min</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">min</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.min.x - min.x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.min.y - min.y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.min.z - min.z).abs() &lt; <span class="number">1e-15</span>);
 
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">max</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">max</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
-        <span class="macro">assert!</span>((<span class="ident">bbox</span>.<span class="ident">max</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">max</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.max.x - max.x).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.max.y - max.y).abs() &lt; <span class="number">1e-15</span>);
+        <span class="macro">assert!</span>((bbox.max.z - max.z).abs() &lt; <span class="number">1e-15</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_overlaps</span>() {
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">3.</span>, <span class="op">-</span><span class="number">5.</span>, <span class="op">-</span><span class="number">7.</span>);
-        <span class="kw">let</span> <span class="ident">center</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_overlaps() {
+        <span class="kw">let </span>min = Point3D::new(-<span class="number">3.</span>, -<span class="number">5.</span>, -<span class="number">7.</span>);
+        <span class="kw">let </span>center = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>max = Point3D::new(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
 
-        <span class="kw">let</span> <span class="ident">bbox1</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">min</span>, <span class="ident">center</span>);
-        <span class="kw">let</span> <span class="ident">bbox2</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">center</span>, <span class="ident">max</span>);
-        <span class="macro">assert!</span>(<span class="ident">bbox1</span>.<span class="ident">overlaps</span>(<span class="kw-2">&amp;</span><span class="ident">bbox2</span>));
+        <span class="kw">let </span>bbox1 = BBox3D::new(min, center);
+        <span class="kw">let </span>bbox2 = BBox3D::new(center, max);
+        <span class="macro">assert!</span>(bbox1.overlaps(<span class="kw-2">&amp;</span>bbox2));
 
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">3.</span>, <span class="op">-</span><span class="number">5.</span>, <span class="op">-</span><span class="number">7.</span>);
-        <span class="kw">let</span> <span class="ident">center</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
+        <span class="kw">let </span>min = Point3D::new(-<span class="number">3.</span>, -<span class="number">5.</span>, -<span class="number">7.</span>);
+        <span class="kw">let </span>center = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>max = Point3D::new(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
 
-        <span class="kw">let</span> <span class="ident">bbox1</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">min</span>, <span class="ident">center</span>);
-        <span class="kw">let</span> <span class="ident">bbox2</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">center</span> <span class="op">+</span> <span class="ident">Vector3D::new</span>(<span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.1</span>), <span class="ident">max</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox1</span>.<span class="ident">overlaps</span>(<span class="kw-2">&amp;</span><span class="ident">bbox2</span>));
+        <span class="kw">let </span>bbox1 = BBox3D::new(min, center);
+        <span class="kw">let </span>bbox2 = BBox3D::new(center + Vector3D::new(<span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.1</span>), max);
+        <span class="macro">assert!</span>(!bbox1.overlaps(<span class="kw-2">&amp;</span>bbox2));
 
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">3.</span>, <span class="op">-</span><span class="number">5.</span>, <span class="op">-</span><span class="number">7.</span>);
-        <span class="kw">let</span> <span class="ident">center</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
+        <span class="kw">let </span>min = Point3D::new(-<span class="number">3.</span>, -<span class="number">5.</span>, -<span class="number">7.</span>);
+        <span class="kw">let </span>center = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>max = Point3D::new(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
 
-        <span class="kw">let</span> <span class="ident">bbox1</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">min</span>, <span class="ident">center</span>);
-        <span class="kw">let</span> <span class="ident">bbox2</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">center</span> <span class="op">-</span> <span class="ident">Vector3D::new</span>(<span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.1</span>), <span class="ident">max</span>);
-        <span class="macro">assert!</span>(<span class="ident">bbox1</span>.<span class="ident">overlaps</span>(<span class="kw-2">&amp;</span><span class="ident">bbox2</span>));
+        <span class="kw">let </span>bbox1 = BBox3D::new(min, center);
+        <span class="kw">let </span>bbox2 = BBox3D::new(center - Vector3D::new(<span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.1</span>), max);
+        <span class="macro">assert!</span>(bbox1.overlaps(<span class="kw-2">&amp;</span>bbox2));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_point_inside</span>() {
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">3.</span>, <span class="op">-</span><span class="number">5.</span>, <span class="op">-</span><span class="number">7.</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_point_inside() {
+        <span class="kw">let </span>min = Point3D::new(-<span class="number">3.</span>, -<span class="number">5.</span>, -<span class="number">7.</span>);
+        <span class="kw">let </span>max = Point3D::new(<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">7.</span>);
 
-        <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">min</span>, <span class="ident">max</span>);
+        <span class="kw">let </span>bbox = BBox3D::new(min, max);
 
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">point_inside</span>(<span class="ident">min</span>));
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">point_inside_exclusive</span>(<span class="ident">min</span>));
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">point_inside</span>(<span class="ident">max</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox</span>.<span class="ident">point_inside_exclusive</span>(<span class="ident">max</span>));
+        <span class="macro">assert!</span>(bbox.point_inside(min));
+        <span class="macro">assert!</span>(bbox.point_inside_exclusive(min));
+        <span class="macro">assert!</span>(bbox.point_inside(max));
+        <span class="macro">assert!</span>(!bbox.point_inside_exclusive(max));
 
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">point_inside</span>(<span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>)));
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">point_inside_exclusive</span>(<span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>)));
+        <span class="macro">assert!</span>(bbox.point_inside(Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>)));
+        <span class="macro">assert!</span>(bbox.point_inside_exclusive(Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>)));
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox</span>.<span class="ident">point_inside</span>(<span class="ident">Point3D::new</span>(<span class="number">9e9</span>, <span class="number">9e9</span>, <span class="number">9e9</span>)));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox</span>.<span class="ident">point_inside_exclusive</span>(<span class="ident">Point3D::new</span>(<span class="number">9e9</span>, <span class="number">9e9</span>, <span class="number">9e9</span>)));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox</span>.<span class="ident">point_inside</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">9e9</span>, <span class="op">-</span><span class="number">9e9</span>, <span class="op">-</span><span class="number">9e9</span>)));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox</span>.<span class="ident">point_inside_exclusive</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">9e9</span>, <span class="op">-</span><span class="number">9e9</span>, <span class="op">-</span><span class="number">9e9</span>)));
+        <span class="macro">assert!</span>(!bbox.point_inside(Point3D::new(<span class="number">9e9</span>, <span class="number">9e9</span>, <span class="number">9e9</span>)));
+        <span class="macro">assert!</span>(!bbox.point_inside_exclusive(Point3D::new(<span class="number">9e9</span>, <span class="number">9e9</span>, <span class="number">9e9</span>)));
+        <span class="macro">assert!</span>(!bbox.point_inside(Point3D::new(-<span class="number">9e9</span>, -<span class="number">9e9</span>, -<span class="number">9e9</span>)));
+        <span class="macro">assert!</span>(!bbox.point_inside_exclusive(Point3D::new(-<span class="number">9e9</span>, -<span class="number">9e9</span>, -<span class="number">9e9</span>)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_surface_area</span>() {
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">0.5</span>, <span class="op">-</span><span class="number">0.5</span>, <span class="op">-</span><span class="number">0.5</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">0.5</span>, <span class="op">-</span><span class="number">0.5</span>, <span class="op">-</span><span class="number">0.5</span>) <span class="op">*</span> <span class="op">-</span><span class="number">1.</span>;
-        <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">min</span>, <span class="ident">max</span>);
-        <span class="kw">let</span> <span class="ident">area</span> <span class="op">=</span> <span class="ident">bbox</span>.<span class="ident">surface_area</span>();
-        <span class="macro">assert!</span>((<span class="number">6.</span> <span class="op">-</span> <span class="ident">area</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-7</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_surface_area() {
+        <span class="kw">let </span>min = Point3D::new(-<span class="number">0.5</span>, -<span class="number">0.5</span>, -<span class="number">0.5</span>);
+        <span class="kw">let </span>max = Point3D::new(-<span class="number">0.5</span>, -<span class="number">0.5</span>, -<span class="number">0.5</span>) * -<span class="number">1.</span>;
+        <span class="kw">let </span>bbox = BBox3D::new(min, max);
+        <span class="kw">let </span>area = bbox.surface_area();
+        <span class="macro">assert!</span>((<span class="number">6. </span>- area).abs() &lt; <span class="number">1e-7</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_box_intersection</span>() {
-        <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>);
-        <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::new</span>(<span class="ident">min</span>, <span class="ident">max</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_box_intersection() {
+        <span class="kw">let </span>min = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>max = Point3D::new(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>);
+        <span class="kw">let </span>bbox = BBox3D::new(min, max);
 
-        <span class="comment">// From inside of the box... they should all intersect</span>
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">9000</span> {
-            <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-                <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="ident">rand::random</span>(), <span class="ident">rand::random</span>(), <span class="ident">rand::random</span>()),
-                <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="ident">rand::random</span>(), <span class="ident">rand::random</span>(), <span class="ident">rand::random</span>())
-                    .<span class="ident">get_normalized</span>(),
+        <span class="comment">// From inside of the box... they should all intersect
+        </span><span class="kw">for _ in </span><span class="number">0</span>..<span class="number">9000 </span>{
+            <span class="kw">let </span>ray = Ray3D {
+                origin: Point3D::new(rand::random(), rand::random(), rand::random()),
+                direction: Vector3D::new(rand::random(), rand::random(), rand::random())
+                    .get_normalized(),
             };
-            <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-                <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-                <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-                <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+            <span class="kw">let </span>inv_dir = Vector3D::new(
+                <span class="number">1. </span>/ ray.direction.x,
+                <span class="number">1. </span>/ ray.direction.y,
+                <span class="number">1. </span>/ ray.direction.z,
             );
-            <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+            <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
         }
 
-        <span class="comment">// From outside pointing to the center of the box</span>
-        <span class="comment">// ... they should all intersect</span>
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">9000</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="ident">rand::random</span>();
-            <span class="ident">x</span> <span class="op">-</span><span class="op">=</span> <span class="number">0.5</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">rand::random</span>();
-            <span class="ident">y</span> <span class="op">-</span><span class="op">=</span> <span class="number">0.5</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">rand::random</span>();
-            <span class="ident">z</span> <span class="op">-</span><span class="op">=</span> <span class="number">0.5</span>;
-            <span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>) <span class="op">*</span> <span class="number">10.</span>;
-            <span class="kw">let</span> <span class="ident">direction</span> <span class="op">=</span> (<span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>) <span class="op">-</span> <span class="ident">origin</span>).<span class="ident">get_normalized</span>();
-            <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> { <span class="ident">origin</span>, <span class="ident">direction</span> };
-            <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-                <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-                <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-                <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="comment">// From outside pointing to the center of the box
+        // ... they should all intersect
+        </span><span class="kw">for _ in </span><span class="number">0</span>..<span class="number">9000 </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>x: Float = rand::random();
+            x -= <span class="number">0.5</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>y = rand::random();
+            y -= <span class="number">0.5</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>z = rand::random();
+            z -= <span class="number">0.5</span>;
+            <span class="kw">let </span>origin = Point3D::new(x, y, z) * <span class="number">10.</span>;
+            <span class="kw">let </span>direction = (Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>) - origin).get_normalized();
+            <span class="kw">let </span>ray = Ray3D { origin, direction };
+            <span class="kw">let </span>inv_dir = Vector3D::new(
+                <span class="number">1. </span>/ ray.direction.x,
+                <span class="number">1. </span>/ ray.direction.y,
+                <span class="number">1. </span>/ ray.direction.z,
             );
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>) {
-                <span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>);
+            <span class="kw">if </span>!bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir) {
+                bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir);
                 <span class="macro">panic!</span>(<span class="string">&quot;Did not intersect!&quot;</span>);
             }
         }
 
-        <span class="comment">// On top of the Box... should NOT intersect</span>
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">9000</span> {
-            <span class="kw">let</span> <span class="ident">x</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="ident">rand::random</span>();
-            <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">rand::random</span>();
-            <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="number">1.5</span>;
+        <span class="comment">// On top of the Box... should NOT intersect
+        </span><span class="kw">for _ in </span><span class="number">0</span>..<span class="number">9000 </span>{
+            <span class="kw">let </span>x: Float = rand::random();
+            <span class="kw">let </span>y = rand::random();
+            <span class="kw">let </span>z = <span class="number">1.5</span>;
 
-            <span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-            <span class="kw">let</span> <span class="ident">direction</span> <span class="op">=</span>
-                <span class="ident">Vector3D::new</span>(<span class="ident">rand::random</span>(), <span class="ident">rand::random</span>(), <span class="ident">rand::random</span>()).<span class="ident">get_normalized</span>();
-            <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> { <span class="ident">origin</span>, <span class="ident">direction</span> };
-            <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-                <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-                <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-                <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+            <span class="kw">let </span>origin = Point3D::new(x, y, z);
+            <span class="kw">let </span>direction =
+                Vector3D::new(rand::random(), rand::random(), rand::random()).get_normalized();
+            <span class="kw">let </span>ray = Ray3D { origin, direction };
+            <span class="kw">let </span>inv_dir = Vector3D::new(
+                <span class="number">1. </span>/ ray.direction.x,
+                <span class="number">1. </span>/ ray.direction.y,
+                <span class="number">1. </span>/ ray.direction.z,
             );
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+            <span class="macro">assert!</span>(!bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
         }
 
-        <span class="comment">/* PARALLEL TO Z AXIS */</span>
-        <span class="comment">// From inside Up</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>),
+        <span class="comment">/* PARALLEL TO Z AXIS */
+        // From inside Up
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From inside Down</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>),
+        <span class="comment">// From inside Down
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, -<span class="number">1.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From Below Up</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="op">-</span><span class="number">1.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>),
+        <span class="comment">// From Below Up
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, -<span class="number">1.5</span>),
+            direction: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From Below Down</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="op">-</span><span class="number">1.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>),
+        <span class="comment">// From Below Down
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, -<span class="number">1.5</span>),
+            direction: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, -<span class="number">1.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(!bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From Top Up</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">1.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>),
+        <span class="comment">// From Top Up
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">1.5</span>),
+            direction: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(!bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From Top Down</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">1.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>),
+        <span class="comment">// From Top Down
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">1.5</span>),
+            direction: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, -<span class="number">1.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">/* PARALLEL TO Y AXIS */</span>
-        <span class="comment">// From inside Up</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>),
+        <span class="comment">/* PARALLEL TO Y AXIS */
+        // From inside Up
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From inside Down</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>),
+        <span class="comment">// From inside Down
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(<span class="number">0.</span>, -<span class="number">1.</span>, <span class="number">0.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From Below Up</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="op">-</span><span class="number">1.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>),
+        <span class="comment">// From Below Up
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, -<span class="number">1.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From Below Down</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="op">-</span><span class="number">1.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>),
+        <span class="comment">// From Below Down
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, -<span class="number">1.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(<span class="number">0.</span>, -<span class="number">1.</span>, <span class="number">0.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(!bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From Top Up</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">1.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>),
+        <span class="comment">// From Top Up
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, <span class="number">1.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(!bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From Top Down</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">1.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>),
+        <span class="comment">// From Top Down
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, <span class="number">1.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(<span class="number">0.</span>, -<span class="number">1.</span>, <span class="number">0.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">/* PARALLEL TO X AXIS */</span>
-        <span class="comment">// From inside Up</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+        <span class="comment">/* PARALLEL TO X AXIS */
+        // From inside Up
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From inside Down</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+        <span class="comment">// From inside Down
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(-<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From Below Up</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+        <span class="comment">// From Below Up
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(-<span class="number">1.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From Below Down</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+        <span class="comment">// From Below Down
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(-<span class="number">1.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(-<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(!bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From Top Up</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">1.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+        <span class="comment">// From Top Up
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">1.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(!bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
 
-        <span class="comment">// From Top Down</span>
-        <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-            <span class="ident">origin</span>: <span class="ident">Point3D::new</span>(<span class="number">1.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
-            <span class="ident">direction</span>: <span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+        <span class="comment">// From Top Down
+        </span><span class="kw">let </span>ray = Ray3D {
+            origin: Point3D::new(<span class="number">1.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>),
+            direction: Vector3D::new(-<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
         };
-        <span class="kw">let</span> <span class="ident">inv_dir</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">x</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">y</span>,
-            <span class="number">1.</span> <span class="op">/</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">z</span>,
+        <span class="kw">let </span>inv_dir = Vector3D::new(
+            <span class="number">1. </span>/ ray.direction.x,
+            <span class="number">1. </span>/ ray.direction.y,
+            <span class="number">1. </span>/ ray.direction.z,
         );
-        <span class="macro">assert!</span>(<span class="ident">bbox</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>, <span class="kw-2">&amp;</span><span class="ident">inv_dir</span>));
+        <span class="macro">assert!</span>(bbox.intersect(<span class="kw-2">&amp;</span>ray, <span class="kw-2">&amp;</span>inv_dir));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

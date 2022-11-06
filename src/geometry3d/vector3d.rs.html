@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/vector3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>vector3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/vector3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>vector3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>
 <script>
   "use strict";
@@ -717,646 +717,646 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/</span>
+*/
 
-<span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
-<span class="kw">use</span> <span class="ident">serde::Serialize</span>;
+</span><span class="kw">use </span>serde::Deserialize;
+<span class="kw">use </span>serde::Serialize;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Float;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Point3D</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Point3D;
+<span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// A 3-dimensional Vector</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Vector3D</span> {
-    <span class="doccomment">/// the X component</span>
-    <span class="kw">pub</span> <span class="ident">x</span>: <span class="ident">Float</span>,
-    <span class="doccomment">/// the Y component    </span>
-    <span class="kw">pub</span> <span class="ident">y</span>: <span class="ident">Float</span>,
-    <span class="doccomment">/// the Z component</span>
-    <span class="kw">pub</span> <span class="ident">z</span>: <span class="ident">Float</span>,
+<span class="doccomment">/// A 3-dimensional Vector
+</span><span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>Vector3D {
+    <span class="doccomment">/// the X component
+    </span><span class="kw">pub </span>x: Float,
+    <span class="doccomment">/// the Y component    
+    </span><span class="kw">pub </span>y: Float,
+    <span class="doccomment">/// the Z component
+    </span><span class="kw">pub </span>z: Float,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Vector3D({:.5},{:.5},{:.5})&quot;</span>, <span class="self">self</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">y</span>, <span class="self">self</span>.<span class="ident">z</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Vector3D {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;Vector3D({:.5},{:.5},{:.5})&quot;</span>, <span class="self">self</span>.x, <span class="self">self</span>.y, <span class="self">self</span>.z)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::convert::From</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="ident">Vector3D::new</span>(<span class="ident">v</span>.<span class="ident">x</span>, <span class="ident">v</span>.<span class="ident">y</span>, <span class="ident">v</span>.<span class="ident">z</span>)
+<span class="kw">impl </span>std::convert::From&lt;Point3D&gt; <span class="kw">for </span>Vector3D {
+    <span class="kw">fn </span>from(v: Point3D) -&gt; Vector3D {
+        Vector3D::new(v.x, v.y, v.z)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Vector3D</span> {
-    <span class="doccomment">/// Creates a new vector.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">Float</span>, <span class="ident">y</span>: <span class="ident">Float</span>, <span class="ident">z</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="ident">Vector3D</span> { <span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span> }
+<span class="kw">impl </span>Vector3D {
+    <span class="doccomment">/// Creates a new vector.
+    </span><span class="kw">pub fn </span>new(x: Float, y: Float, z: Float) -&gt; Vector3D {
+        Vector3D { x, y, z }
     }
 
-    <span class="doccomment">/// Returns a new vector, containing the absolute values of each component of `self`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">x</span>: <span class="self">self</span>.<span class="ident">x</span>.<span class="ident">abs</span>(),
-            <span class="ident">y</span>: <span class="self">self</span>.<span class="ident">y</span>.<span class="ident">abs</span>(),
-            <span class="ident">z</span>: <span class="self">self</span>.<span class="ident">z</span>.<span class="ident">abs</span>(),
+    <span class="doccomment">/// Returns a new vector, containing the absolute values of each component of `self`
+    </span><span class="kw">pub fn </span>abs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            x: <span class="self">self</span>.x.abs(),
+            y: <span class="self">self</span>.y.abs(),
+            z: <span class="self">self</span>.z.abs(),
         }
     }
 
-    <span class="doccomment">/// Transforms a [`Vector3D`] into a [`Point3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_point3d</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
-        <span class="ident">Point3D</span> {
-            <span class="ident">x</span>: <span class="self">self</span>.<span class="ident">x</span>,
-            <span class="ident">y</span>: <span class="self">self</span>.<span class="ident">y</span>,
-            <span class="ident">z</span>: <span class="self">self</span>.<span class="ident">z</span>,
+    <span class="doccomment">/// Transforms a [`Vector3D`] into a [`Point3D`]
+    </span><span class="kw">pub fn </span>as_point3d(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Point3D {
+        Point3D {
+            x: <span class="self">self</span>.x,
+            y: <span class="self">self</span>.y,
+            z: <span class="self">self</span>.z,
         }
     }
 
-    <span class="doccomment">/// Gets a normalized [`Vector3D`] that is perpendicular</span>
-    <span class="doccomment">/// to `self`</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quick_inv_sqrt&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_perpendicular</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">const</span> <span class="ident">TINY</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">100.</span> <span class="op">*</span> <span class="ident">Float::EPSILON</span>;
-        <span class="kw">let</span> <span class="ident">ax</span>: <span class="ident">Float</span>;
-        <span class="kw">let</span> <span class="ident">ay</span>: <span class="ident">Float</span>;
-        <span class="kw">let</span> <span class="ident">az</span>: <span class="ident">Float</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">x</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">TINY</span> {
-            <span class="kw">let</span> <span class="ident">vx2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x</span>;
-            <span class="kw">let</span> <span class="ident">vy2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">y</span>;
+    <span class="doccomment">/// Gets a normalized [`Vector3D`] that is perpendicular
+    /// to `self`
+    </span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;quick_inv_sqrt&quot;</span>))]
+    </span><span class="kw">pub fn </span>get_perpendicular(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, String&gt; {
+        <span class="kw">const </span>TINY: Float = <span class="number">100. </span>* Float::EPSILON;
+        <span class="kw">let </span>ax: Float;
+        <span class="kw">let </span>ay: Float;
+        <span class="kw">let </span>az: Float;
+        <span class="kw">if </span><span class="self">self</span>.x.abs() &gt; TINY {
+            <span class="kw">let </span>vx2 = <span class="self">self</span>.x * <span class="self">self</span>.x;
+            <span class="kw">let </span>vy2 = <span class="self">self</span>.y * <span class="self">self</span>.y;
 
-            <span class="ident">ay</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">/</span> (<span class="ident">vx2</span> <span class="op">+</span> <span class="ident">vy2</span>).<span class="ident">sqrt</span>();
-            <span class="ident">az</span> <span class="op">=</span> <span class="number">0.</span>;
-            <span class="ident">ax</span> <span class="op">=</span> <span class="op">-</span><span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">ay</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">x</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">y</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">TINY</span> {
-            <span class="kw">let</span> <span class="ident">vx2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x</span>;
-            <span class="kw">let</span> <span class="ident">vy2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">y</span>;
-            <span class="ident">ax</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">/</span> (<span class="ident">vx2</span> <span class="op">+</span> <span class="ident">vy2</span>).<span class="ident">sqrt</span>();
-            <span class="ident">az</span> <span class="op">=</span> <span class="number">0.</span>;
-            <span class="ident">ay</span> <span class="op">=</span> <span class="op">-</span><span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">ax</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">y</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">z</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">TINY</span> {
-            <span class="kw">let</span> <span class="ident">vx2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x</span>;
-            <span class="kw">let</span> <span class="ident">vz2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">z</span>;
+            ay = <span class="self">self</span>.x / (vx2 + vy2).sqrt();
+            az = <span class="number">0.</span>;
+            ax = -<span class="self">self</span>.y * ay / <span class="self">self</span>.x;
+        } <span class="kw">else if </span><span class="self">self</span>.y.abs() &gt; TINY {
+            <span class="kw">let </span>vx2 = <span class="self">self</span>.x * <span class="self">self</span>.x;
+            <span class="kw">let </span>vy2 = <span class="self">self</span>.y * <span class="self">self</span>.y;
+            ax = <span class="self">self</span>.y / (vx2 + vy2).sqrt();
+            az = <span class="number">0.</span>;
+            ay = -<span class="self">self</span>.x * ax / <span class="self">self</span>.y;
+        } <span class="kw">else if </span><span class="self">self</span>.z.abs() &gt; TINY {
+            <span class="kw">let </span>vx2 = <span class="self">self</span>.x * <span class="self">self</span>.x;
+            <span class="kw">let </span>vz2 = <span class="self">self</span>.z * <span class="self">self</span>.z;
 
-            <span class="ident">ax</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">/</span> (<span class="ident">vz2</span> <span class="op">+</span> <span class="ident">vx2</span>).<span class="ident">sqrt</span>();
-            <span class="ident">ay</span> <span class="op">=</span> <span class="number">0.0</span>;
-            <span class="ident">az</span> <span class="op">=</span> <span class="op">-</span><span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">ax</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">z</span>;
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
+            ax = <span class="self">self</span>.z / (vz2 + vx2).sqrt();
+            ay = <span class="number">0.0</span>;
+            az = -<span class="self">self</span>.x * ax / <span class="self">self</span>.z;
+        } <span class="kw">else </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;Trying to get a Vector3D perpendicular to a Zero Vector (self = {})&quot;</span>,
-                <span class="self">self</span>
-            ));
+                <span class="self">self
+            </span>));
         }
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">ax</span>, <span class="ident">ay</span>, <span class="ident">az</span>);
-        <span class="comment">// ret.normalize();</span>
-        <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
+        <span class="kw">let </span>ret = <span class="self">Self</span>::new(ax, ay, az);
+        <span class="comment">// ret.normalize();
+        </span><span class="prelude-val">Ok</span>(ret)
     }
 
-    <span class="doccomment">/// Gets a normalized [`Vector3D`] that is perpendicular</span>
-    <span class="doccomment">/// to `self`</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quick_inv_sqrt&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_perpendicular</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">const</span> <span class="ident">TINY</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">100.</span> <span class="op">*</span> <span class="ident">Float::EPSILON</span>;
-        <span class="kw">let</span> <span class="ident">ax</span>: <span class="ident">Float</span>;
-        <span class="kw">let</span> <span class="ident">ay</span>: <span class="ident">Float</span>;
-        <span class="kw">let</span> <span class="ident">az</span>: <span class="ident">Float</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">x</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">TINY</span> {
-            <span class="kw">let</span> <span class="ident">vx2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x</span>;
-            <span class="kw">let</span> <span class="ident">vy2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">y</span>;
+    <span class="doccomment">/// Gets a normalized [`Vector3D`] that is perpendicular
+    /// to `self`
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;quick_inv_sqrt&quot;</span>)]
+    </span><span class="kw">pub fn </span>get_perpendicular(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, String&gt; {
+        <span class="kw">const </span>TINY: Float = <span class="number">100. </span>* Float::EPSILON;
+        <span class="kw">let </span>ax: Float;
+        <span class="kw">let </span>ay: Float;
+        <span class="kw">let </span>az: Float;
+        <span class="kw">if </span><span class="self">self</span>.x.abs() &gt; TINY {
+            <span class="kw">let </span>vx2 = <span class="self">self</span>.x * <span class="self">self</span>.x;
+            <span class="kw">let </span>vy2 = <span class="self">self</span>.y * <span class="self">self</span>.y;
 
-            <span class="ident">ay</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident"><span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt</span>(<span class="ident">vx2</span> <span class="op">+</span> <span class="ident">vy2</span>);
-            <span class="ident">az</span> <span class="op">=</span> <span class="number">0.</span>;
-            <span class="ident">ax</span> <span class="op">=</span> <span class="op">-</span><span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">ay</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">x</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">y</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">TINY</span> {
-            <span class="kw">let</span> <span class="ident">vx2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x</span>;
-            <span class="kw">let</span> <span class="ident">vy2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">y</span>;
-            <span class="ident">ax</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident"><span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt</span>(<span class="ident">vx2</span> <span class="op">+</span> <span class="ident">vy2</span>);
-            <span class="ident">az</span> <span class="op">=</span> <span class="number">0.</span>;
-            <span class="ident">ay</span> <span class="op">=</span> <span class="op">-</span><span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">ax</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">y</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">z</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">TINY</span> {
-            <span class="kw">let</span> <span class="ident">vx2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x</span>;
-            <span class="kw">let</span> <span class="ident">vz2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">z</span>;
+            ay = <span class="self">self</span>.x * <span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt(vx2 + vy2);
+            az = <span class="number">0.</span>;
+            ax = -<span class="self">self</span>.y * ay / <span class="self">self</span>.x;
+        } <span class="kw">else if </span><span class="self">self</span>.y.abs() &gt; TINY {
+            <span class="kw">let </span>vx2 = <span class="self">self</span>.x * <span class="self">self</span>.x;
+            <span class="kw">let </span>vy2 = <span class="self">self</span>.y * <span class="self">self</span>.y;
+            ax = <span class="self">self</span>.y * <span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt(vx2 + vy2);
+            az = <span class="number">0.</span>;
+            ay = -<span class="self">self</span>.x * ax / <span class="self">self</span>.y;
+        } <span class="kw">else if </span><span class="self">self</span>.z.abs() &gt; TINY {
+            <span class="kw">let </span>vx2 = <span class="self">self</span>.x * <span class="self">self</span>.x;
+            <span class="kw">let </span>vz2 = <span class="self">self</span>.z * <span class="self">self</span>.z;
 
-            <span class="ident">ax</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident"><span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt</span>(<span class="ident">vz2</span> <span class="op">+</span> <span class="ident">vx2</span>);
-            <span class="ident">ay</span> <span class="op">=</span> <span class="number">0.0</span>;
-            <span class="ident">az</span> <span class="op">=</span> <span class="op">-</span><span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">ax</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">z</span>;
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
+            ax = <span class="self">self</span>.z * <span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt(vz2 + vx2);
+            ay = <span class="number">0.0</span>;
+            az = -<span class="self">self</span>.x * ax / <span class="self">self</span>.z;
+        } <span class="kw">else </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;Trying to get a Vector3D perpendicular to a Zero Vector (self = {})&quot;</span>,
-                <span class="self">self</span>
-            ));
+                <span class="self">self
+            </span>));
         }
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">ax</span>, <span class="ident">ay</span>, <span class="ident">az</span>);
-        <span class="comment">// ret.normalize();</span>
-        <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
+        <span class="kw">let </span>ret = <span class="self">Self</span>::new(ax, ay, az);
+        <span class="comment">// ret.normalize();
+        </span><span class="prelude-val">Ok</span>(ret)
     }
 
-    <span class="doccomment">/// Checks whether a vector is equal (or close) to another vector</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">const</span> <span class="ident">TINY</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">1e-5</span>;
-        (<span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">z</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span>
+    <span class="doccomment">/// Checks whether a vector is equal (or close) to another vector
+    </span><span class="kw">pub fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, p: Vector3D) -&gt; bool {
+        <span class="kw">const </span>TINY: Float = <span class="number">1e-5</span>;
+        (<span class="self">self</span>.x - p.x).abs() &lt; TINY &amp;&amp; (<span class="self">self</span>.y - p.y).abs() &lt; TINY &amp;&amp; (<span class="self">self</span>.z - p.z).abs() &lt; TINY
     }
 
-    <span class="doccomment">/// Cross product between two vectors</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cross</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="kw">let</span> <span class="ident">dx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">z</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">y</span>;
-        <span class="kw">let</span> <span class="ident">dy</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">z</span>;
-        <span class="kw">let</span> <span class="ident">dz</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">y</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">x</span>;
+    <span class="doccomment">/// Cross product between two vectors
+    </span><span class="kw">pub fn </span>cross(<span class="kw-2">&amp;</span><span class="self">self</span>, v: Vector3D) -&gt; Vector3D {
+        <span class="kw">let </span>dx = <span class="self">self</span>.y * v.z - <span class="self">self</span>.z * v.y;
+        <span class="kw">let </span>dy = <span class="self">self</span>.z * v.x - <span class="self">self</span>.x * v.z;
+        <span class="kw">let </span>dz = <span class="self">self</span>.x * v.y - <span class="self">self</span>.y * v.x;
 
-        <span class="ident">Vector3D::new</span>(<span class="ident">dx</span>, <span class="ident">dy</span>, <span class="ident">dz</span>)
+        Vector3D::new(dx, dy, dz)
     }
 
-    <span class="doccomment">/// Calculates the length of a vector</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
-        <span class="self">self</span>.<span class="ident">length_squared</span>().<span class="ident">sqrt</span>()
+    <span class="doccomment">/// Calculates the length of a vector
+    </span><span class="kw">pub fn </span>length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Float {
+        <span class="self">self</span>.length_squared().sqrt()
     }
 
-    <span class="doccomment">/// Calculates the length of a vector squared.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Often using the squared of the length is the same as using the length of a vector</span>
-    <span class="doccomment">/// (e.g., when comparing distances, the squared lengths of vectors are sorted in the same order</span>
-    <span class="doccomment">/// as the lengths themselves). In such cases, using `length_squared()` is preferred because</span>
-    <span class="doccomment">/// it is faster</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length_squared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
-        <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">z</span>
+    <span class="doccomment">/// Calculates the length of a vector squared.
+    ///
+    /// Often using the squared of the length is the same as using the length of a vector
+    /// (e.g., when comparing distances, the squared lengths of vectors are sorted in the same order
+    /// as the lengths themselves). In such cases, using `length_squared()` is preferred because
+    /// it is faster
+    </span><span class="kw">pub fn </span>length_squared(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Float {
+        <span class="self">self</span>.x * <span class="self">self</span>.x + <span class="self">self</span>.y * <span class="self">self</span>.y + <span class="self">self</span>.z * <span class="self">self</span>.z
     }
 
-    <span class="doccomment">/// Normalizes a Vector, mutating it.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quick_inv_sqrt&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">1.</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">length</span>();
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quick_inv_sqrt&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt</span>(<span class="self">self</span>.<span class="ident">length_squared</span>());
+    <span class="doccomment">/// Normalizes a Vector, mutating it.
+    </span><span class="kw">pub fn </span>normalize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;quick_inv_sqrt&quot;</span>))]
+        </span><span class="kw">let </span>l = <span class="number">1. </span>/ <span class="self">self</span>.length();
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;quick_inv_sqrt&quot;</span>)]
+        </span><span class="kw">let </span>l = <span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt(<span class="self">self</span>.length_squared());
 
-        <span class="self">self</span>.<span class="ident">x</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">l</span>;
-        <span class="self">self</span>.<span class="ident">y</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">l</span>;
-        <span class="self">self</span>.<span class="ident">z</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">l</span>;
+        <span class="self">self</span>.x <span class="kw-2">*</span>= l;
+        <span class="self">self</span>.y <span class="kw-2">*</span>= l;
+        <span class="self">self</span>.z <span class="kw-2">*</span>= l;
     }
 
-    <span class="doccomment">/// Returns a normalized version of a vector</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_normalized</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-        <span class="ident">ret</span>.<span class="ident">normalize</span>();
-        <span class="ident">ret</span>
+    <span class="doccomment">/// Returns a normalized version of a vector
+    </span><span class="kw">pub fn </span>get_normalized(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vector3D {
+        <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="kw-2">*</span><span class="self">self</span>;
+        ret.normalize();
+        ret
     }
 
-    <span class="doccomment">/// Checks whether a vector is Zero</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_zero</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">const</span> <span class="ident">TINY</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">100.</span> <span class="op">*</span> <span class="ident">Float::EPSILON</span>;
-        <span class="self">self</span>.<span class="ident">x</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">y</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">z</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">TINY</span>
+    <span class="doccomment">/// Checks whether a vector is Zero
+    </span><span class="kw">pub fn </span>is_zero(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">const </span>TINY: Float = <span class="number">100. </span>* Float::EPSILON;
+        <span class="self">self</span>.x.abs() &lt; TINY &amp;&amp; <span class="self">self</span>.y.abs() &lt; TINY &amp;&amp; <span class="self">self</span>.z.abs() &lt; TINY
     }
 
-    <span class="doccomment">/// Checks if two vectors are parallel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_parallel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// If any of them is zero, false</span>
-        <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_zero</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_zero</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="doccomment">/// Checks if two vectors are parallel
+    </span><span class="kw">pub fn </span>is_parallel(<span class="kw-2">&amp;</span><span class="self">self</span>, v: Vector3D) -&gt; bool {
+        <span class="comment">// If any of them is zero, false
+        </span><span class="kw">if </span>v.is_zero() || <span class="self">self</span>.is_zero() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="comment">// This closure will be useful later.</span>
-        <span class="kw">let</span> <span class="ident">check_other</span> <span class="op">=</span> <span class="op">|</span><span class="ident">k_in</span>: <span class="ident">Float</span>, <span class="ident">v1</span>: <span class="ident">Float</span>, <span class="ident">v2</span>: <span class="ident">Float</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">v2</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="number">1e-8</span> {
-                <span class="comment">// Can be divided. Check if division</span>
-                <span class="comment">// results in K (or close to it).</span>
-                (<span class="ident">v1</span> <span class="op">/</span> <span class="ident">v2</span> <span class="op">-</span> <span class="ident">k_in</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-8</span>
-            } <span class="kw">else</span> {
-                <span class="comment">// Cannot be divided... check if v1 is</span>
-                <span class="comment">// also tiny</span>
-                <span class="ident">v1</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-8</span>
-            }
+        <span class="comment">// This closure will be useful later.
+        </span><span class="kw">let </span>check_other = |k_in: Float, v1: Float, v2: Float| {
+            <span class="kw">if </span>v2.abs() &gt; <span class="number">1e-8 </span>{
+                <span class="comment">// Can be divided. Check if division
+                // results in K (or close to it).
+                </span>(v1 / v2 - k_in).abs() &lt; <span class="number">1e-8
+            </span>} <span class="kw">else </span>{
+                <span class="comment">// Cannot be divided... check if v1 is
+                // also tiny
+                </span>v1.abs() &lt; <span class="number">1e-8
+            </span>}
         };
 
-        <span class="comment">// If they point in the same direction, K should be the same in all cases.</span>
-        <span class="comment">// This value (1.0) is never really used I think, but I need to</span>
-        <span class="comment">// initialize the variable... otherwise I get  warming.</span>
-        <span class="kw">let</span> <span class="ident">k</span>; <span class="comment">// = 1.0 as Float;</span>
-        <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">x</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="number">1e-8</span> {
-            <span class="comment">// Let&#39;s try anchoring at X</span>
-            <span class="ident">k</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">/</span> <span class="ident">v</span>.<span class="ident">x</span>;
+        <span class="comment">// If they point in the same direction, K should be the same in all cases.
+        // This value (1.0) is never really used I think, but I need to
+        // initialize the variable... otherwise I get  warming.
+        </span><span class="kw">let </span>k; <span class="comment">// = 1.0 as Float;
+        </span><span class="kw">if </span>v.x.abs() &gt; <span class="number">1e-8 </span>{
+            <span class="comment">// Let&#39;s try anchoring at X
+            </span>k = <span class="self">self</span>.x / v.x;
 
-            <span class="comment">// Check if Y and Z have the same K.</span>
-            <span class="ident">check_other</span>(<span class="ident">k</span>, <span class="self">self</span>.<span class="ident">y</span>, <span class="ident">v</span>.<span class="ident">y</span>) <span class="op">&amp;&amp;</span> <span class="ident">check_other</span>(<span class="ident">k</span>, <span class="self">self</span>.<span class="ident">z</span>, <span class="ident">v</span>.<span class="ident">z</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">y</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="number">1e-8</span> {
-            <span class="comment">// Let&#39;s try anchoring at Y</span>
-            <span class="ident">k</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">/</span> <span class="ident">v</span>.<span class="ident">y</span>;
+            <span class="comment">// Check if Y and Z have the same K.
+            </span>check_other(k, <span class="self">self</span>.y, v.y) &amp;&amp; check_other(k, <span class="self">self</span>.z, v.z)
+        } <span class="kw">else if </span>v.y.abs() &gt; <span class="number">1e-8 </span>{
+            <span class="comment">// Let&#39;s try anchoring at Y
+            </span>k = <span class="self">self</span>.y / v.y;
 
-            <span class="comment">// return</span>
-            <span class="ident">check_other</span>(<span class="ident">k</span>, <span class="self">self</span>.<span class="ident">x</span>, <span class="ident">v</span>.<span class="ident">x</span>) <span class="op">&amp;&amp;</span> <span class="ident">check_other</span>(<span class="ident">k</span>, <span class="self">self</span>.<span class="ident">z</span>, <span class="ident">v</span>.<span class="ident">z</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// Since v is not zero, then</span>
-            <span class="comment">// v.z.abs() must be larget than tiny</span>
-            <span class="comment">// Let&#39;s anchor at Z</span>
+            <span class="comment">// return
+            </span>check_other(k, <span class="self">self</span>.x, v.x) &amp;&amp; check_other(k, <span class="self">self</span>.z, v.z)
+        } <span class="kw">else </span>{
+            <span class="comment">// Since v is not zero, then
+            // v.z.abs() must be larget than tiny
+            // Let&#39;s anchor at Z
 
-            <span class="comment">//if v.z.abs() &gt; tiny {</span>
-            <span class="ident">k</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">/</span> <span class="ident">v</span>.<span class="ident">z</span>;
-            <span class="comment">//}</span>
-            <span class="ident">check_other</span>(<span class="ident">k</span>, <span class="self">self</span>.<span class="ident">x</span>, <span class="ident">v</span>.<span class="ident">x</span>) <span class="op">&amp;&amp;</span> <span class="ident">check_other</span>(<span class="ident">k</span>, <span class="self">self</span>.<span class="ident">y</span>, <span class="ident">v</span>.<span class="ident">y</span>)
+            //if v.z.abs() &gt; tiny {
+            </span>k = <span class="self">self</span>.z / v.z;
+            <span class="comment">//}
+            </span>check_other(k, <span class="self">self</span>.x, v.x) &amp;&amp; check_other(k, <span class="self">self</span>.y, v.y)
         }
-    } <span class="comment">// end of is_parallel</span>
+    } <span class="comment">// end of is_parallel
 
-    <span class="doccomment">/// Checks if two vectors are parallel and follow the same direction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_same_direction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_parallel</span>(<span class="ident">v</span>) {
-            <span class="comment">// If they are not parallel, don&#39;t bother</span>
-            <span class="bool-val">false</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// Dot product must be positive for the</span>
-            <span class="comment">// vectors to point in the same general</span>
-            <span class="comment">// direction</span>
-            <span class="kw-2">*</span><span class="self">self</span> <span class="op">*</span> <span class="ident">v</span> <span class="op">&gt;</span> <span class="number">0.</span>
-        }
+    </span><span class="doccomment">/// Checks if two vectors are parallel and follow the same direction.
+    </span><span class="kw">pub fn </span>is_same_direction(<span class="kw-2">&amp;</span><span class="self">self</span>, v: Vector3D) -&gt; bool {
+        <span class="kw">if </span>!<span class="self">self</span>.is_parallel(v) {
+            <span class="comment">// If they are not parallel, don&#39;t bother
+            </span><span class="bool-val">false
+        </span>} <span class="kw">else </span>{
+            <span class="comment">// Dot product must be positive for the
+            // vectors to point in the same general
+            // direction
+            </span><span class="kw-2">*</span><span class="self">self </span>* v &gt; <span class="number">0.
+        </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Mul</span><span class="op">&lt;</span><span class="ident">Vector3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Float</span>;
+<span class="kw">impl </span>std::ops::Mul&lt;Vector3D&gt; <span class="kw">for </span>Vector3D {
+    <span class="kw">type </span>Output = Float;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">Float</span> {
+    <span class="kw">fn </span>mul(<span class="self">self</span>, other: Vector3D) -&gt; Float {
         {
-            <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">y</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">z</span>
+            <span class="self">self</span>.x * other.x + <span class="self">self</span>.y * other.y + <span class="self">self</span>.z * other.z
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Mul</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vector3D</span>;
+<span class="kw">impl </span>std::ops::Mul&lt;Float&gt; <span class="kw">for </span>Vector3D {
+    <span class="kw">type </span>Output = Vector3D;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="ident">Vector3D::new</span>(<span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">s</span>, <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">s</span>, <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">s</span>)
+    <span class="kw">fn </span>mul(<span class="self">self</span>, s: Float) -&gt; Vector3D {
+        Vector3D::new(<span class="self">self</span>.x * s, <span class="self">self</span>.y * s, <span class="self">self</span>.z * s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Mul</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Float</span>;
+<span class="kw">impl </span>std::ops::Mul&lt;Point3D&gt; <span class="kw">for </span>Vector3D {
+    <span class="kw">type </span>Output = Float;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">Float</span> {
+    <span class="kw">fn </span>mul(<span class="self">self</span>, other: Point3D) -&gt; Float {
         {
-            <span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">y</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">z</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">z</span>
+            <span class="self">self</span>.x * other.x + <span class="self">self</span>.y * other.y + <span class="self">self</span>.z * other.z
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::MulAssign</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="ident">Float</span>) {
-        <span class="self">self</span>.<span class="ident">x</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">s</span>;
-        <span class="self">self</span>.<span class="ident">y</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">s</span>;
-        <span class="self">self</span>.<span class="ident">z</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">s</span>;
+<span class="kw">impl </span>std::ops::MulAssign&lt;Float&gt; <span class="kw">for </span>Vector3D {
+    <span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: Float) {
+        <span class="self">self</span>.x <span class="kw-2">*</span>= s;
+        <span class="self">self</span>.y <span class="kw-2">*</span>= s;
+        <span class="self">self</span>.z <span class="kw-2">*</span>= s;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Div</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vector3D</span>;
+<span class="kw">impl </span>std::ops::Div&lt;Float&gt; <span class="kw">for </span>Vector3D {
+    <span class="kw">type </span>Output = Vector3D;
 
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="ident">Vector3D::new</span>(<span class="self">self</span>.<span class="ident">x</span> <span class="op">/</span> <span class="ident">s</span>, <span class="self">self</span>.<span class="ident">y</span> <span class="op">/</span> <span class="ident">s</span>, <span class="self">self</span>.<span class="ident">z</span> <span class="op">/</span> <span class="ident">s</span>)
+    <span class="kw">fn </span>div(<span class="self">self</span>, s: Float) -&gt; Vector3D {
+        Vector3D::new(<span class="self">self</span>.x / s, <span class="self">self</span>.y / s, <span class="self">self</span>.z / s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::DivAssign</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">fn</span> <span class="ident">div_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="ident">Float</span>) {
-        <span class="self">self</span>.<span class="ident">x</span> <span class="op">/</span><span class="op">=</span> <span class="ident">s</span>;
-        <span class="self">self</span>.<span class="ident">y</span> <span class="op">/</span><span class="op">=</span> <span class="ident">s</span>;
-        <span class="self">self</span>.<span class="ident">z</span> <span class="op">/</span><span class="op">=</span> <span class="ident">s</span>;
+<span class="kw">impl </span>std::ops::DivAssign&lt;Float&gt; <span class="kw">for </span>Vector3D {
+    <span class="kw">fn </span>div_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: Float) {
+        <span class="self">self</span>.x /= s;
+        <span class="self">self</span>.y /= s;
+        <span class="self">self</span>.z /= s;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Add</span><span class="op">&lt;</span><span class="ident">Vector3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vector3D</span>;
+<span class="kw">impl </span>std::ops::Add&lt;Vector3D&gt; <span class="kw">for </span>Vector3D {
+    <span class="kw">type </span>Output = Vector3D;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="ident">Vector3D::new</span>(<span class="self">self</span>.<span class="ident">x</span> <span class="op">+</span> <span class="ident">other</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">y</span> <span class="op">+</span> <span class="ident">other</span>.<span class="ident">y</span>, <span class="self">self</span>.<span class="ident">z</span> <span class="op">+</span> <span class="ident">other</span>.<span class="ident">z</span>)
+    <span class="kw">fn </span>add(<span class="self">self</span>, other: Vector3D) -&gt; Vector3D {
+        Vector3D::new(<span class="self">self</span>.x + other.x, <span class="self">self</span>.y + other.y, <span class="self">self</span>.z + other.z)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::AddAssign</span><span class="op">&lt;</span><span class="ident">Vector3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">fn</span> <span class="ident">add_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Vector3D</span>) {
-        <span class="self">self</span>.<span class="ident">x</span> <span class="op">+</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">x</span>;
-        <span class="self">self</span>.<span class="ident">y</span> <span class="op">+</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">y</span>;
-        <span class="self">self</span>.<span class="ident">z</span> <span class="op">+</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">z</span>;
+<span class="kw">impl </span>std::ops::AddAssign&lt;Vector3D&gt; <span class="kw">for </span>Vector3D {
+    <span class="kw">fn </span>add_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: Vector3D) {
+        <span class="self">self</span>.x += other.x;
+        <span class="self">self</span>.y += other.y;
+        <span class="self">self</span>.z += other.z;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::SubAssign</span><span class="op">&lt;</span><span class="ident">Vector3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Vector3D</span>) {
-        <span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">x</span>;
-        <span class="self">self</span>.<span class="ident">y</span> <span class="op">-</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">y</span>;
-        <span class="self">self</span>.<span class="ident">z</span> <span class="op">-</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">z</span>;
+<span class="kw">impl </span>std::ops::SubAssign&lt;Vector3D&gt; <span class="kw">for </span>Vector3D {
+    <span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: Vector3D) {
+        <span class="self">self</span>.x -= other.x;
+        <span class="self">self</span>.y -= other.y;
+        <span class="self">self</span>.z -= other.z;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Neg</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vector3D</span>;
+<span class="kw">impl </span>std::ops::Neg <span class="kw">for </span>Vector3D {
+    <span class="kw">type </span>Output = Vector3D;
 
-    <span class="kw">fn</span> <span class="ident">neg</span>(<span class="self">self</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="self">self</span>.<span class="ident">x</span>, <span class="op">-</span><span class="self">self</span>.<span class="ident">y</span>, <span class="op">-</span><span class="self">self</span>.<span class="ident">z</span>)
+    <span class="kw">fn </span>neg(<span class="self">self</span>) -&gt; Vector3D {
+        Vector3D::new(-<span class="self">self</span>.x, -<span class="self">self</span>.y, -<span class="self">self</span>.z)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Sub</span><span class="op">&lt;</span><span class="ident">Vector3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vector3D</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vector3D</span>;
+<span class="kw">impl </span>std::ops::Sub&lt;Vector3D&gt; <span class="kw">for </span>Vector3D {
+    <span class="kw">type </span>Output = Vector3D;
 
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Vector3D</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="ident">Vector3D::new</span>(<span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">other</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">other</span>.<span class="ident">y</span>, <span class="self">self</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">other</span>.<span class="ident">z</span>)
+    <span class="kw">fn </span>sub(<span class="self">self</span>, other: Vector3D) -&gt; Vector3D {
+        Vector3D::new(<span class="self">self</span>.x - other.x, <span class="self">self</span>.y - other.y, <span class="self">self</span>.z - other.z)
     }
 }
 
-<span class="comment">/***********/</span>
-<span class="comment">/* TESTING */</span>
-<span class="comment">/***********/</span>
+<span class="comment">/***********/
+/* TESTING */
+/***********/
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">testing</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</span><span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>testing {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_get_perpendicular</span>() {
-        <span class="kw">fn</span> <span class="ident">check</span>(<span class="ident">v</span>: <span class="ident">Vector3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">perp</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">get_perpendicular</span>()<span class="question-mark">?</span>;
-            <span class="kw">if</span> (<span class="ident">v</span> <span class="op">*</span> <span class="ident">perp</span>).<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="number">100.</span> <span class="op">*</span> <span class="ident">Float::EPSILON</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_get_perpendicular() {
+        <span class="kw">fn </span>check(v: Vector3D) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+            <span class="kw">let </span>perp = v.get_perpendicular()<span class="question-mark">?</span>;
+            <span class="kw">if </span>(v * perp).abs() &gt; <span class="number">100. </span>* Float::EPSILON {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                     <span class="string">&quot;Vector {} is not perpendicular with vector {} (dot prod is {})&quot;</span>,
-                    <span class="ident">v</span>,
-                    <span class="ident">perp</span>,
-                    (<span class="ident">v</span> <span class="op">*</span> <span class="ident">perp</span>).<span class="ident">abs</span>()
+                    v,
+                    perp,
+                    (v * perp).abs()
                 ));
             }
-            <span class="kw">if</span> (<span class="number">1.</span> <span class="op">-</span> <span class="ident">perp</span>.<span class="ident">length</span>()).<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="number">0.00001</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
+            <span class="kw">if </span>(<span class="number">1. </span>- perp.length()).abs() &gt; <span class="number">0.00001 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                     <span class="string">&quot;Perpendicular Vector {} is not normalized... length is {}&quot;</span>,
-                    <span class="ident">perp</span>,
-                    <span class="ident">perp</span>.<span class="ident">length</span>()
+                    perp,
+                    perp.length()
                 ));
             }
             <span class="prelude-val">Ok</span>(())
         }
 
-        <span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">1.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
+        check(Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>)).unwrap();
+        check(Vector3D::new(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">1.</span>)).unwrap();
+        check(Vector3D::new(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).unwrap();
+        check(Vector3D::new(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).unwrap();
+        check(Vector3D::new(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>)).unwrap();
 
-        <span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="number">3.</span>, <span class="number">0.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="number">3.</span>, <span class="number">123.1</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="number">3.</span>, <span class="op">-</span><span class="number">123.1</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="number">3.</span>, <span class="op">-</span><span class="number">123.1</span>, <span class="number">10.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="number">3.</span>, <span class="number">0.</span>, <span class="number">10.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="op">-</span><span class="number">123.1</span>, <span class="number">10.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">50.</span>)).<span class="ident">unwrap</span>();
+        check(Vector3D::new(<span class="number">3.</span>, <span class="number">0.</span>, <span class="number">0.</span>)).unwrap();
+        check(Vector3D::new(<span class="number">3.</span>, <span class="number">123.1</span>, <span class="number">0.</span>)).unwrap();
+        check(Vector3D::new(-<span class="number">3.</span>, -<span class="number">123.1</span>, <span class="number">0.</span>)).unwrap();
+        check(Vector3D::new(-<span class="number">3.</span>, -<span class="number">123.1</span>, <span class="number">10.</span>)).unwrap();
+        check(Vector3D::new(-<span class="number">3.</span>, <span class="number">0.</span>, <span class="number">10.</span>)).unwrap();
+        check(Vector3D::new(<span class="number">0.</span>, -<span class="number">123.1</span>, <span class="number">10.</span>)).unwrap();
+        check(Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">50.</span>)).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">check</span>(<span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>)).<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(check(Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>)).is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">1.0</span>;
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="number">2.0</span>;
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="number">3.0</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>x = <span class="number">1.0</span>;
+        <span class="kw">let </span>y = <span class="number">2.0</span>;
+        <span class="kw">let </span>z = <span class="number">3.0</span>;
 
-        <span class="kw">let</span> <span class="ident">pt</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">x</span>, <span class="ident">pt</span>.<span class="ident">x</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">y</span>, <span class="ident">pt</span>.<span class="ident">y</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">z</span>, <span class="ident">pt</span>.<span class="ident">z</span>);
+        <span class="kw">let </span>pt = Vector3D::new(x, y, z);
+        <span class="macro">assert_eq!</span>(x, pt.x);
+        <span class="macro">assert_eq!</span>(y, pt.y);
+        <span class="macro">assert_eq!</span>(z, pt.z);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">x</span>, <span class="ident">pt</span>.<span class="ident">x</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">y</span>, <span class="ident">pt</span>.<span class="ident">y</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">z</span>, <span class="ident">pt</span>.<span class="ident">z</span>);
+        <span class="macro">assert_eq!</span>(x, pt.x);
+        <span class="macro">assert_eq!</span>(y, pt.y);
+        <span class="macro">assert_eq!</span>(z, pt.z);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_dot</span>() {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_dot() {
+        <span class="kw">let </span>x = Vector3D::new(<span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
+        <span class="kw">let </span>y = Vector3D::new(<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">x</span> <span class="op">*</span> <span class="ident">y</span>, <span class="number">0.0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">y</span> <span class="op">*</span> <span class="ident">x</span>, <span class="number">0.0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">x</span> <span class="op">*</span> <span class="ident">x</span>, <span class="number">1.0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">y</span> <span class="op">*</span> <span class="ident">y</span>, <span class="number">1.0</span>);
+        <span class="macro">assert_eq!</span>(x * y, <span class="number">0.0</span>);
+        <span class="macro">assert_eq!</span>(y * x, <span class="number">0.0</span>);
+        <span class="macro">assert_eq!</span>(x * x, <span class="number">1.0</span>);
+        <span class="macro">assert_eq!</span>(y * y, <span class="number">1.0</span>);
 
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">1.0</span>, <span class="number">3.0</span>, <span class="op">-</span><span class="number">10.0</span>);
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">0.1</span>, <span class="number">2.0</span>, <span class="number">10.0</span>);
+        <span class="kw">let </span>x = Vector3D::new(<span class="number">1.0</span>, <span class="number">3.0</span>, -<span class="number">10.0</span>);
+        <span class="kw">let </span>y = Vector3D::new(<span class="number">0.1</span>, <span class="number">2.0</span>, <span class="number">10.0</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">x</span> <span class="op">*</span> <span class="ident">y</span>, <span class="number">1.</span> <span class="op">*</span> <span class="number">0.1</span> <span class="op">+</span> <span class="number">3.</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">-</span> <span class="number">10.</span> <span class="op">*</span> <span class="number">10.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">y</span> <span class="op">*</span> <span class="ident">x</span>, <span class="number">1.</span> <span class="op">*</span> <span class="number">0.1</span> <span class="op">+</span> <span class="number">3.</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">-</span> <span class="number">10.</span> <span class="op">*</span> <span class="number">10.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">x</span> <span class="op">*</span> <span class="ident">x</span>, <span class="number">1.</span> <span class="op">+</span> <span class="number">3.</span> <span class="op">*</span> <span class="number">3.</span> <span class="op">+</span> <span class="number">10.</span> <span class="op">*</span> <span class="number">10.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">y</span> <span class="op">*</span> <span class="ident">y</span>, <span class="number">0.1</span> <span class="op">*</span> <span class="number">0.1</span> <span class="op">+</span> <span class="number">2.0</span> <span class="op">*</span> <span class="number">2.0</span> <span class="op">+</span> <span class="number">10.</span> <span class="op">*</span> <span class="number">10.</span>);
+        <span class="macro">assert_eq!</span>(x * y, <span class="number">1. </span>* <span class="number">0.1 </span>+ <span class="number">3. </span>* <span class="number">2. </span>- <span class="number">10. </span>* <span class="number">10.</span>);
+        <span class="macro">assert_eq!</span>(y * x, <span class="number">1. </span>* <span class="number">0.1 </span>+ <span class="number">3. </span>* <span class="number">2. </span>- <span class="number">10. </span>* <span class="number">10.</span>);
+        <span class="macro">assert_eq!</span>(x * x, <span class="number">1. </span>+ <span class="number">3. </span>* <span class="number">3. </span>+ <span class="number">10. </span>* <span class="number">10.</span>);
+        <span class="macro">assert_eq!</span>(y * y, <span class="number">0.1 </span>* <span class="number">0.1 </span>+ <span class="number">2.0 </span>* <span class="number">2.0 </span>+ <span class="number">10. </span>* <span class="number">10.</span>);
 
-        <span class="comment">// Against a point</span>
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">1.0</span>, <span class="number">3.0</span>, <span class="op">-</span><span class="number">10.0</span>);
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.1</span>, <span class="number">2.0</span>, <span class="number">10.0</span>);
+        <span class="comment">// Against a point
+        </span><span class="kw">let </span>x = Vector3D::new(<span class="number">1.0</span>, <span class="number">3.0</span>, -<span class="number">10.0</span>);
+        <span class="kw">let </span>y = Point3D::new(<span class="number">0.1</span>, <span class="number">2.0</span>, <span class="number">10.0</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">x</span> <span class="op">*</span> <span class="ident">y</span>, <span class="number">1.</span> <span class="op">*</span> <span class="number">0.1</span> <span class="op">+</span> <span class="number">3.</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">-</span> <span class="number">10.</span> <span class="op">*</span> <span class="number">10.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">y</span> <span class="op">*</span> <span class="ident">x</span>, <span class="number">1.</span> <span class="op">*</span> <span class="number">0.1</span> <span class="op">+</span> <span class="number">3.</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">-</span> <span class="number">10.</span> <span class="op">*</span> <span class="number">10.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">x</span> <span class="op">*</span> <span class="ident">x</span>, <span class="number">1.</span> <span class="op">+</span> <span class="number">3.</span> <span class="op">*</span> <span class="number">3.</span> <span class="op">+</span> <span class="number">10.</span> <span class="op">*</span> <span class="number">10.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">y</span> <span class="op">*</span> <span class="ident">y</span>, <span class="number">0.1</span> <span class="op">*</span> <span class="number">0.1</span> <span class="op">+</span> <span class="number">2.0</span> <span class="op">*</span> <span class="number">2.0</span> <span class="op">+</span> <span class="number">10.</span> <span class="op">*</span> <span class="number">10.</span>);
+        <span class="macro">assert_eq!</span>(x * y, <span class="number">1. </span>* <span class="number">0.1 </span>+ <span class="number">3. </span>* <span class="number">2. </span>- <span class="number">10. </span>* <span class="number">10.</span>);
+        <span class="macro">assert_eq!</span>(y * x, <span class="number">1. </span>* <span class="number">0.1 </span>+ <span class="number">3. </span>* <span class="number">2. </span>- <span class="number">10. </span>* <span class="number">10.</span>);
+        <span class="macro">assert_eq!</span>(x * x, <span class="number">1. </span>+ <span class="number">3. </span>* <span class="number">3. </span>+ <span class="number">10. </span>* <span class="number">10.</span>);
+        <span class="macro">assert_eq!</span>(y * y, <span class="number">0.1 </span>* <span class="number">0.1 </span>+ <span class="number">2.0 </span>* <span class="number">2.0 </span>+ <span class="number">10. </span>* <span class="number">10.</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_scale</span>() {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">1.2</span>;
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="number">5.22</span>;
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="number">9.123</span>;
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="number">4.123</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_scale() {
+        <span class="kw">let </span>x = <span class="number">1.2</span>;
+        <span class="kw">let </span>y = <span class="number">5.22</span>;
+        <span class="kw">let </span>z = <span class="number">9.123</span>;
+        <span class="kw">let </span>s = <span class="number">4.123</span>;
 
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="kw">let</span> <span class="ident">new_v</span> <span class="op">=</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">s</span>;
+        <span class="kw">let </span>v = Vector3D::new(x, y, z);
+        <span class="kw">let </span>new_v = v * s;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">new_v</span>.<span class="ident">x</span>, <span class="ident">x</span> <span class="op">*</span> <span class="ident">s</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">new_v</span>.<span class="ident">y</span>, <span class="ident">y</span> <span class="op">*</span> <span class="ident">s</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">new_v</span>.<span class="ident">z</span>, <span class="ident">z</span> <span class="op">*</span> <span class="ident">s</span>);
+        <span class="macro">assert_eq!</span>(new_v.x, x * s);
+        <span class="macro">assert_eq!</span>(new_v.y, y * s);
+        <span class="macro">assert_eq!</span>(new_v.z, z * s);
 
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="kw">let</span> <span class="ident">new_v</span> <span class="op">=</span> <span class="ident">v</span> <span class="op">/</span> <span class="ident">s</span>;
+        <span class="kw">let </span>v = Vector3D::new(x, y, z);
+        <span class="kw">let </span>new_v = v / s;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">new_v</span>.<span class="ident">x</span>, <span class="ident">x</span> <span class="op">/</span> <span class="ident">s</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">new_v</span>.<span class="ident">y</span>, <span class="ident">y</span> <span class="op">/</span> <span class="ident">s</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">new_v</span>.<span class="ident">z</span>, <span class="ident">z</span> <span class="op">/</span> <span class="ident">s</span>);
+        <span class="macro">assert_eq!</span>(new_v.x, x / s);
+        <span class="macro">assert_eq!</span>(new_v.y, y / s);
+        <span class="macro">assert_eq!</span>(new_v.z, z / s);
 
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">1.2</span>;
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="number">5.22</span>;
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="number">9.123</span>;
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="number">4.123</span>;
+        <span class="kw">let </span>x = <span class="number">1.2</span>;
+        <span class="kw">let </span>y = <span class="number">5.22</span>;
+        <span class="kw">let </span>z = <span class="number">9.123</span>;
+        <span class="kw">let </span>s = <span class="number">4.123</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="ident">v</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">s</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>v = Vector3D::new(x, y, z);
+        v <span class="kw-2">*</span>= s;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">v</span>.<span class="ident">x</span>, <span class="ident">x</span> <span class="op">*</span> <span class="ident">s</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">v</span>.<span class="ident">y</span>, <span class="ident">y</span> <span class="op">*</span> <span class="ident">s</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">v</span>.<span class="ident">z</span>, <span class="ident">z</span> <span class="op">*</span> <span class="ident">s</span>);
+        <span class="macro">assert_eq!</span>(v.x, x * s);
+        <span class="macro">assert_eq!</span>(v.y, y * s);
+        <span class="macro">assert_eq!</span>(v.z, z * s);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="ident">v</span> <span class="op">/</span><span class="op">=</span> <span class="ident">s</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>v = Vector3D::new(x, y, z);
+        v /= s;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">v</span>.<span class="ident">x</span>, <span class="ident">x</span> <span class="op">/</span> <span class="ident">s</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">v</span>.<span class="ident">y</span>, <span class="ident">y</span> <span class="op">/</span> <span class="ident">s</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">v</span>.<span class="ident">z</span>, <span class="ident">z</span> <span class="op">/</span> <span class="ident">s</span>);
+        <span class="macro">assert_eq!</span>(v.x, x / s);
+        <span class="macro">assert_eq!</span>(v.y, y / s);
+        <span class="macro">assert_eq!</span>(v.z, z / s);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_add</span>() {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">1.2</span>;
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="number">5.22</span>;
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="number">9.123</span>;
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="number">1.212312</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_add() {
+        <span class="kw">let </span>x = <span class="number">1.2</span>;
+        <span class="kw">let </span>y = <span class="number">5.22</span>;
+        <span class="kw">let </span>z = <span class="number">9.123</span>;
+        <span class="kw">let </span>s = <span class="number">1.212312</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">s</span> <span class="op">*</span> <span class="ident">x</span>, <span class="ident">s</span> <span class="op">*</span> <span class="ident">y</span>, <span class="ident">s</span> <span class="op">*</span> <span class="ident">z</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>v = Vector3D::new(x, y, z);
+        <span class="kw">let </span>d = Vector3D::new(s * x, s * y, s * z);
 
-        <span class="kw">let</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">v</span> <span class="op">+</span> <span class="ident">d</span>;
+        <span class="kw">let </span>v2 = v + d;
 
-        <span class="macro">assert!</span>(<span class="ident">v2</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">x</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">&lt;</span> <span class="number">1E-10</span>);
-        <span class="macro">assert!</span>(<span class="ident">v2</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">y</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">&lt;</span> <span class="number">1E-10</span>);
-        <span class="macro">assert!</span>(<span class="ident">v2</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">z</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">&lt;</span> <span class="number">1E-10</span>);
+        <span class="macro">assert!</span>(v2.x - x * (s + <span class="number">1.0</span>) &lt; <span class="number">1E-10</span>);
+        <span class="macro">assert!</span>(v2.y - y * (s + <span class="number">1.0</span>) &lt; <span class="number">1E-10</span>);
+        <span class="macro">assert!</span>(v2.z - z * (s + <span class="number">1.0</span>) &lt; <span class="number">1E-10</span>);
 
-        <span class="ident">v</span> <span class="op">+</span><span class="op">=</span> <span class="ident">d</span>;
-        <span class="macro">assert!</span>(<span class="ident">v</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">x</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">&lt;</span> <span class="number">1E-10</span>);
-        <span class="macro">assert!</span>(<span class="ident">v</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">y</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">&lt;</span> <span class="number">1E-10</span>);
-        <span class="macro">assert!</span>(<span class="ident">v</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">z</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">&lt;</span> <span class="number">1E-10</span>);
+        v += d;
+        <span class="macro">assert!</span>(v.x - x * (s + <span class="number">1.0</span>) &lt; <span class="number">1E-10</span>);
+        <span class="macro">assert!</span>(v.y - y * (s + <span class="number">1.0</span>) &lt; <span class="number">1E-10</span>);
+        <span class="macro">assert!</span>(v.z - z * (s + <span class="number">1.0</span>) &lt; <span class="number">1E-10</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_sub</span>() {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">1.2</span>;
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="number">5.22</span>;
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="number">9.123</span>;
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="number">1.212312</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_sub() {
+        <span class="kw">let </span>x = <span class="number">1.2</span>;
+        <span class="kw">let </span>y = <span class="number">5.22</span>;
+        <span class="kw">let </span>z = <span class="number">9.123</span>;
+        <span class="kw">let </span>s = <span class="number">1.212312</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="ident">s</span> <span class="op">*</span> <span class="ident">x</span>, <span class="op">-</span><span class="ident">s</span> <span class="op">*</span> <span class="ident">y</span>, <span class="op">-</span><span class="ident">s</span> <span class="op">*</span> <span class="ident">z</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>v = Vector3D::new(x, y, z);
+        <span class="kw">let </span>d = Vector3D::new(-s * x, -s * y, -s * z);
 
-        <span class="kw">let</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">v</span> <span class="op">-</span> <span class="ident">d</span>;
+        <span class="kw">let </span>v2 = v - d;
 
-        <span class="macro">assert!</span>(<span class="ident">v2</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">x</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">&lt;</span> <span class="number">1E-10</span>);
-        <span class="macro">assert!</span>(<span class="ident">v2</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">y</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">&lt;</span> <span class="number">1E-10</span>);
-        <span class="macro">assert!</span>(<span class="ident">v2</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">z</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">&lt;</span> <span class="number">1E-10</span>);
+        <span class="macro">assert!</span>(v2.x - x * (s + <span class="number">1.0</span>) &lt; <span class="number">1E-10</span>);
+        <span class="macro">assert!</span>(v2.y - y * (s + <span class="number">1.0</span>) &lt; <span class="number">1E-10</span>);
+        <span class="macro">assert!</span>(v2.z - z * (s + <span class="number">1.0</span>) &lt; <span class="number">1E-10</span>);
 
-        <span class="ident">v</span> <span class="op">-</span><span class="op">=</span> <span class="ident">d</span>;
-        <span class="macro">assert!</span>(<span class="ident">v</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">x</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">&lt;</span> <span class="number">1E-10</span>);
-        <span class="macro">assert!</span>(<span class="ident">v</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">y</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">&lt;</span> <span class="number">1E-10</span>);
-        <span class="macro">assert!</span>(<span class="ident">v</span>.<span class="ident">z</span> <span class="op">-</span> <span class="ident">z</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">&lt;</span> <span class="number">1E-10</span>);
+        v -= d;
+        <span class="macro">assert!</span>(v.x - x * (s + <span class="number">1.0</span>) &lt; <span class="number">1E-10</span>);
+        <span class="macro">assert!</span>(v.y - y * (s + <span class="number">1.0</span>) &lt; <span class="number">1E-10</span>);
+        <span class="macro">assert!</span>(v.z - z * (s + <span class="number">1.0</span>) &lt; <span class="number">1E-10</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_compare</span>() {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">123.1</span>;
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="number">543.1</span>;
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="number">9123.2</span>;
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="number">0.1</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_compare() {
+        <span class="kw">let </span>x = <span class="number">123.1</span>;
+        <span class="kw">let </span>y = <span class="number">543.1</span>;
+        <span class="kw">let </span>z = <span class="number">9123.2</span>;
+        <span class="kw">let </span>d = <span class="number">0.1</span>;
 
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="kw">let</span> <span class="ident">p2</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">p2</span>));
+        <span class="kw">let </span>p = Vector3D::new(x, y, z);
+        <span class="kw">let </span>p2 = Vector3D::new(x, y, z);
+        <span class="macro">assert!</span>(p.compare(p2));
 
-        <span class="kw">let</span> <span class="ident">p2</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span> <span class="op">+</span> <span class="ident">d</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">p2</span>));
+        <span class="kw">let </span>p2 = Vector3D::new(x + d, y, z);
+        <span class="macro">assert!</span>(!p.compare(p2));
 
-        <span class="kw">let</span> <span class="ident">p2</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span> <span class="op">-</span> <span class="ident">d</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">p2</span>));
+        <span class="kw">let </span>p2 = Vector3D::new(x, y, z - d);
+        <span class="macro">assert!</span>(!p.compare(p2));
 
-        <span class="kw">let</span> <span class="ident">p2</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span>, <span class="op">-</span><span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">p2</span>));
+        <span class="kw">let </span>p2 = Vector3D::new(x, -y, z);
+        <span class="macro">assert!</span>(!p.compare(p2));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_cross</span>() {
-        <span class="kw">let</span> <span class="ident">zero</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_cross() {
+        <span class="kw">let </span>zero = Vector3D::new(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
+        <span class="kw">let </span>x = Vector3D::new(<span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
+        <span class="kw">let </span>y = Vector3D::new(<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
+        <span class="kw">let </span>z = Vector3D::new(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>);
 
-        <span class="macro">assert!</span>(<span class="ident">x</span>.<span class="ident">cross</span>(<span class="ident">x</span>).<span class="ident">compare</span>(<span class="ident">zero</span>));
-        <span class="macro">assert!</span>(<span class="ident">x</span>.<span class="ident">cross</span>(<span class="ident">y</span>).<span class="ident">compare</span>(<span class="ident">z</span>));
-        <span class="macro">assert!</span>(<span class="ident">y</span>.<span class="ident">cross</span>(<span class="ident">z</span>).<span class="ident">compare</span>(<span class="ident">x</span>));
+        <span class="macro">assert!</span>(x.cross(x).compare(zero));
+        <span class="macro">assert!</span>(x.cross(y).compare(z));
+        <span class="macro">assert!</span>(y.cross(z).compare(x));
 
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">2.</span>, <span class="number">3.</span>, <span class="number">4.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">5.</span>, <span class="number">6.</span>, <span class="number">7.</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">cross</span>(<span class="ident">b</span>);
+        <span class="kw">let </span>a = Vector3D::new(<span class="number">2.</span>, <span class="number">3.</span>, <span class="number">4.</span>);
+        <span class="kw">let </span>b = Vector3D::new(<span class="number">5.</span>, <span class="number">6.</span>, <span class="number">7.</span>);
+        <span class="kw">let </span>c = a.cross(b);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">x</span>, <span class="op">-</span><span class="number">3.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">y</span>, <span class="number">6.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">z</span>, <span class="op">-</span><span class="number">3.</span>);
+        <span class="macro">assert_eq!</span>(c.x, -<span class="number">3.</span>);
+        <span class="macro">assert_eq!</span>(c.y, <span class="number">6.</span>);
+        <span class="macro">assert_eq!</span>(c.z, -<span class="number">3.</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_length</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="number">5.0</span>;
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">a</span>, <span class="ident">a</span>, <span class="ident">a</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_length() {
+        <span class="kw">let </span>a = <span class="number">5.0</span>;
+        <span class="kw">let </span>x = Vector3D::new(a, a, a);
 
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">length</span>();
-        <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="ident">l</span> <span class="op">-</span> (<span class="number">3.0</span> <span class="kw">as</span> <span class="ident">Float</span>).<span class="ident">sqrt</span>() <span class="op">*</span> <span class="ident">a</span>;
-        <span class="macro">assert!</span>(<span class="ident">delta</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1E-5</span>);
+        <span class="kw">let </span>l = x.length();
+        <span class="kw">let </span>delta = l - (<span class="number">3.0 </span><span class="kw">as </span>Float).sqrt() * a;
+        <span class="macro">assert!</span>(delta.abs() &lt; <span class="number">1E-5</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_normalize</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">12.1</span>, <span class="number">54.1</span>, <span class="number">765.1</span>);
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">length</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_normalize() {
+        <span class="kw">let </span><span class="kw-2">mut </span>v = Vector3D::new(<span class="number">12.1</span>, <span class="number">54.1</span>, <span class="number">765.1</span>);
+        <span class="kw">let </span>l = v.length();
 
-        <span class="kw">let</span> <span class="ident">v_norm_ref</span> <span class="op">=</span> <span class="ident">v</span> <span class="op">/</span> <span class="ident">l</span>;
+        <span class="kw">let </span>v_norm_ref = v / l;
 
-        <span class="kw">let</span> <span class="ident">v_norm</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">get_normalized</span>();
-        <span class="macro">assert!</span>(<span class="ident">v_norm</span>.<span class="ident">compare</span>(<span class="ident">v_norm_ref</span>));
+        <span class="kw">let </span>v_norm = v.get_normalized();
+        <span class="macro">assert!</span>(v_norm.compare(v_norm_ref));
 
-        <span class="ident">v</span>.<span class="ident">normalize</span>();
-        <span class="macro">assert!</span>(<span class="ident">v</span>.<span class="ident">compare</span>(<span class="ident">v_norm_ref</span>));
+        v.normalize();
+        <span class="macro">assert!</span>(v.compare(v_norm_ref));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_is_zero</span>() {
-        <span class="kw">let</span> <span class="ident">zero</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_is_zero() {
+        <span class="kw">let </span>zero = Vector3D::new(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
 
-        <span class="macro">assert!</span>(<span class="ident">zero</span>.<span class="ident">is_zero</span>());
+        <span class="macro">assert!</span>(zero.is_zero());
 
-        <span class="kw">let</span> <span class="ident">nearly_zero</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">1E-4</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">nearly_zero</span>.<span class="ident">is_zero</span>());
+        <span class="kw">let </span>nearly_zero = Vector3D::new(<span class="number">1E-4</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
+        <span class="macro">assert!</span>(!nearly_zero.is_zero());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_is_parallel</span>() {
-        <span class="comment">// Some Any of them is zero vector.</span>
-        <span class="kw">let</span> <span class="ident">v1</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">123.1</span>, <span class="number">5.6</span>, <span class="number">99.12</span>);
-        <span class="kw">let</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">v1</span>.<span class="ident">is_parallel</span>(<span class="ident">v2</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">v2</span>.<span class="ident">is_parallel</span>(<span class="ident">v1</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">v2</span>.<span class="ident">is_parallel</span>(<span class="ident">v2</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_is_parallel() {
+        <span class="comment">// Some Any of them is zero vector.
+        </span><span class="kw">let </span>v1 = Vector3D::new(<span class="number">123.1</span>, <span class="number">5.6</span>, <span class="number">99.12</span>);
+        <span class="kw">let </span>v2 = Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="macro">assert!</span>(!v1.is_parallel(v2));
+        <span class="macro">assert!</span>(!v2.is_parallel(v1));
+        <span class="macro">assert!</span>(!v2.is_parallel(v2));
 
-        <span class="kw">let</span> <span class="ident">v1</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">123.1</span>, <span class="number">5.6</span>, <span class="number">99.12</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">v1</span> <span class="op">*</span> <span class="number">3.14</span>;
+        <span class="kw">let </span>v1 = Vector3D::new(<span class="number">123.1</span>, <span class="number">5.6</span>, <span class="number">99.12</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>v2 = v1 * <span class="number">3.14</span>;
 
-        <span class="comment">// V2 is v1 scaled... same dir and</span>
-        <span class="comment">// parallel</span>
-        <span class="macro">assert!</span>(<span class="ident">v1</span>.<span class="ident">is_parallel</span>(<span class="ident">v2</span>));
-        <span class="macro">assert!</span>(<span class="ident">v1</span>.<span class="ident">is_same_direction</span>(<span class="ident">v2</span>));
+        <span class="comment">// V2 is v1 scaled... same dir and
+        // parallel
+        </span><span class="macro">assert!</span>(v1.is_parallel(v2));
+        <span class="macro">assert!</span>(v1.is_same_direction(v2));
 
-        <span class="comment">// V2 goes in the opposite dir...</span>
-        <span class="comment">// Paralel, but no in same dir</span>
-        <span class="ident">v2</span> <span class="op">/</span><span class="op">=</span> <span class="op">-</span><span class="number">1.0</span>;
-        <span class="macro">assert!</span>(<span class="ident">v1</span>.<span class="ident">is_parallel</span>(<span class="ident">v2</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">v1</span>.<span class="ident">is_same_direction</span>(<span class="ident">v2</span>));
+        <span class="comment">// V2 goes in the opposite dir...
+        // Paralel, but no in same dir
+        </span>v2 /= -<span class="number">1.0</span>;
+        <span class="macro">assert!</span>(v1.is_parallel(v2));
+        <span class="macro">assert!</span>(!v1.is_same_direction(v2));
 
-        <span class="comment">// Are not parallel... none of them</span>
-        <span class="comment">//are true</span>
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">0.1</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
-        <span class="ident">v2</span> <span class="op">+</span><span class="op">=</span> <span class="ident">d</span>;
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">v1</span>.<span class="ident">is_parallel</span>(<span class="ident">v2</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">v1</span>.<span class="ident">is_same_direction</span>(<span class="ident">v2</span>));
+        <span class="comment">// Are not parallel... none of them
+        //are true
+        </span><span class="kw">let </span>d = Vector3D::new(<span class="number">0.1</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
+        v2 += d;
+        <span class="macro">assert!</span>(!v1.is_parallel(v2));
+        <span class="macro">assert!</span>(!v1.is_same_direction(v2));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_negation</span>() {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">1.2</span>;
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="number">5.22</span>;
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="number">9.123</span>;
-        <span class="kw">let</span> <span class="ident">v1</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>);
-        <span class="kw">let</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="op">-</span><span class="ident">x</span>, <span class="op">-</span><span class="ident">y</span>, <span class="op">-</span><span class="ident">z</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_negation() {
+        <span class="kw">let </span>x = <span class="number">1.2</span>;
+        <span class="kw">let </span>y = <span class="number">5.22</span>;
+        <span class="kw">let </span>z = <span class="number">9.123</span>;
+        <span class="kw">let </span>v1 = Vector3D::new(x, y, z);
+        <span class="kw">let </span>v2 = Vector3D::new(-x, -y, -z);
 
-        <span class="macro">assert_eq!</span>((<span class="op">-</span><span class="ident">v1</span>).<span class="ident">x</span>, <span class="op">-</span><span class="ident">x</span>);
-        <span class="macro">assert_eq!</span>((<span class="op">-</span><span class="ident">v1</span>).<span class="ident">y</span>, <span class="op">-</span><span class="ident">y</span>);
-        <span class="macro">assert_eq!</span>((<span class="op">-</span><span class="ident">v1</span>).<span class="ident">z</span>, <span class="op">-</span><span class="ident">z</span>);
+        <span class="macro">assert_eq!</span>((-v1).x, -x);
+        <span class="macro">assert_eq!</span>((-v1).y, -y);
+        <span class="macro">assert_eq!</span>((-v1).z, -z);
 
-        <span class="macro">assert!</span>(<span class="ident">v1</span>.<span class="ident">compare</span>(<span class="op">-</span><span class="ident">v2</span>));
+        <span class="macro">assert!</span>(v1.compare(-v2));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

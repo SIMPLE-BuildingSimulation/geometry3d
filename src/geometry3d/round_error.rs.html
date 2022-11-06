@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/round_error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>round_error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/round_error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>round_error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>
 <script>
   "use strict";
@@ -697,626 +697,626 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/</span>
+*/
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::Float;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;float&quot;</span>))]</span>
-<span class="kw">const</span> <span class="ident">ZERO</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;float&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">ZERO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;float&quot;</span>))]
+</span><span class="kw">const </span>ZERO: u64 = <span class="number">0</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;float&quot;</span>)]
+</span><span class="kw">const </span>ZERO: u32 = <span class="number">0</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;float&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">MINUS_ZERO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">2147483648</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;float&quot;</span>))]</span>
-<span class="kw">const</span> <span class="ident">MINUS_ZERO</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">9223372036854775808</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;float&quot;</span>)]
+</span><span class="kw">const </span>MINUS_ZERO: u32 = <span class="number">2147483648</span>;
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;float&quot;</span>))]
+</span><span class="kw">const </span>MINUS_ZERO: u64 = <span class="number">9223372036854775808</span>;
 
-<span class="kw">fn</span> <span class="ident">next_float_up</span>(<span class="ident">v</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Float</span> {
-    <span class="comment">// Handle infinity and negative zero for _NextFloatUp()_</span>
-    <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_infinite</span>() <span class="op">&amp;&amp;</span> <span class="ident">v</span> <span class="op">&gt;</span> <span class="number">0.</span> {
-        <span class="kw">return</span> <span class="ident">v</span>;
+<span class="kw">fn </span>next_float_up(v: Float) -&gt; Float {
+    <span class="comment">// Handle infinity and negative zero for _NextFloatUp()_
+    </span><span class="kw">if </span>v.is_infinite() &amp;&amp; v &gt; <span class="number">0. </span>{
+        <span class="kw">return </span>v;
     }
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ui</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">to_bits</span>();
-    <span class="kw">if</span> <span class="ident">ui</span> <span class="op">==</span> <span class="ident">MINUS_ZERO</span> {
-        <span class="kw">return</span> <span class="number">0.0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>ui = v.to_bits();
+    <span class="kw">if </span>ui == MINUS_ZERO {
+        <span class="kw">return </span><span class="number">0.0</span>;
     }
 
-    <span class="comment">// Advance _v_ to next higher float</span>
-    <span class="kw">if</span> <span class="ident">v</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0.</span> {
-        <span class="ident">ui</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-    } <span class="kw">else</span> {
-        <span class="ident">ui</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="comment">// Advance _v_ to next higher float
+    </span><span class="kw">if </span>v &gt;= <span class="number">0. </span>{
+        ui += <span class="number">1</span>;
+    } <span class="kw">else </span>{
+        ui -= <span class="number">1</span>;
     }
-    <span class="ident">Float::from_bits</span>(<span class="ident">ui</span>)
+    Float::from_bits(ui)
 }
 
-<span class="kw">fn</span> <span class="ident">next_float_down</span>(<span class="ident">v</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Float</span> {
-    <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_infinite</span>() <span class="op">&amp;&amp;</span> <span class="ident">v</span> <span class="op">&lt;</span> <span class="number">0.</span> {
-        <span class="kw">return</span> <span class="ident">v</span>;
+<span class="kw">fn </span>next_float_down(v: Float) -&gt; Float {
+    <span class="kw">if </span>v.is_infinite() &amp;&amp; v &lt; <span class="number">0. </span>{
+        <span class="kw">return </span>v;
     }
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ui</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">to_bits</span>();
-    <span class="kw">if</span> <span class="ident">ui</span> <span class="op">==</span> <span class="ident">ZERO</span> {
-        <span class="kw">return</span> <span class="number">0.0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>ui = v.to_bits();
+    <span class="kw">if </span>ui == ZERO {
+        <span class="kw">return </span><span class="number">0.0</span>;
     }
-    <span class="kw">if</span> <span class="ident">v</span> <span class="op">&gt;</span> <span class="number">0.</span> {
-        <span class="ident">ui</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-    } <span class="kw">else</span> {
-        <span class="ident">ui</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">if </span>v &gt; <span class="number">0. </span>{
+        ui -= <span class="number">1</span>;
+    } <span class="kw">else </span>{
+        ui += <span class="number">1</span>;
     }
-    <span class="ident">Float::from_bits</span>(<span class="ident">ui</span>)
+    Float::from_bits(ui)
 }
 
-<span class="doccomment">/// Contains a `Float` value as well as an error</span>
-<span class="doccomment">/// interval.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApproxFloat</span> {
-    <span class="doccomment">/// The lower boundary</span>
-    <span class="kw">pub</span> <span class="ident">low</span>: <span class="ident">Float</span>,
+<span class="doccomment">/// Contains a `Float` value as well as an error
+/// interval.
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub struct </span>ApproxFloat {
+    <span class="doccomment">/// The lower boundary
+    </span><span class="kw">pub </span>low: Float,
 
-    <span class="doccomment">/// The higher boundary</span>
-    <span class="kw">pub</span> <span class="ident">high</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// The higher boundary
+    </span><span class="kw">pub </span>high: Float,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">Float</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_value_and_error</span>(<span class="ident">value</span>, <span class="number">0.0</span>)
+<span class="kw">impl </span>From&lt;Float&gt; <span class="kw">for </span>ApproxFloat {
+    <span class="kw">fn </span>from(value: Float) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_value_and_error(value, <span class="number">0.0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ApproxFloat</span> {
-    <span class="doccomment">/// Creates a new ApproxFloat</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_value_and_error</span>(<span class="ident">value</span>: <span class="ident">Float</span>, <span class="ident">abs_error</span>: <span class="ident">Float</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">low</span>: <span class="ident">value</span> <span class="op">-</span> <span class="ident">abs_error</span>,
-            <span class="ident">high</span>: <span class="ident">value</span> <span class="op">+</span> <span class="ident">abs_error</span>,
+<span class="kw">impl </span>ApproxFloat {
+    <span class="doccomment">/// Creates a new ApproxFloat
+    </span><span class="kw">pub fn </span>from_value_and_error(value: Float, abs_error: Float) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            low: value - abs_error,
+            high: value + abs_error,
         }
     }
 
-    <span class="doccomment">/// Creates a new ApproxFloat</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bounds</span>(<span class="ident">low</span>: <span class="ident">Float</span>, <span class="ident">high</span>: <span class="ident">Float</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">high</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">low</span>);
-        <span class="self">Self</span> { <span class="ident">low</span>, <span class="ident">high</span> }
+    <span class="doccomment">/// Creates a new ApproxFloat
+    </span><span class="kw">pub fn </span>from_bounds(low: Float, high: Float) -&gt; <span class="self">Self </span>{
+        <span class="macro">debug_assert!</span>(high &gt;= low);
+        <span class="self">Self </span>{ low, high }
     }
 
-    <span class="doccomment">/// Returns the midpoint</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">midpoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
-        (<span class="self">self</span>.<span class="ident">low</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">high</span>) <span class="op">/</span> <span class="number">2.</span>
+    <span class="doccomment">/// Returns the midpoint
+    </span><span class="kw">pub fn </span>midpoint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Float {
+        (<span class="self">self</span>.low + <span class="self">self</span>.high) / <span class="number">2.
+    </span>}
+
+    <span class="doccomment">/// Returns the midpoint
+    </span><span class="kw">pub fn </span>as_float(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Float {
+        <span class="self">self</span>.midpoint()
     }
 
-    <span class="doccomment">/// Returns the midpoint</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_float</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
-        <span class="self">self</span>.<span class="ident">midpoint</span>()
+    <span class="doccomment">/// Calculates the square root
+    </span><span class="kw">pub fn </span>sqrt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>low = next_float_down(<span class="self">self</span>.low.sqrt());
+        <span class="comment">// if low &lt; 0. {
+        //     low = 0.
+        // }
+        </span><span class="kw">let </span>high = next_float_up(<span class="self">self</span>.high.sqrt());
+
+        <span class="self">Self </span>{ low, high }
     }
 
-    <span class="doccomment">/// Calculates the square root</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sqrt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">low</span> <span class="op">=</span> <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">low</span>.<span class="ident">sqrt</span>());
-        <span class="comment">// if low &lt; 0. {</span>
-        <span class="comment">//     low = 0.</span>
-        <span class="comment">// }</span>
-        <span class="kw">let</span> <span class="ident">high</span> <span class="op">=</span> <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">high</span>.<span class="ident">sqrt</span>());
+    <span class="doccomment">/// Retrieves the absolute error
+    </span><span class="kw">pub fn </span>absolute_error(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Float {
+        (<span class="self">self</span>.high - <span class="self">self</span>.low) / <span class="number">2.
+    </span>}
 
-        <span class="self">Self</span> { <span class="ident">low</span>, <span class="ident">high</span> }
-    }
-
-    <span class="doccomment">/// Retrieves the absolute error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">absolute_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
-        (<span class="self">self</span>.<span class="ident">high</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">low</span>) <span class="op">/</span> <span class="number">2.</span>
-    }
-
-    <span class="doccomment">/// Identifies the values for $`ax^2+bx+c=0`$ problem,</span>
-    <span class="doccomment">/// where $`$x = \frac{-b +- \sqrt{b^2-4ac}}{2a}`$</span>
-    <span class="doccomment">/// The returned result contains the smallest value first.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Source: PBRT-v3 source code.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">solve_quadratic</span>(
-        <span class="ident">a</span>: <span class="ident">ApproxFloat</span>,
-        <span class="ident">b</span>: <span class="ident">ApproxFloat</span>,
-        <span class="ident">c</span>: <span class="ident">ApproxFloat</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">ApproxFloat</span>, <span class="ident">ApproxFloat</span>)<span class="op">&gt;</span> {
-        <span class="comment">// Find quadratic discriminant</span>
-        <span class="kw">let</span> <span class="ident">disc</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">-</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">c</span> <span class="op">*</span> <span class="number">4.</span>;
-        <span class="kw">if</span> <span class="ident">disc</span>.<span class="ident">low</span> <span class="op">&lt;</span> <span class="number">0.</span> {
-            <span class="comment">// Does not intersect</span>
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Identifies the values for $`ax^2+bx+c=0`$ problem,
+    /// where $`$x = \frac{-b +- \sqrt{b^2-4ac}}{2a}`$
+    /// The returned result contains the smallest value first.
+    ///
+    /// Source: PBRT-v3 source code.
+    </span><span class="kw">pub fn </span>solve_quadratic(
+        a: ApproxFloat,
+        b: ApproxFloat,
+        c: ApproxFloat,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;(ApproxFloat, ApproxFloat)&gt; {
+        <span class="comment">// Find quadratic discriminant
+        </span><span class="kw">let </span>disc = b * b - a * c * <span class="number">4.</span>;
+        <span class="kw">if </span>disc.low &lt; <span class="number">0. </span>{
+            <span class="comment">// Does not intersect
+            </span><span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">discr_sqrt</span> <span class="op">=</span> <span class="ident">disc</span>.<span class="ident">sqrt</span>();
+        <span class="kw">let </span>discr_sqrt = disc.sqrt();
 
-        <span class="comment">// Use Muller&#39;s method for making this faster...</span>
+        <span class="comment">// Use Muller&#39;s method for making this faster...
 
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">ApproxFloat</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">as_float</span>() <span class="op">&lt;</span> <span class="number">0.</span> {
-            <span class="op">-</span>(<span class="ident">b</span> <span class="op">-</span> <span class="ident">discr_sqrt</span>) <span class="op">*</span> <span class="number">0.5</span>
-        } <span class="kw">else</span> {
-            <span class="op">-</span>(<span class="ident">b</span> <span class="op">+</span> <span class="ident">discr_sqrt</span>) <span class="op">*</span> <span class="number">0.5</span>
-        };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x1</span> <span class="op">=</span> <span class="ident">q</span> <span class="op">/</span> <span class="ident">a</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x2</span> <span class="op">=</span> <span class="ident">c</span> <span class="op">/</span> <span class="ident">q</span>;
+        </span><span class="kw">let </span>q: ApproxFloat = <span class="kw">if </span>b.as_float() &lt; <span class="number">0. </span>{
+            -(b - discr_sqrt) * <span class="number">0.5
+        </span>} <span class="kw">else </span>{
+            -(b + discr_sqrt) * <span class="number">0.5
+        </span>};
+        <span class="kw">let </span><span class="kw-2">mut </span>x1 = q / a;
+        <span class="kw">let </span><span class="kw-2">mut </span>x2 = c / q;
 
-        <span class="comment">// Sort them</span>
-        <span class="kw">if</span> <span class="ident">x1</span>.<span class="ident">low</span> <span class="op">&gt;</span> <span class="ident">x2</span>.<span class="ident">low</span> {
-            <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">x1</span>, <span class="kw-2">&amp;mut</span> <span class="ident">x2</span>);
+        <span class="comment">// Sort them
+        </span><span class="kw">if </span>x1.low &gt; x2.low {
+            std::mem::swap(<span class="kw-2">&amp;mut </span>x1, <span class="kw-2">&amp;mut </span>x2);
         }
 
-        <span class="prelude-val">Some</span>((<span class="ident">x1</span>, <span class="ident">x2</span>))
+        <span class="prelude-val">Some</span>((x1, x2))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Neg</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>std::ops::Neg <span class="kw">for </span>ApproxFloat {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">neg</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">Self</span> {
-            <span class="ident">low</span>: <span class="op">-</span><span class="self">self</span>.<span class="ident">low</span>,
-            <span class="ident">high</span>: <span class="op">-</span><span class="self">self</span>.<span class="ident">high</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::ops::Add</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">low</span>: <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">+</span> <span class="ident">other</span>.<span class="ident">low</span>),
-            <span class="ident">high</span>: <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">+</span> <span class="ident">other</span>.<span class="ident">high</span>),
+    <span class="kw">fn </span>neg(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self </span>{
+            low: -<span class="self">self</span>.low,
+            high: -<span class="self">self</span>.high,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Add</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>std::ops::Add <span class="kw">for </span>ApproxFloat {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Float</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">other</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::ops::Sub</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">low</span>: <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">-</span> <span class="ident">other</span>.<span class="ident">low</span>),
-            <span class="ident">high</span>: <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">-</span> <span class="ident">other</span>.<span class="ident">high</span>),
+    <span class="kw">fn </span>add(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            low: next_float_down(<span class="self">self</span>.low + other.low),
+            high: next_float_up(<span class="self">self</span>.high + other.high),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Sub</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>std::ops::Add&lt;Float&gt; <span class="kw">for </span>ApproxFloat {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Float</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span> <span class="op">-</span> <span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">other</span>)
+    <span class="kw">fn </span>add(<span class="self">self</span>, other: Float) -&gt; <span class="self">Self </span>{
+        <span class="self">self </span>+ <span class="self">Self</span>::from(other)
     }
 }
 
-<span class="doccomment">/// Calculates the minimum and the maximum of a `&amp;[Float; 4]`</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_min</span>(<span class="ident">aux</span>: <span class="kw-2">&amp;</span>[<span class="ident">Float</span>; <span class="number">4</span>]) -&gt; (<span class="ident">Float</span>, <span class="ident">Float</span>) {
-    <span class="comment">// let v = std::simd::Simd::from(*aux);</span>
-    <span class="comment">// (v.reduce_max(), v.reduce_min())</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">aux</span>[<span class="number">0</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">aux</span>[<span class="number">0</span>];
-    <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">aux</span>.<span class="ident">iter</span>().<span class="ident">skip</span>(<span class="number">1</span>) {
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">v</span> <span class="op">&gt;</span> <span class="ident">max</span> {
-            <span class="ident">max</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">v</span>
-        }
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">v</span> <span class="op">&lt;</span> <span class="ident">min</span> {
-            <span class="ident">min</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">v</span>
+<span class="kw">impl </span>std::ops::Sub <span class="kw">for </span>ApproxFloat {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+
+    <span class="kw">fn </span>sub(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            low: next_float_down(<span class="self">self</span>.low - other.low),
+            high: next_float_up(<span class="self">self</span>.high - other.high),
         }
     }
-    (<span class="ident">max</span>, <span class="ident">min</span>)
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Mul</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>std::ops::Sub&lt;Float&gt; <span class="kw">for </span>ApproxFloat {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">lp</span> <span class="op">=</span> [
-            <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">low</span>),
-            <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">low</span>),
-            <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">high</span>),
-            <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">high</span>),
+    <span class="kw">fn </span>sub(<span class="self">self</span>, other: Float) -&gt; <span class="self">Self </span>{
+        <span class="self">self </span>- <span class="self">Self</span>::from(other)
+    }
+}
+
+<span class="doccomment">/// Calculates the minimum and the maximum of a `&amp;[Float; 4]`
+</span><span class="kw">pub fn </span>max_min(aux: <span class="kw-2">&amp;</span>[Float; <span class="number">4</span>]) -&gt; (Float, Float) {
+    <span class="comment">// let v = std::simd::Simd::from(*aux);
+    // (v.reduce_max(), v.reduce_min())
+    </span><span class="kw">let </span><span class="kw-2">mut </span>max = aux[<span class="number">0</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>min = aux[<span class="number">0</span>];
+    <span class="kw">for </span>v <span class="kw">in </span>aux.iter().skip(<span class="number">1</span>) {
+        <span class="kw">if </span><span class="kw-2">*</span>v &gt; max {
+            max = <span class="kw-2">*</span>v
+        }
+        <span class="kw">if </span><span class="kw-2">*</span>v &lt; min {
+            min = <span class="kw-2">*</span>v
+        }
+    }
+    (max, min)
+}
+
+<span class="kw">impl </span>std::ops::Mul <span class="kw">for </span>ApproxFloat {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+
+    <span class="kw">fn </span>mul(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>lp = [
+            next_float_down(<span class="self">self</span>.low * other.low),
+            next_float_down(<span class="self">self</span>.high * other.low),
+            next_float_down(<span class="self">self</span>.low * other.high),
+            next_float_down(<span class="self">self</span>.high * other.high),
         ];
-        <span class="kw">let</span> <span class="ident">hp</span> <span class="op">=</span> [
-            <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">low</span>),
-            <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">low</span>),
-            <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">high</span>),
-            <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">high</span>),
+        <span class="kw">let </span>hp = [
+            next_float_up(<span class="self">self</span>.low * other.low),
+            next_float_up(<span class="self">self</span>.high * other.low),
+            next_float_up(<span class="self">self</span>.low * other.high),
+            next_float_up(<span class="self">self</span>.high * other.high),
         ];
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">min</span>) <span class="op">=</span> <span class="ident">max_min</span>(<span class="kw-2">&amp;</span><span class="ident">lp</span>);
-        <span class="kw">let</span> (<span class="ident">max</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">max_min</span>(<span class="kw-2">&amp;</span><span class="ident">hp</span>);
+        <span class="kw">let </span>(<span class="kw">_</span>, min) = max_min(<span class="kw-2">&amp;</span>lp);
+        <span class="kw">let </span>(max, <span class="kw">_</span>) = max_min(<span class="kw-2">&amp;</span>hp);
 
-        <span class="self">Self</span> {
-            <span class="ident">low</span>: <span class="ident">next_float_down</span>(<span class="ident">min</span>),
-            <span class="ident">high</span>: <span class="ident">next_float_up</span>(<span class="ident">max</span>),
+        <span class="self">Self </span>{
+            low: next_float_down(min),
+            high: next_float_up(max),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Mul</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>std::ops::Mul&lt;Float&gt; <span class="kw">for </span>ApproxFloat {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Float</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// The code in here is basically an optimized version of doing the following:</span>
-        <span class="comment">// self * Self::from(other)</span>
+    <span class="kw">fn </span>mul(<span class="self">self</span>, other: Float) -&gt; <span class="self">Self </span>{
+        <span class="comment">// The code in here is basically an optimized version of doing the following:
+        // self * Self::from(other)
 
-        <span class="comment">// assume it is possitive</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">*</span> <span class="ident">other</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">*</span> <span class="ident">other</span>);
-        <span class="comment">// Swap if I was wrong.</span>
-        <span class="kw">if</span> <span class="ident">min</span> <span class="op">&gt;</span> <span class="ident">max</span> {
-            <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">min</span>, <span class="kw-2">&amp;mut</span> <span class="ident">max</span>);
+        // assume it is possitive
+        </span><span class="kw">let </span><span class="kw-2">mut </span>min = next_float_down(<span class="self">self</span>.low * other);
+        <span class="kw">let </span><span class="kw-2">mut </span>max = next_float_up(<span class="self">self</span>.high * other);
+        <span class="comment">// Swap if I was wrong.
+        </span><span class="kw">if </span>min &gt; max {
+            std::mem::swap(<span class="kw-2">&amp;mut </span>min, <span class="kw-2">&amp;mut </span>max);
         }
 
-        <span class="self">Self</span> {
-            <span class="ident">low</span>: <span class="ident">next_float_down</span>(<span class="ident">min</span>),
-            <span class="ident">high</span>: <span class="ident">next_float_up</span>(<span class="ident">max</span>),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::ops::Div</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">lp</span> <span class="op">=</span> [
-            <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">low</span>),
-            <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">low</span>),
-            <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">high</span>),
-            <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">high</span>),
-        ];
-        <span class="kw">let</span> <span class="ident">hp</span> <span class="op">=</span> [
-            <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">low</span>),
-            <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">low</span>),
-            <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">high</span>),
-            <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">high</span>),
-        ];
-
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">min</span>) <span class="op">=</span> <span class="ident">max_min</span>(<span class="kw-2">&amp;</span><span class="ident">lp</span>);
-        <span class="kw">let</span> (<span class="ident">max</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">max_min</span>(<span class="kw-2">&amp;</span><span class="ident">hp</span>);
-        <span class="self">Self</span> {
-            <span class="ident">low</span>: <span class="ident">next_float_down</span>(<span class="ident">min</span>),
-            <span class="ident">high</span>: <span class="ident">next_float_up</span>(<span class="ident">max</span>),
+        <span class="self">Self </span>{
+            low: next_float_down(min),
+            high: next_float_up(max),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Div</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>std::ops::Div <span class="kw">for </span>ApproxFloat {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Float</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span> <span class="op">/</span> <span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">other</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::ops::AddAssign</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">fn</span> <span class="ident">add_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) {
-        <span class="self">self</span>.<span class="ident">low</span> <span class="op">=</span> <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">+</span> <span class="ident">other</span>.<span class="ident">low</span>);
-        <span class="self">self</span>.<span class="ident">high</span> <span class="op">=</span> <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">+</span> <span class="ident">other</span>.<span class="ident">high</span>);
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::ops::AddAssign</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">fn</span> <span class="ident">add_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Float</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">+</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">other</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::ops::SubAssign</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) {
-        <span class="self">self</span>.<span class="ident">low</span> <span class="op">=</span> <span class="ident">next_float_down</span>(<span class="self">self</span>.<span class="ident">low</span> <span class="op">-</span> <span class="ident">other</span>.<span class="ident">low</span>);
-        <span class="self">self</span>.<span class="ident">high</span> <span class="op">=</span> <span class="ident">next_float_up</span>(<span class="self">self</span>.<span class="ident">high</span> <span class="op">-</span> <span class="ident">other</span>.<span class="ident">high</span>);
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::ops::SubAssign</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Float</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">-</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">other</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::ops::MulAssign</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) {
-        <span class="kw">let</span> <span class="ident">aux</span> <span class="op">=</span> [
-            <span class="self">self</span>.<span class="ident">low</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">low</span>,
-            <span class="self">self</span>.<span class="ident">high</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">low</span>,
-            <span class="self">self</span>.<span class="ident">low</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">high</span>,
-            <span class="self">self</span>.<span class="ident">high</span> <span class="op">*</span> <span class="ident">other</span>.<span class="ident">high</span>,
+    <span class="kw">fn </span>div(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>lp = [
+            next_float_down(<span class="self">self</span>.low / other.low),
+            next_float_down(<span class="self">self</span>.high / other.low),
+            next_float_down(<span class="self">self</span>.low / other.high),
+            next_float_down(<span class="self">self</span>.high / other.high),
         ];
-        <span class="kw">let</span> (<span class="ident">max</span>, <span class="ident">min</span>) <span class="op">=</span> <span class="ident">max_min</span>(<span class="kw-2">&amp;</span><span class="ident">aux</span>);
-        <span class="self">self</span>.<span class="ident">low</span> <span class="op">=</span> <span class="ident">next_float_down</span>(<span class="ident">min</span>);
-        <span class="self">self</span>.<span class="ident">high</span> <span class="op">=</span> <span class="ident">next_float_up</span>(<span class="ident">max</span>);
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::ops::MulAssign</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Float</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">other</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::ops::DivAssign</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">fn</span> <span class="ident">div_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) {
-        <span class="kw">let</span> <span class="ident">aux</span> <span class="op">=</span> [
-            <span class="self">self</span>.<span class="ident">low</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">low</span>,
-            <span class="self">self</span>.<span class="ident">high</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">low</span>,
-            <span class="self">self</span>.<span class="ident">low</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">high</span>,
-            <span class="self">self</span>.<span class="ident">high</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">high</span>,
+        <span class="kw">let </span>hp = [
+            next_float_up(<span class="self">self</span>.low / other.low),
+            next_float_up(<span class="self">self</span>.high / other.low),
+            next_float_up(<span class="self">self</span>.low / other.high),
+            next_float_up(<span class="self">self</span>.high / other.high),
         ];
-        <span class="kw">let</span> (<span class="ident">max</span>, <span class="ident">min</span>) <span class="op">=</span> <span class="ident">max_min</span>(<span class="kw-2">&amp;</span><span class="ident">aux</span>);
-        <span class="self">self</span>.<span class="ident">low</span> <span class="op">=</span> <span class="ident">next_float_down</span>(<span class="ident">min</span>);
-        <span class="self">self</span>.<span class="ident">high</span> <span class="op">=</span> <span class="ident">next_float_up</span>(<span class="ident">max</span>);
+
+        <span class="kw">let </span>(<span class="kw">_</span>, min) = max_min(<span class="kw-2">&amp;</span>lp);
+        <span class="kw">let </span>(max, <span class="kw">_</span>) = max_min(<span class="kw-2">&amp;</span>hp);
+        <span class="self">Self </span>{
+            low: next_float_down(min),
+            high: next_float_up(max),
+        }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::DivAssign</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApproxFloat</span> {
-    <span class="kw">fn</span> <span class="ident">div_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Float</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">/</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">other</span>)
+<span class="kw">impl </span>std::ops::Div&lt;Float&gt; <span class="kw">for </span>ApproxFloat {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+
+    <span class="kw">fn </span>div(<span class="self">self</span>, other: Float) -&gt; <span class="self">Self </span>{
+        <span class="self">self </span>/ <span class="self">Self</span>::from(other)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">testing</span> {
+<span class="kw">impl </span>std::ops::AddAssign <span class="kw">for </span>ApproxFloat {
+    <span class="kw">fn </span>add_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
+        <span class="self">self</span>.low = next_float_down(<span class="self">self</span>.low + other.low);
+        <span class="self">self</span>.high = next_float_up(<span class="self">self</span>.high + other.high);
+    }
+}
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="kw">impl </span>std::ops::AddAssign&lt;Float&gt; <span class="kw">for </span>ApproxFloat {
+    <span class="kw">fn </span>add_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: Float) {
+        <span class="kw-2">*</span><span class="self">self </span>+= <span class="self">Self</span>::from(other)
+    }
+}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_float</span>() {
-        <span class="kw">fn</span> <span class="ident">check</span>(<span class="ident">a</span>: <span class="ident">Float</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">aup</span> <span class="op">=</span> <span class="ident">next_float_up</span>(<span class="ident">a</span>);
-            <span class="kw">let</span> <span class="ident">adown</span> <span class="op">=</span> <span class="ident">next_float_down</span>(<span class="ident">a</span>);
-            <span class="kw">if</span> <span class="ident">aup</span> <span class="op">&lt;</span> <span class="ident">a</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;aup&#39; ({}) is lower than &#39;a&#39; ({})&quot;</span>, <span class="ident">aup</span>, <span class="ident">a</span>));
+<span class="kw">impl </span>std::ops::SubAssign <span class="kw">for </span>ApproxFloat {
+    <span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
+        <span class="self">self</span>.low = next_float_down(<span class="self">self</span>.low - other.low);
+        <span class="self">self</span>.high = next_float_up(<span class="self">self</span>.high - other.high);
+    }
+}
+
+<span class="kw">impl </span>std::ops::SubAssign&lt;Float&gt; <span class="kw">for </span>ApproxFloat {
+    <span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: Float) {
+        <span class="kw-2">*</span><span class="self">self </span>-= <span class="self">Self</span>::from(other)
+    }
+}
+
+<span class="kw">impl </span>std::ops::MulAssign <span class="kw">for </span>ApproxFloat {
+    <span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
+        <span class="kw">let </span>aux = [
+            <span class="self">self</span>.low * other.low,
+            <span class="self">self</span>.high * other.low,
+            <span class="self">self</span>.low * other.high,
+            <span class="self">self</span>.high * other.high,
+        ];
+        <span class="kw">let </span>(max, min) = max_min(<span class="kw-2">&amp;</span>aux);
+        <span class="self">self</span>.low = next_float_down(min);
+        <span class="self">self</span>.high = next_float_up(max);
+    }
+}
+
+<span class="kw">impl </span>std::ops::MulAssign&lt;Float&gt; <span class="kw">for </span>ApproxFloat {
+    <span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: Float) {
+        <span class="kw-2">*</span><span class="self">self </span><span class="kw-2">*</span>= <span class="self">Self</span>::from(other)
+    }
+}
+
+<span class="kw">impl </span>std::ops::DivAssign <span class="kw">for </span>ApproxFloat {
+    <span class="kw">fn </span>div_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
+        <span class="kw">let </span>aux = [
+            <span class="self">self</span>.low / other.low,
+            <span class="self">self</span>.high / other.low,
+            <span class="self">self</span>.low / other.high,
+            <span class="self">self</span>.high / other.high,
+        ];
+        <span class="kw">let </span>(max, min) = max_min(<span class="kw-2">&amp;</span>aux);
+        <span class="self">self</span>.low = next_float_down(min);
+        <span class="self">self</span>.high = next_float_up(max);
+    }
+}
+
+<span class="kw">impl </span>std::ops::DivAssign&lt;Float&gt; <span class="kw">for </span>ApproxFloat {
+    <span class="kw">fn </span>div_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: Float) {
+        <span class="kw-2">*</span><span class="self">self </span>/= <span class="self">Self</span>::from(other)
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>testing {
+
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_float() {
+        <span class="kw">fn </span>check(a: Float) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+            <span class="kw">let </span>aup = next_float_up(a);
+            <span class="kw">let </span>adown = next_float_down(a);
+            <span class="kw">if </span>aup &lt; a {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;aup&#39; ({}) is lower than &#39;a&#39; ({})&quot;</span>, aup, a));
             }
-            <span class="kw">if</span> <span class="ident">adown</span> <span class="op">&gt;</span> <span class="ident">a</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;adown&#39; ({}) is larger than &#39;a&#39; ({})&quot;</span>, <span class="ident">adown</span>, <span class="ident">a</span>));
+            <span class="kw">if </span>adown &gt; a {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;adown&#39; ({}) is larger than &#39;a&#39; ({})&quot;</span>, adown, a));
             }
 
             <span class="prelude-val">Ok</span>(())
         }
 
-        <span class="ident">check</span>(<span class="number">0.</span>).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="ident">Float::EPSILON</span>).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="op">-</span><span class="ident">Float::EPSILON</span>).<span class="ident">unwrap</span>();
-        <span class="ident">check</span>(<span class="op">-</span><span class="number">12312.</span>).<span class="ident">unwrap</span>();
+        check(<span class="number">0.</span>).unwrap();
+        check(Float::EPSILON).unwrap();
+        check(-Float::EPSILON).unwrap();
+        check(-<span class="number">12312.</span>).unwrap();
 
-        <span class="ident">check</span>(<span class="ident">Float::MAX</span>).<span class="ident">unwrap</span>();
+        check(Float::MAX).unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_from_float</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="number">1.23</span>;
-        <span class="kw">let</span> <span class="ident">approx</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="ident">a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">to_bits</span>(), <span class="ident">approx</span>.<span class="ident">low</span>.<span class="ident">to_bits</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">to_bits</span>(), <span class="ident">approx</span>.<span class="ident">high</span>.<span class="ident">to_bits</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_from_float() {
+        <span class="kw">let </span>a = <span class="number">1.23</span>;
+        <span class="kw">let </span>approx = ApproxFloat::from(a);
+        <span class="macro">assert_eq!</span>(a.to_bits(), approx.low.to_bits());
+        <span class="macro">assert_eq!</span>(a.to_bits(), approx.high.to_bits());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_from_value_error</span>() {
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="number">1.23</span>;
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="number">0.1231</span>;
-        <span class="kw">let</span> <span class="ident">approx</span> <span class="op">=</span> <span class="ident">ApproxFloat::from_value_and_error</span>(<span class="ident">v</span>, <span class="ident">err</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_from_value_error() {
+        <span class="kw">let </span>v = <span class="number">1.23</span>;
+        <span class="kw">let </span>err = <span class="number">0.1231</span>;
+        <span class="kw">let </span>approx = ApproxFloat::from_value_and_error(v, err);
 
-        <span class="comment">// check that the difference is correct</span>
-        <span class="macro">assert!</span>(((<span class="ident">approx</span>.<span class="ident">high</span> <span class="op">-</span> <span class="ident">approx</span>.<span class="ident">low</span>) <span class="op">-</span> <span class="ident">err</span> <span class="op">*</span> <span class="number">2.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>);
-        <span class="comment">// Check that the signs are correct</span>
-        <span class="macro">assert!</span>(<span class="ident">approx</span>.<span class="ident">high</span> <span class="op">&gt;</span> <span class="ident">approx</span>.<span class="ident">low</span>);
+        <span class="comment">// check that the difference is correct
+        </span><span class="macro">assert!</span>(((approx.high - approx.low) - err * <span class="number">2.</span>).abs() &lt; Float::EPSILON);
+        <span class="comment">// Check that the signs are correct
+        </span><span class="macro">assert!</span>(approx.high &gt; approx.low);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_from_bounds</span>() {
-        <span class="kw">let</span> <span class="ident">low</span> <span class="op">=</span> <span class="number">1.23</span>;
-        <span class="kw">let</span> <span class="ident">high</span> <span class="op">=</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">low</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_from_bounds() {
+        <span class="kw">let </span>low = <span class="number">1.23</span>;
+        <span class="kw">let </span>high = <span class="number">2. </span>* low;
 
-        <span class="kw">let</span> <span class="ident">approx</span> <span class="op">=</span> <span class="ident">ApproxFloat::from_bounds</span>(<span class="ident">low</span>, <span class="ident">high</span>);
+        <span class="kw">let </span>approx = ApproxFloat::from_bounds(low, high);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">low</span>.<span class="ident">to_bits</span>(), <span class="ident">approx</span>.<span class="ident">low</span>.<span class="ident">to_bits</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">high</span>.<span class="ident">to_bits</span>(), <span class="ident">approx</span>.<span class="ident">high</span>.<span class="ident">to_bits</span>());
+        <span class="macro">assert_eq!</span>(low.to_bits(), approx.low.to_bits());
+        <span class="macro">assert_eq!</span>(high.to_bits(), approx.high.to_bits());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_midpoint_as_float</span>() {
-        <span class="kw">let</span> <span class="ident">low</span> <span class="op">=</span> <span class="number">1.1231</span>;
-        <span class="kw">let</span> <span class="ident">high</span> <span class="op">=</span> <span class="number">9872.123</span>;
-        <span class="kw">let</span> <span class="ident">mid</span> <span class="op">=</span> (<span class="ident">low</span> <span class="op">+</span> <span class="ident">high</span>) <span class="op">/</span> <span class="number">2.</span>;
-        <span class="kw">let</span> <span class="ident">app</span> <span class="op">=</span> <span class="ident">ApproxFloat</span> { <span class="ident">low</span>, <span class="ident">high</span> };
-        <span class="macro">assert!</span>((<span class="ident">mid</span> <span class="op">-</span> <span class="ident">app</span>.<span class="ident">midpoint</span>()).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>);
-        <span class="macro">assert!</span>((<span class="ident">mid</span> <span class="op">-</span> <span class="ident">app</span>.<span class="ident">as_float</span>()).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_midpoint_as_float() {
+        <span class="kw">let </span>low = <span class="number">1.1231</span>;
+        <span class="kw">let </span>high = <span class="number">9872.123</span>;
+        <span class="kw">let </span>mid = (low + high) / <span class="number">2.</span>;
+        <span class="kw">let </span>app = ApproxFloat { low, high };
+        <span class="macro">assert!</span>((mid - app.midpoint()).abs() &lt; Float::EPSILON);
+        <span class="macro">assert!</span>((mid - app.as_float()).abs() &lt; Float::EPSILON);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_approx_sqrt</span>() {
-        <span class="comment">// With zero error</span>
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="number">1.123123</span>;
-        <span class="kw">let</span> <span class="ident">app</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="ident">a</span>);
-        <span class="macro">assert!</span>((<span class="ident">a</span>.<span class="ident">sqrt</span>() <span class="op">-</span> <span class="ident">app</span>.<span class="ident">sqrt</span>().<span class="ident">as_float</span>()).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_approx_sqrt() {
+        <span class="comment">// With zero error
+        </span><span class="kw">let </span>a = <span class="number">1.123123</span>;
+        <span class="kw">let </span>app = ApproxFloat::from(a);
+        <span class="macro">assert!</span>((a.sqrt() - app.sqrt().as_float()).abs() &lt; Float::EPSILON);
 
-        <span class="comment">// With error</span>
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="number">0.2</span>;
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="number">0.1</span>;
-        <span class="kw">let</span> <span class="ident">app</span> <span class="op">=</span> <span class="ident">ApproxFloat::from_value_and_error</span>(<span class="ident">a</span>, <span class="ident">err</span>);
-        <span class="macro">assert!</span>((<span class="ident">a</span>.<span class="ident">sqrt</span>() <span class="op">-</span> <span class="ident">app</span>.<span class="ident">sqrt</span>().<span class="ident">as_float</span>()).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">err</span>);
+        <span class="comment">// With error
+        </span><span class="kw">let </span>a = <span class="number">0.2</span>;
+        <span class="kw">let </span>err = <span class="number">0.1</span>;
+        <span class="kw">let </span>app = ApproxFloat::from_value_and_error(a, err);
+        <span class="macro">assert!</span>((a.sqrt() - app.sqrt().as_float()).abs() &lt; <span class="number">2. </span>* err);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_absolute_error</span>() {
-        <span class="comment">// With zero error</span>
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="number">1.123123</span>;
-        <span class="kw">let</span> <span class="ident">app</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="ident">a</span>);
-        <span class="macro">assert!</span>(<span class="ident">app</span>.<span class="ident">absolute_error</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_absolute_error() {
+        <span class="comment">// With zero error
+        </span><span class="kw">let </span>a = <span class="number">1.123123</span>;
+        <span class="kw">let </span>app = ApproxFloat::from(a);
+        <span class="macro">assert!</span>(app.absolute_error() &lt; Float::EPSILON);
 
-        <span class="comment">// With error</span>
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="number">1.123123</span>;
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="number">0.2</span>;
-        <span class="kw">let</span> <span class="ident">app</span> <span class="op">=</span> <span class="ident">ApproxFloat::from_value_and_error</span>(<span class="ident">a</span>, <span class="ident">err</span>);
-        <span class="macro">assert!</span>((<span class="ident">app</span>.<span class="ident">absolute_error</span>() <span class="op">-</span> <span class="ident">err</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>);
+        <span class="comment">// With error
+        </span><span class="kw">let </span>a = <span class="number">1.123123</span>;
+        <span class="kw">let </span>err = <span class="number">0.2</span>;
+        <span class="kw">let </span>app = ApproxFloat::from_value_and_error(a, err);
+        <span class="macro">assert!</span>((app.absolute_error() - err).abs() &lt; Float::EPSILON);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_approx_quadratic</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="number">1.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="op">-</span><span class="number">1.</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="op">-</span><span class="number">6.</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">x1</span>, <span class="ident">x2</span>)) <span class="op">=</span> <span class="ident">ApproxFloat::solve_quadratic</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>) {
-            <span class="macro">println!</span>(<span class="string">&quot;x1 = {}, x2 = {}&quot;</span>, <span class="ident">x1</span>.<span class="ident">midpoint</span>(), <span class="ident">x2</span>.<span class="ident">midpoint</span>());
-            <span class="macro">assert!</span>((<span class="ident">x1</span>.<span class="ident">midpoint</span>() <span class="op">-</span> <span class="op">-</span><span class="number">2.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-6</span>);
-            <span class="macro">assert!</span>((<span class="ident">x2</span>.<span class="ident">midpoint</span>() <span class="op">-</span> <span class="number">3.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>);
-        } <span class="kw">else</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_approx_quadratic() {
+        <span class="kw">let </span>a = ApproxFloat::from(<span class="number">1.</span>);
+        <span class="kw">let </span>b = ApproxFloat::from(-<span class="number">1.</span>);
+        <span class="kw">let </span>c = ApproxFloat::from(-<span class="number">6.</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((x1, x2)) = ApproxFloat::solve_quadratic(a, b, c) {
+            <span class="macro">println!</span>(<span class="string">&quot;x1 = {}, x2 = {}&quot;</span>, x1.midpoint(), x2.midpoint());
+            <span class="macro">assert!</span>((x1.midpoint() - -<span class="number">2.</span>).abs() &lt; <span class="number">1e-6</span>);
+            <span class="macro">assert!</span>((x2.midpoint() - <span class="number">3.</span>).abs() &lt; Float::EPSILON);
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;Expecting results!&quot;</span>)
         }
 
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="op">-</span><span class="number">6.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="number">15.</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="number">36.</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">x1</span>, <span class="ident">x2</span>)) <span class="op">=</span> <span class="ident">ApproxFloat::solve_quadratic</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>) {
-            <span class="macro">println!</span>(<span class="string">&quot;x1 = {}, x2 = {}&quot;</span>, <span class="ident">x1</span>.<span class="ident">midpoint</span>(), <span class="ident">x2</span>.<span class="ident">midpoint</span>());
-            <span class="macro">assert!</span>((<span class="ident">x1</span>.<span class="ident">midpoint</span>() <span class="op">-</span> <span class="op">-</span><span class="number">1.5</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>);
-            <span class="macro">assert!</span>((<span class="ident">x2</span>.<span class="ident">midpoint</span>() <span class="op">-</span> <span class="number">4.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">5.</span> <span class="op">*</span> <span class="ident">Float::EPSILON</span>); <span class="comment">// still pretty accurate</span>
-        } <span class="kw">else</span> {
+        <span class="kw">let </span>a = ApproxFloat::from(-<span class="number">6.</span>);
+        <span class="kw">let </span>b = ApproxFloat::from(<span class="number">15.</span>);
+        <span class="kw">let </span>c = ApproxFloat::from(<span class="number">36.</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((x1, x2)) = ApproxFloat::solve_quadratic(a, b, c) {
+            <span class="macro">println!</span>(<span class="string">&quot;x1 = {}, x2 = {}&quot;</span>, x1.midpoint(), x2.midpoint());
+            <span class="macro">assert!</span>((x1.midpoint() - -<span class="number">1.5</span>).abs() &lt; Float::EPSILON);
+            <span class="macro">assert!</span>((x2.midpoint() - <span class="number">4.</span>).abs() &lt; <span class="number">5. </span>* Float::EPSILON); <span class="comment">// still pretty accurate
+        </span>} <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;Expected results!&quot;</span>)
         }
 
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="number">6.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="number">5.</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="op">-</span><span class="number">6.</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">x1</span>, <span class="ident">x2</span>)) <span class="op">=</span> <span class="ident">ApproxFloat::solve_quadratic</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>) {
-            <span class="macro">println!</span>(<span class="string">&quot;x1 = {}, x2 = {}&quot;</span>, <span class="ident">x1</span>.<span class="ident">midpoint</span>(), <span class="ident">x2</span>.<span class="ident">midpoint</span>());
-            <span class="macro">assert!</span>((<span class="ident">x1</span>.<span class="ident">midpoint</span>() <span class="op">-</span> <span class="op">-</span><span class="number">3.</span> <span class="op">/</span> <span class="number">2.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>);
-            <span class="macro">assert!</span>((<span class="ident">x2</span>.<span class="ident">midpoint</span>() <span class="op">-</span> <span class="number">2.</span> <span class="op">/</span> <span class="number">3.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>);
-        } <span class="kw">else</span> {
+        <span class="kw">let </span>a = ApproxFloat::from(<span class="number">6.</span>);
+        <span class="kw">let </span>b = ApproxFloat::from(<span class="number">5.</span>);
+        <span class="kw">let </span>c = ApproxFloat::from(-<span class="number">6.</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((x1, x2)) = ApproxFloat::solve_quadratic(a, b, c) {
+            <span class="macro">println!</span>(<span class="string">&quot;x1 = {}, x2 = {}&quot;</span>, x1.midpoint(), x2.midpoint());
+            <span class="macro">assert!</span>((x1.midpoint() - -<span class="number">3. </span>/ <span class="number">2.</span>).abs() &lt; Float::EPSILON);
+            <span class="macro">assert!</span>((x2.midpoint() - <span class="number">2. </span>/ <span class="number">3.</span>).abs() &lt; Float::EPSILON);
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;Expected results!&quot;</span>)
         }
 
-        <span class="comment">// One solution... not really possible with uncertainty. can Discriminant be == 0.?</span>
-        <span class="comment">// let a = ApproxFloat::from(2.);</span>
-        <span class="comment">// if let Some((x1,x2)) =  ApproxFloat::solve_quadratic(ApproxFloat::from(1.), a*2., a*a){</span>
-        <span class="comment">//     assert_eq!(x1.midpoint(),-a.midpoint());</span>
-        <span class="comment">//     assert_eq!(x2.midpoint(), x1.midpoint());</span>
-        <span class="comment">// }else{</span>
-        <span class="comment">//     panic!(&quot;Expected results!&quot;)</span>
-        <span class="comment">// }</span>
+        <span class="comment">// One solution... not really possible with uncertainty. can Discriminant be == 0.?
+        // let a = ApproxFloat::from(2.);
+        // if let Some((x1,x2)) =  ApproxFloat::solve_quadratic(ApproxFloat::from(1.), a*2., a*a){
+        //     assert_eq!(x1.midpoint(),-a.midpoint());
+        //     assert_eq!(x2.midpoint(), x1.midpoint());
+        // }else{
+        //     panic!(&quot;Expected results!&quot;)
+        // }
 
-        <span class="comment">// No solution</span>
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="number">3.12312598712</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">ApproxFloat::from</span>(<span class="number">2.12312</span>);
+        // No solution
+        </span><span class="kw">let </span>a = ApproxFloat::from(<span class="number">3.12312598712</span>);
+        <span class="kw">let </span>c = ApproxFloat::from(<span class="number">2.12312</span>);
 
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> (<span class="ident">a</span> <span class="op">*</span> <span class="ident">c</span>).<span class="ident">sqrt</span>() <span class="op">*</span> <span class="number">2.</span> <span class="op">-</span> <span class="number">0.1</span>; <span class="comment">// b &lt; 2 (a*c).sqrt() --&gt; discriminant &lt; 0</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">x1</span>, <span class="ident">x2</span>)) <span class="op">=</span> <span class="ident">ApproxFloat::solve_quadratic</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>) {
+        <span class="kw">let </span>b = (a * c).sqrt() * <span class="number">2. </span>- <span class="number">0.1</span>; <span class="comment">// b &lt; 2 (a*c).sqrt() --&gt; discriminant &lt; 0
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>((x1, x2)) = ApproxFloat::solve_quadratic(a, b, c) {
             <span class="macro">panic!</span>(
                 <span class="string">&quot;unexpected solitions: x1 = {}, x2 = {}&quot;</span>,
-                <span class="ident">x1</span>.<span class="ident">midpoint</span>(),
-                <span class="ident">x2</span>.<span class="ident">midpoint</span>()
+                x1.midpoint(),
+                x2.midpoint()
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_max_min</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> [<span class="number">1.</span>, <span class="number">2.</span>, <span class="number">3.</span>, <span class="number">4.</span>];
-        <span class="kw">let</span> (<span class="ident">max</span>, <span class="ident">min</span>) <span class="op">=</span> <span class="ident">max_min</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">max</span>, <span class="number">4.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">min</span>, <span class="number">1.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_max_min() {
+        <span class="kw">let </span>a = [<span class="number">1.</span>, <span class="number">2.</span>, <span class="number">3.</span>, <span class="number">4.</span>];
+        <span class="kw">let </span>(max, min) = max_min(<span class="kw-2">&amp;</span>a);
+        <span class="macro">assert_eq!</span>(max, <span class="number">4.</span>);
+        <span class="macro">assert_eq!</span>(min, <span class="number">1.</span>);
 
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> [<span class="number">4.</span>, <span class="number">3.</span>, <span class="number">2.</span>, <span class="number">1.</span>];
-        <span class="kw">let</span> (<span class="ident">max</span>, <span class="ident">min</span>) <span class="op">=</span> <span class="ident">max_min</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">max</span>, <span class="number">4.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">min</span>, <span class="number">1.</span>);
+        <span class="kw">let </span>a = [<span class="number">4.</span>, <span class="number">3.</span>, <span class="number">2.</span>, <span class="number">1.</span>];
+        <span class="kw">let </span>(max, min) = max_min(<span class="kw-2">&amp;</span>a);
+        <span class="macro">assert_eq!</span>(max, <span class="number">4.</span>);
+        <span class="macro">assert_eq!</span>(min, <span class="number">1.</span>);
 
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> [<span class="number">1.</span>, <span class="number">1.2</span>, <span class="number">5.</span>, <span class="number">1.</span>];
-        <span class="kw">let</span> (<span class="ident">max</span>, <span class="ident">min</span>) <span class="op">=</span> <span class="ident">max_min</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">max</span>, <span class="number">5.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">min</span>, <span class="number">1.</span>);
+        <span class="kw">let </span>a = [<span class="number">1.</span>, <span class="number">1.2</span>, <span class="number">5.</span>, <span class="number">1.</span>];
+        <span class="kw">let </span>(max, min) = max_min(<span class="kw-2">&amp;</span>a);
+        <span class="macro">assert_eq!</span>(max, <span class="number">5.</span>);
+        <span class="macro">assert_eq!</span>(min, <span class="number">1.</span>);
 
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> [<span class="op">-</span><span class="number">1.</span>, <span class="op">-</span><span class="number">1.2</span>, <span class="op">-</span><span class="number">5.</span>, <span class="op">-</span><span class="number">1.</span>];
-        <span class="kw">let</span> (<span class="ident">max</span>, <span class="ident">min</span>) <span class="op">=</span> <span class="ident">max_min</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">max</span>, <span class="op">-</span><span class="number">1.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">min</span>, <span class="op">-</span><span class="number">5.</span>);
+        <span class="kw">let </span>a = [-<span class="number">1.</span>, -<span class="number">1.2</span>, -<span class="number">5.</span>, -<span class="number">1.</span>];
+        <span class="kw">let </span>(max, min) = max_min(<span class="kw-2">&amp;</span>a);
+        <span class="macro">assert_eq!</span>(max, -<span class="number">1.</span>);
+        <span class="macro">assert_eq!</span>(min, -<span class="number">5.</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_approx_operations</span>() {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="number">4.1231</span>;
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="number">0.123</span>;
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="ident">ApproxFloat::from_value_and_error</span>(<span class="ident">value</span>, <span class="ident">error</span>);
-        <span class="kw">let</span> <span class="ident">other_value</span> <span class="op">=</span> <span class="number">123.</span>;
-        <span class="kw">let</span> <span class="ident">other_error</span> <span class="op">=</span> <span class="number">0.4</span>;
-        <span class="kw">let</span> <span class="ident">other</span> <span class="op">=</span> <span class="ident">ApproxFloat::from_value_and_error</span>(<span class="ident">other_value</span>, <span class="ident">other_error</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_approx_operations() {
+        <span class="kw">let </span>value = <span class="number">4.1231</span>;
+        <span class="kw">let </span>error = <span class="number">0.123</span>;
+        <span class="kw">let </span>this = ApproxFloat::from_value_and_error(value, error);
+        <span class="kw">let </span>other_value = <span class="number">123.</span>;
+        <span class="kw">let </span>other_error = <span class="number">0.4</span>;
+        <span class="kw">let </span>other = ApproxFloat::from_value_and_error(other_value, other_error);
 
-        <span class="comment">// Negate</span>
-        <span class="macro">assert_eq!</span>(<span class="op">-</span>(<span class="ident">this</span>.<span class="ident">as_float</span>()), (<span class="op">-</span><span class="ident">this</span>).<span class="ident">as_float</span>());
+        <span class="comment">// Negate
+        </span><span class="macro">assert_eq!</span>(-(this.as_float()), (-this).as_float());
 
-        <span class="comment">// Add Self</span>
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">this</span> <span class="op">+</span> <span class="ident">other</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">as_float</span>(), <span class="ident">value</span> <span class="op">+</span> <span class="ident">other_value</span>);
+        <span class="comment">// Add Self
+        </span><span class="kw">let </span>result = this + other;
+        <span class="macro">assert_eq!</span>(result.as_float(), value + other_value);
 
-        <span class="comment">// Add Float</span>
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">this</span> <span class="op">+</span> <span class="ident">other_value</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">as_float</span>(), <span class="ident">value</span> <span class="op">+</span> <span class="ident">other_value</span>);
+        <span class="comment">// Add Float
+        </span><span class="kw">let </span>result = this + other_value;
+        <span class="macro">assert_eq!</span>(result.as_float(), value + other_value);
 
-        <span class="comment">// Sub Self</span>
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">this</span> <span class="op">-</span> <span class="ident">other</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">as_float</span>(), <span class="ident">value</span> <span class="op">-</span> <span class="ident">other_value</span>);
+        <span class="comment">// Sub Self
+        </span><span class="kw">let </span>result = this - other;
+        <span class="macro">assert_eq!</span>(result.as_float(), value - other_value);
 
-        <span class="comment">// Sub Float</span>
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">this</span> <span class="op">-</span> <span class="ident">other_value</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">as_float</span>(), <span class="ident">value</span> <span class="op">-</span> <span class="ident">other_value</span>);
+        <span class="comment">// Sub Float
+        </span><span class="kw">let </span>result = this - other_value;
+        <span class="macro">assert_eq!</span>(result.as_float(), value - other_value);
 
-        <span class="comment">// Mul Self</span>
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">this</span> <span class="op">*</span> <span class="ident">other</span>;
-        <span class="macro">assert!</span>((<span class="ident">result</span>.<span class="ident">as_float</span>() <span class="op">-</span> <span class="ident">value</span> <span class="op">*</span> <span class="ident">other_value</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">error</span>);
+        <span class="comment">// Mul Self
+        </span><span class="kw">let </span>result = this * other;
+        <span class="macro">assert!</span>((result.as_float() - value * other_value).abs() &lt; <span class="number">2. </span>* error);
 
-        <span class="comment">// Mul Float</span>
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">this</span> <span class="op">*</span> <span class="ident">other_value</span>;
-        <span class="macro">assert!</span>((<span class="ident">result</span>.<span class="ident">as_float</span>() <span class="op">-</span> <span class="ident">value</span> <span class="op">*</span> <span class="ident">other_value</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">error</span>);
+        <span class="comment">// Mul Float
+        </span><span class="kw">let </span>result = this * other_value;
+        <span class="macro">assert!</span>((result.as_float() - value * other_value).abs() &lt; <span class="number">2. </span>* error);
 
-        <span class="comment">// Div Self</span>
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">this</span> <span class="op">/</span> <span class="ident">other</span>;
-        <span class="macro">assert!</span>((<span class="ident">result</span>.<span class="ident">as_float</span>() <span class="op">-</span> <span class="ident">value</span> <span class="op">/</span> <span class="ident">other_value</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">error</span>);
+        <span class="comment">// Div Self
+        </span><span class="kw">let </span>result = this / other;
+        <span class="macro">assert!</span>((result.as_float() - value / other_value).abs() &lt; <span class="number">2. </span>* error);
 
-        <span class="comment">// Div Float</span>
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">this</span> <span class="op">/</span> <span class="ident">other_value</span>;
-        <span class="macro">assert!</span>((<span class="ident">result</span>.<span class="ident">as_float</span>() <span class="op">-</span> <span class="ident">value</span> <span class="op">/</span> <span class="ident">other_value</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">error</span>);
+        <span class="comment">// Div Float
+        </span><span class="kw">let </span>result = this / other_value;
+        <span class="macro">assert!</span>((result.as_float() - value / other_value).abs() &lt; <span class="number">2. </span>* error);
 
-        <span class="comment">// Add Assign Self</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_this</span> <span class="op">=</span> <span class="ident">this</span>;
-        <span class="ident">new_this</span> <span class="op">+</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">new_this</span>.<span class="ident">as_float</span>(), <span class="ident">value</span> <span class="op">+</span> <span class="ident">other_value</span>);
+        <span class="comment">// Add Assign Self
+        </span><span class="kw">let </span><span class="kw-2">mut </span>new_this = this;
+        new_this += other;
+        <span class="macro">assert_eq!</span>(new_this.as_float(), value + other_value);
 
-        <span class="comment">// Add Assign Float</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_this</span> <span class="op">=</span> <span class="ident">this</span>;
-        <span class="ident">new_this</span> <span class="op">+</span><span class="op">=</span> <span class="ident">other_value</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">new_this</span>.<span class="ident">as_float</span>(), <span class="ident">value</span> <span class="op">+</span> <span class="ident">other_value</span>);
+        <span class="comment">// Add Assign Float
+        </span><span class="kw">let </span><span class="kw-2">mut </span>new_this = this;
+        new_this += other_value;
+        <span class="macro">assert_eq!</span>(new_this.as_float(), value + other_value);
 
-        <span class="comment">// Sub Assign Self</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_this</span> <span class="op">=</span> <span class="ident">this</span>;
-        <span class="ident">new_this</span> <span class="op">-</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">new_this</span>.<span class="ident">as_float</span>(), <span class="ident">value</span> <span class="op">-</span> <span class="ident">other_value</span>);
+        <span class="comment">// Sub Assign Self
+        </span><span class="kw">let </span><span class="kw-2">mut </span>new_this = this;
+        new_this -= other;
+        <span class="macro">assert_eq!</span>(new_this.as_float(), value - other_value);
 
-        <span class="comment">// Sub Assign Float</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_this</span> <span class="op">=</span> <span class="ident">this</span>;
-        <span class="ident">new_this</span> <span class="op">-</span><span class="op">=</span> <span class="ident">other_value</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">new_this</span>.<span class="ident">as_float</span>(), <span class="ident">value</span> <span class="op">-</span> <span class="ident">other_value</span>);
+        <span class="comment">// Sub Assign Float
+        </span><span class="kw">let </span><span class="kw-2">mut </span>new_this = this;
+        new_this -= other_value;
+        <span class="macro">assert_eq!</span>(new_this.as_float(), value - other_value);
 
-        <span class="comment">// Mul Assign Self</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_this</span> <span class="op">=</span> <span class="ident">this</span>;
-        <span class="ident">new_this</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="macro">assert!</span>((<span class="ident">new_this</span>.<span class="ident">as_float</span>() <span class="op">-</span> <span class="ident">value</span> <span class="op">*</span> <span class="ident">other_value</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">error</span>);
+        <span class="comment">// Mul Assign Self
+        </span><span class="kw">let </span><span class="kw-2">mut </span>new_this = this;
+        new_this <span class="kw-2">*</span>= other;
+        <span class="macro">assert!</span>((new_this.as_float() - value * other_value).abs() &lt; <span class="number">2. </span>* error);
 
-        <span class="comment">// Mul Assign Float</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_this</span> <span class="op">=</span> <span class="ident">this</span>;
-        <span class="ident">new_this</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">other_value</span>;
-        <span class="macro">assert!</span>((<span class="ident">new_this</span>.<span class="ident">as_float</span>() <span class="op">-</span> <span class="ident">value</span> <span class="op">*</span> <span class="ident">other_value</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">error</span>);
+        <span class="comment">// Mul Assign Float
+        </span><span class="kw">let </span><span class="kw-2">mut </span>new_this = this;
+        new_this <span class="kw-2">*</span>= other_value;
+        <span class="macro">assert!</span>((new_this.as_float() - value * other_value).abs() &lt; <span class="number">2. </span>* error);
 
-        <span class="comment">// Div Assign Self</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_this</span> <span class="op">=</span> <span class="ident">this</span>;
-        <span class="ident">new_this</span> <span class="op">/</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="macro">assert!</span>((<span class="ident">new_this</span>.<span class="ident">as_float</span>() <span class="op">-</span> <span class="ident">value</span> <span class="op">/</span> <span class="ident">other_value</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">error</span>);
+        <span class="comment">// Div Assign Self
+        </span><span class="kw">let </span><span class="kw-2">mut </span>new_this = this;
+        new_this /= other;
+        <span class="macro">assert!</span>((new_this.as_float() - value / other_value).abs() &lt; <span class="number">2. </span>* error);
 
-        <span class="comment">// Div Assign Float</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_this</span> <span class="op">=</span> <span class="ident">this</span>;
-        <span class="ident">new_this</span> <span class="op">/</span><span class="op">=</span> <span class="ident">other_value</span>;
-        <span class="macro">assert!</span>((<span class="ident">new_this</span>.<span class="ident">as_float</span>() <span class="op">-</span> <span class="ident">value</span> <span class="op">/</span> <span class="ident">other_value</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">error</span>);
+        <span class="comment">// Div Assign Float
+        </span><span class="kw">let </span><span class="kw-2">mut </span>new_this = this;
+        new_this /= other_value;
+        <span class="macro">assert!</span>((new_this.as_float() - value / other_value).abs() &lt; <span class="number">2. </span>* error);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

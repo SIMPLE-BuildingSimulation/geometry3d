@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/distant_source3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>distant_source3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/distant_source3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>distant_source3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>
 <script>
   "use strict";
@@ -262,191 +262,191 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/</span>
+*/
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::intersection::IntersectionInfo</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">BBox3D</span>, <span class="ident">Disk3D</span>, <span class="ident">Point3D</span>, <span class="ident">Ray3D</span>, <span class="ident">Transform</span>, <span class="ident">Vector3D</span>};
+</span><span class="kw">use </span><span class="kw">crate</span>::intersection::IntersectionInfo;
+<span class="kw">use crate</span>::{BBox3D, Disk3D, Point3D, Ray3D, Transform, Vector3D};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Float</span>, <span class="ident">PI</span>};
+<span class="kw">use </span><span class="kw">crate</span>::RefCount;
+<span class="kw">use crate</span>::{Float, PI};
 
-<span class="doccomment">/// Represents a solid angle pointing from any [`Point3D`] in the scene towards</span>
-<span class="doccomment">/// a certain `direction` (i.e., a [`Vector3D`]). So, this is not really a surface</span>
-<span class="doccomment">/// because it is at an infinite distance from any point.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DistantSource3D</span> {
-    <span class="doccomment">/// The direction pointing to the souRefCounte</span>
-    <span class="kw">pub</span> <span class="ident">direction</span>: <span class="ident">Vector3D</span>,
+<span class="doccomment">/// Represents a solid angle pointing from any [`Point3D`] in the scene towards
+/// a certain `direction` (i.e., a [`Vector3D`]). So, this is not really a surface
+/// because it is at an infinite distance from any point.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>DistantSource3D {
+    <span class="doccomment">/// The direction pointing to the souRefCounte
+    </span><span class="kw">pub </span>direction: Vector3D,
 
-    <span class="doccomment">/// The solid angle in Sr</span>
-    <span class="kw">pub</span> <span class="ident">omega</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// The solid angle in Sr
+    </span><span class="kw">pub </span>omega: Float,
 
-    <span class="doccomment">/// The angle in Radians</span>
-    <span class="kw">pub</span> <span class="ident">angle</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// The angle in Radians
+    </span><span class="kw">pub </span>angle: Float,
 
-    <span class="doccomment">/// Cos half angle</span>
-    <span class="kw">pub</span> <span class="ident">cos_half_alpha</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// Cos half angle
+    </span><span class="kw">pub </span>cos_half_alpha: Float,
 
-    <span class="doccomment">/// Tan of half angle</span>
-    <span class="kw">pub</span> <span class="ident">tan_half_alpha</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// Tan of half angle
+    </span><span class="kw">pub </span>tan_half_alpha: Float,
 
-    <span class="doccomment">/// A pointer to the [`Transform`] associated with this `DistantSouRefCounte3D`</span>
-    <span class="ident">transform</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="comment">// Does the transform change the hand-ness of the coordinate system?</span>
-    <span class="comment">// transform_reverses: bool,</span>
-}
+    <span class="doccomment">/// A pointer to the [`Transform`] associated with this `DistantSouRefCounte3D`
+    </span>transform: <span class="prelude-ty">Option</span>&lt;RefCount&lt;Transform&gt;&gt;,
+    <span class="comment">// Does the transform change the hand-ness of the coordinate system?
+    // transform_reverses: bool,
+</span>}
 
-<span class="kw">impl</span> <span class="ident">DistantSource3D</span> {
-    <span class="doccomment">/// Creates a new `DistantSouRefCounte3D` geometry.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Inputs:</span>
-    <span class="doccomment">/// * direction: A [`Vector3D`] pointing to the souRefCounte</span>
-    <span class="doccomment">/// * angle: The flat angle in Radians (e.g., a hemisphere would be $`\pi`$)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">direction</span>: <span class="ident">Vector3D</span>, <span class="ident">angle</span>: <span class="ident">Float</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">tan_half_alpha</span> <span class="op">=</span> (<span class="ident">angle</span> <span class="op">/</span> <span class="number">2.0</span>).<span class="ident">tan</span>();
-        <span class="kw">let</span> <span class="ident">omega</span> <span class="op">=</span> <span class="ident">tan_half_alpha</span> <span class="op">*</span> <span class="ident">tan_half_alpha</span> <span class="op">*</span> <span class="ident">PI</span>;
-        <span class="self">Self</span> {
-            <span class="ident">omega</span>,
-            <span class="ident">angle</span>,
-            <span class="ident">tan_half_alpha</span>,
-            <span class="ident">cos_half_alpha</span>: (<span class="ident">angle</span> <span class="op">/</span> <span class="number">2.</span>).<span class="ident">cos</span>(),
-            <span class="ident">direction</span>: <span class="ident">direction</span>.<span class="ident">get_normalized</span>(),
-            <span class="comment">// transform_reverses: false,</span>
-            <span class="ident">transform</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>DistantSource3D {
+    <span class="doccomment">/// Creates a new `DistantSouRefCounte3D` geometry.
+    ///
+    /// # Inputs:
+    /// * direction: A [`Vector3D`] pointing to the souRefCounte
+    /// * angle: The flat angle in Radians (e.g., a hemisphere would be $`\pi`$)
+    </span><span class="kw">pub fn </span>new(direction: Vector3D, angle: Float) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>tan_half_alpha = (angle / <span class="number">2.0</span>).tan();
+        <span class="kw">let </span>omega = tan_half_alpha * tan_half_alpha * PI;
+        <span class="self">Self </span>{
+            omega,
+            angle,
+            tan_half_alpha,
+            cos_half_alpha: (angle / <span class="number">2.</span>).cos(),
+            direction: direction.get_normalized(),
+            <span class="comment">// transform_reverses: false,
+            </span>transform: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Creates a proxy [`Disk3D`] that can be used for sampling and</span>
-    <span class="doccomment">/// other operations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_proxy_disk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">t</span>: <span class="ident">Float</span>) -&gt; <span class="ident">Disk3D</span> {
-        <span class="comment">// Simulate a Disk3D and get that value.</span>
-        <span class="kw">let</span> <span class="ident">center</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">direction</span> <span class="op">*</span> <span class="ident">t</span>).<span class="ident">as_point3d</span>();
-        <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">direction</span>;
-        <span class="kw">let</span> <span class="ident">radius</span> <span class="op">=</span> <span class="ident">t</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">tan_half_alpha</span>;
+    <span class="doccomment">/// Creates a proxy [`Disk3D`] that can be used for sampling and
+    /// other operations
+    </span><span class="kw">pub fn </span>get_proxy_disk(<span class="kw-2">&amp;</span><span class="self">self</span>, t: Float) -&gt; Disk3D {
+        <span class="comment">// Simulate a Disk3D and get that value.
+        </span><span class="kw">let </span>center = (<span class="self">self</span>.direction * t).as_point3d();
+        <span class="kw">let </span>normal = <span class="self">self</span>.direction;
+        <span class="kw">let </span>radius = t * <span class="self">self</span>.tan_half_alpha;
 
-        <span class="ident">Disk3D::new</span>(<span class="ident">center</span>, <span class="ident">normal</span>, <span class="ident">radius</span>)
+        Disk3D::new(center, normal, radius)
     }
 
-    <span class="doccomment">/// The name of the figure. Useful for debugging.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;source&quot;</span>
+    <span class="doccomment">/// The name of the figure. Useful for debugging.
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;source&quot;
+    </span>}
+
+    <span class="doccomment">/// Gets a `BBox3D` bounding the object, in local coordinates
+    </span><span class="kw">pub fn </span>bounds(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BBox3D {
+        <span class="macro">panic!</span>(<span class="string">&quot;Trying to get the bounds of a {}&quot;</span>, <span class="self">self</span>.id())
     }
 
-    <span class="doccomment">/// Gets a `BBox3D` bounding the object, in local coordinates</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bounds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BBox3D</span> {
-        <span class="macro">panic!</span>(<span class="string">&quot;Trying to get the bounds of a {}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>())
+    <span class="doccomment">/// Gets the area of the object
+    </span><span class="kw">pub fn </span>area(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Float {
+        Float::MAX
     }
 
-    <span class="doccomment">/// Gets the area of the object</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
-        <span class="ident">Float::MAX</span>
+    <span class="doccomment">/// Borrows the [`Transform`]
+    </span><span class="kw">pub fn </span>transform(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;RefCount&lt;Transform&gt;&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.transform
     }
 
-    <span class="doccomment">/// Borrows the [`Transform`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">transform</span>
-    }
-
-    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance</span>
-    <span class="doccomment">/// `t` and the normal [`Vector3D`] at that point. If the distance</span>
-    <span class="doccomment">/// is negative (i.e., the object is behind the plane), it should return</span>
-    <span class="doccomment">/// [`None`].    </span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///  The steps should be:</span>
-    <span class="doccomment">/// * Calculate the point of intersection</span>
-    <span class="doccomment">/// * Calculate normal and side of intersection</span>
-    <span class="doccomment">/// * Calculate (u,v)</span>
-    <span class="doccomment">/// * Calculate first derivative (i.e., dp_du, dp_dv)</span>
-    <span class="doccomment">/// * Calculate second derivative (i.e., d2p_duu, d2p_dvv, d2p_duv)</span>
-    <span class="doccomment">/// * Call `IntersectionInfo::new(ray,p, u, v, dpdu, dpdv, d2p_duu, d2p_dvv, d2p_duv)`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersect_local_ray</span>(
+    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance
+    /// `t` and the normal [`Vector3D`] at that point. If the distance
+    /// is negative (i.e., the object is behind the plane), it should return
+    /// [`None`].    
+    ///
+    ///  The steps should be:
+    /// * Calculate the point of intersection
+    /// * Calculate normal and side of intersection
+    /// * Calculate (u,v)
+    /// * Calculate first derivative (i.e., dp_du, dp_dv)
+    /// * Calculate second derivative (i.e., d2p_duu, d2p_dvv, d2p_duv)
+    /// * Call `IntersectionInfo::new(ray,p, u, v, dpdu, dpdv, d2p_duu, d2p_dvv, d2p_duv)`
+    </span><span class="kw">pub fn </span>intersect_local_ray(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
-        <span class="ident">o_error</span>: <span class="ident">Point3D</span>,
-        <span class="ident">d_error</span>: <span class="ident">Point3D</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntersectionInfo</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">phit</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">simple_intersect_local_ray</span>(<span class="ident">ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">10.</span>;
-        <span class="kw">let</span> <span class="ident">phi</span> <span class="op">=</span> <span class="number">0.5</span>; <span class="comment">// I don&#39;t think this value is relevant</span>
-        <span class="kw">let</span> <span class="ident">disk</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_proxy_disk</span>(<span class="ident">t</span>);
-        <span class="comment">// Get basic info and update</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">disk</span>.<span class="ident">intersection_info</span>(<span class="ident">ray</span>, <span class="ident">ray</span>.<span class="ident">project</span>(<span class="ident">t</span>), <span class="ident">phi</span>)<span class="question-mark">?</span>;
-        <span class="ident">info</span>.<span class="ident">p</span> <span class="op">=</span> <span class="ident">phit</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">info</span>)
+        ray: <span class="kw-2">&amp;</span>Ray3D,
+        o_error: Point3D,
+        d_error: Point3D,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;IntersectionInfo&gt; {
+        <span class="kw">let </span>phit = <span class="self">self</span>.simple_intersect_local_ray(ray, o_error, d_error)<span class="question-mark">?</span>;
+        <span class="kw">let </span>t = <span class="number">10.</span>;
+        <span class="kw">let </span>phi = <span class="number">0.5</span>; <span class="comment">// I don&#39;t think this value is relevant
+        </span><span class="kw">let </span>disk = <span class="self">self</span>.get_proxy_disk(t);
+        <span class="comment">// Get basic info and update
+        </span><span class="kw">let </span><span class="kw-2">mut </span>info = disk.intersection_info(ray, ray.project(t), phi)<span class="question-mark">?</span>;
+        info.p = phit;
+        <span class="prelude-val">Some</span>(info)
     }
 
-    <span class="doccomment">/// Like `intersect_local_ray` but simplified because there is not need</span>
-    <span class="doccomment">/// for calcuating the paramtrisized elements</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_intersect_local_ray</span>(
+    <span class="doccomment">/// Like `intersect_local_ray` but simplified because there is not need
+    /// for calcuating the paramtrisized elements
+    </span><span class="kw">pub fn </span>simple_intersect_local_ray(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
-        <span class="ident">_o_error</span>: <span class="ident">Point3D</span>,
-        <span class="ident">_d_error</span>: <span class="ident">Point3D</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> {
-        <span class="comment">// intersects as long as it is in the same direction...</span>
-        <span class="kw">let</span> <span class="ident">cos_angle</span> <span class="op">=</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">get_normalized</span>() <span class="op">*</span> <span class="self">self</span>.<span class="ident">direction</span>;
-        <span class="kw">if</span> <span class="ident">cos_angle</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">cos_half_alpha</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ray</span>.<span class="ident">project</span>(<span class="ident">Float::MAX</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+        ray: <span class="kw-2">&amp;</span>Ray3D,
+        _o_error: Point3D,
+        _d_error: Point3D,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;Point3D&gt; {
+        <span class="comment">// intersects as long as it is in the same direction...
+        </span><span class="kw">let </span>cos_angle = ray.direction.get_normalized() * <span class="self">self</span>.direction;
+        <span class="kw">if </span>cos_angle &gt;= <span class="self">self</span>.cos_half_alpha {
+            <span class="prelude-val">Some</span>(ray.project(Float::MAX))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,</span>
-    <span class="doccomment">/// returning a detailed [`IntersectionInfo`] about the intersaction .</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntersectionInfo</span><span class="op">&gt;</span> {
-        <span class="comment">// Transform ray into object space, if needed</span>
-        <span class="kw">let</span> (<span class="ident">local_ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform</span>() {
-            <span class="ident">t</span>.<span class="ident">inv_transform_ray</span>(<span class="ident">ray</span>)
-        } <span class="kw">else</span> {
-            (<span class="kw-2">*</span><span class="ident">ray</span>, <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>), <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>))
+    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
+    /// returning a detailed [`IntersectionInfo`] about the intersaction .
+    </span><span class="kw">pub fn </span>intersect(<span class="kw-2">&amp;</span><span class="self">self</span>, ray: <span class="kw-2">&amp;</span>Ray3D) -&gt; <span class="prelude-ty">Option</span>&lt;IntersectionInfo&gt; {
+        <span class="comment">// Transform ray into object space, if needed
+        </span><span class="kw">let </span>(local_ray, o_error, d_error) = <span class="kw">if let </span><span class="prelude-val">Some</span>(t) = <span class="self">self</span>.transform() {
+            t.inv_transform_ray(ray)
+        } <span class="kw">else </span>{
+            (<span class="kw-2">*</span>ray, Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>), Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>))
         };
 
-        <span class="comment">// Intersect, and return transformed back... if needed</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">intersect_local_ray</span>(<span class="kw-2">&amp;</span><span class="ident">local_ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>) {
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">info</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">info</span>.<span class="ident">transform</span>(<span class="ident">t</span>))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">info</span>)
+        <span class="comment">// Intersect, and return transformed back... if needed
+        </span><span class="kw">match </span><span class="self">self</span>.intersect_local_ray(<span class="kw-2">&amp;</span>local_ray, o_error, d_error) {
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(info) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(t) = <span class="self">self</span>.transform() {
+                    <span class="prelude-val">Some</span>(info.transform(t))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(info)
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,</span>
-    <span class="doccomment">/// returning the point of intersection, if any.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_intersect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> {
-        <span class="comment">// Transform ray into object space, if needed</span>
-        <span class="kw">let</span> (<span class="ident">local_ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform</span>() {
-            <span class="ident">t</span>.<span class="ident">inv_transform_ray</span>(<span class="ident">ray</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">Transform::new</span>();
-            <span class="ident">t</span>.<span class="ident">inv_transform_ray</span>(<span class="ident">ray</span>)
+    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
+    /// returning the point of intersection, if any.
+    </span><span class="kw">pub fn </span>simple_intersect(<span class="kw-2">&amp;</span><span class="self">self</span>, ray: <span class="kw-2">&amp;</span>Ray3D) -&gt; <span class="prelude-ty">Option</span>&lt;Point3D&gt; {
+        <span class="comment">// Transform ray into object space, if needed
+        </span><span class="kw">let </span>(local_ray, o_error, d_error) = <span class="kw">if let </span><span class="prelude-val">Some</span>(t) = <span class="self">self</span>.transform() {
+            t.inv_transform_ray(ray)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>t = Transform::new();
+            t.inv_transform_ray(ray)
         };
 
-        <span class="comment">// Intersect, and return transformed back... if needed</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">simple_intersect_local_ray</span>(<span class="kw-2">&amp;</span><span class="ident">local_ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>) {
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">phit</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">t</span>.<span class="ident">transform_pt</span>(<span class="ident">phit</span>))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">phit</span>)
+        <span class="comment">// Intersect, and return transformed back... if needed
+        </span><span class="kw">match </span><span class="self">self</span>.simple_intersect_local_ray(<span class="kw-2">&amp;</span>local_ray, o_error, d_error) {
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(phit) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(t) = <span class="self">self</span>.transform() {
+                    <span class="prelude-val">Some</span>(t.transform_pt(phit))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(phit)
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Gets a `BBox3D` bounding the object, in world&#39;s coordinates.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">world_bounds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BBox3D</span> {
-        <span class="kw">let</span> <span class="ident">local_b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bounds</span>();
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">transform</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">transform_bbox</span>(<span class="ident">local_b</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">local_b</span>,
+    <span class="doccomment">/// Gets a `BBox3D` bounding the object, in world&#39;s coordinates.
+    </span><span class="kw">pub fn </span>world_bounds(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BBox3D {
+        <span class="kw">let </span>local_b = <span class="self">self</span>.bounds();
+        <span class="kw">match </span><span class="self">self</span>.transform() {
+            <span class="prelude-val">Some</span>(t) =&gt; t.transform_bbox(local_b),
+            <span class="prelude-val">None </span>=&gt; local_b,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

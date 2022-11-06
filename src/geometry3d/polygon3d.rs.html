@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/polygon3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>polygon3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/polygon3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>polygon3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>
 <script>
   "use strict";
@@ -817,746 +817,746 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/</span>
+*/
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>};
+</span><span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Loop3D</span>, <span class="ident">Point3D</span>, <span class="ident">Segment3D</span>, <span class="ident">Vector3D</span>};
+<span class="kw">use </span><span class="kw">crate</span>::Float;
+<span class="kw">use crate</span>::{Loop3D, Point3D, Segment3D, Vector3D};
 
-<span class="doccomment">/// A 3-dimensional Polygon which can contain holes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is a structure containing several [`Loop3D`]. One of them is</span>
-<span class="doccomment">/// the `outer` [`Loop3D`], and there there can be several `inner` [`Loop3D`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Polygon3D</span> {
-    <span class="doccomment">/// The outer [`Loop3D`]</span>
-    <span class="ident">outer</span>: <span class="ident">Loop3D</span>,
+<span class="doccomment">/// A 3-dimensional Polygon which can contain holes.
+///
+/// It is a structure containing several [`Loop3D`]. One of them is
+/// the `outer` [`Loop3D`], and there there can be several `inner` [`Loop3D`].
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Polygon3D {
+    <span class="doccomment">/// The outer [`Loop3D`]
+    </span>outer: Loop3D,
 
-    <span class="doccomment">/// A vector of inner [`Loop3D`]</span>
-    <span class="ident">inner</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Loop3D</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A vector of inner [`Loop3D`]
+    </span>inner: Vec&lt;Loop3D&gt;,
 
-    <span class="doccomment">/// The area of the `Polygon3D`    </span>
-    <span class="ident">area</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// The area of the `Polygon3D`    
+    </span>area: Float,
 
-    <span class="doccomment">/// The normal of the `Polygon3D`, following a right-hand convention</span>
-    <span class="ident">normal</span>: <span class="ident">Vector3D</span>,
+    <span class="doccomment">/// The normal of the `Polygon3D`, following a right-hand convention
+    </span>normal: Vector3D,
 }
 
-<span class="kw">impl</span> <span class="ident">std::convert::From</span><span class="op">&lt;</span><span class="ident">Loop3D</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Polygon3D</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">outer</span>: <span class="ident">Loop3D</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">area</span> <span class="op">=</span> <span class="ident">outer</span>
-            .<span class="ident">area</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Trying to convert a non-closed Loop3D into a Polygon3D&quot;</span>);
-        <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="ident">outer</span>.<span class="ident">normal</span>();
+<span class="kw">impl </span>std::convert::From&lt;Loop3D&gt; <span class="kw">for </span>Polygon3D {
+    <span class="kw">fn </span>from(outer: Loop3D) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>area = outer
+            .area()
+            .expect(<span class="string">&quot;Trying to convert a non-closed Loop3D into a Polygon3D&quot;</span>);
+        <span class="kw">let </span>normal = outer.normal();
 
-        <span class="self">Self</span> {
-            <span class="ident">outer</span>,
-            <span class="ident">inner</span>: <span class="ident">Vec::with_capacity</span>(<span class="number">0</span>),
-            <span class="ident">area</span>,
-            <span class="ident">normal</span>,
+        <span class="self">Self </span>{
+            outer,
+            inner: Vec::with_capacity(<span class="number">0</span>),
+            area,
+            normal,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Polygon3D</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Polygon3D {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Loop3D</span> <span class="op">=</span> <span class="ident">Deserialize::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>data: Loop3D = Deserialize::deserialize(deserializer)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">data</span>.<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(data.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Polygon3D</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="kw">impl </span>Serialize <span class="kw">for </span>Polygon3D {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_closed_loop</span>();
-        <span class="ident">l</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        <span class="kw">let </span>l = <span class="self">self</span>.get_closed_loop();
+        l.serialize(serializer)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Polygon3D</span> {
-    <span class="doccomment">/// Creates a new [`Loop3D`] without any holes</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">outer</span>: <span class="ident">Loop3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Polygon3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">outer</span>.<span class="ident">is_closed</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Trying to create a Polygon3D from a loop that is not closed&quot;</span>.<span class="ident">to_string</span>());
+<span class="kw">impl </span>Polygon3D {
+    <span class="doccomment">/// Creates a new [`Loop3D`] without any holes
+    </span><span class="kw">pub fn </span>new(outer: Loop3D) -&gt; <span class="prelude-ty">Result</span>&lt;Polygon3D, String&gt; {
+        <span class="kw">if </span>!outer.is_closed() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Trying to create a Polygon3D from a loop that is not closed&quot;</span>.to_string());
         }
 
-        <span class="kw">let</span> <span class="ident">area</span> <span class="op">=</span> <span class="ident">outer</span>.<span class="ident">area</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="ident">outer</span>.<span class="ident">normal</span>();
+        <span class="kw">let </span>area = outer.area()<span class="question-mark">?</span>;
+        <span class="kw">let </span>normal = outer.normal();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Polygon3D</span> {
-            <span class="ident">outer</span>,
-            <span class="ident">area</span>,
-            <span class="ident">normal</span>,
-            <span class="ident">inner</span>: <span class="ident">Vec::new</span>(),
+        <span class="prelude-val">Ok</span>(Polygon3D {
+            outer,
+            area,
+            normal,
+            inner: Vec::new(),
         })
     }
 
-    <span class="comment">// pub fn normal_at_intersection(&amp;self, ray: &amp;Ray3D, t: Float) -&gt; (Vector3D, SurfaceSide) {</span>
-    <span class="comment">//     let p = self.outer[0];</span>
-    <span class="comment">//     SurfaceSide::get_side(self.normal, ray.direction)</span>
-    <span class="comment">// }</span>
+    <span class="comment">// pub fn normal_at_intersection(&amp;self, ray: &amp;Ray3D, t: Float) -&gt; (Vector3D, SurfaceSide) {
+    //     let p = self.outer[0];
+    //     SurfaceSide::get_side(self.normal, ray.direction)
+    // }
 
-    <span class="doccomment">/// Retrieves the normal to the Polygon</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="self">self</span>.<span class="ident">normal</span>
+    </span><span class="doccomment">/// Retrieves the normal to the Polygon
+    </span><span class="kw">pub fn </span>normal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vector3D {
+        <span class="self">self</span>.normal
     }
 
-    <span class="doccomment">/// Calculates the average of the [`Point3D`] in the Outer [`Loop3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">outer_centroid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">centroid</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">outer</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">outer</span>();
-        <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">outer</span>.<span class="ident">vertices</span>() {
-            <span class="ident">centroid</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">v</span>;
+    <span class="doccomment">/// Calculates the average of the [`Point3D`] in the Outer [`Loop3D`]
+    </span><span class="kw">pub fn </span>outer_centroid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Point3D {
+        <span class="kw">let </span><span class="kw-2">mut </span>centroid = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>outer = <span class="self">self</span>.outer();
+        <span class="kw">for </span>v <span class="kw">in </span>outer.vertices() {
+            centroid += <span class="kw-2">*</span>v;
         }
-        <span class="ident">centroid</span> <span class="op">/</span> (<span class="ident">outer</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">Float</span>)
+        centroid / (outer.len() <span class="kw">as </span>Float)
     }
 
-    <span class="doccomment">/// Borrows the Outer [`Loop3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">outer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Loop3D</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">outer</span>
+    <span class="doccomment">/// Borrows the Outer [`Loop3D`]
+    </span><span class="kw">pub fn </span>outer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Loop3D {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.outer
     }
 
-    <span class="doccomment">/// Clones the Outer [`Loop3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone_outer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Loop3D</span> {
-        <span class="self">self</span>.<span class="ident">outer</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// Clones the Outer [`Loop3D`]
+    </span><span class="kw">pub fn </span>clone_outer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Loop3D {
+        <span class="self">self</span>.outer.clone()
     }
 
-    <span class="doccomment">/// Counts the inner [`Loop3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_inner_loops</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Counts the inner [`Loop3D`]
+    </span><span class="kw">pub fn </span>n_inner_loops(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.inner.len()
     }
 
-    <span class="doccomment">/// Borrows an inner [`Loop3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Loop3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>[<span class="ident">i</span>]);
+    <span class="doccomment">/// Borrows an inner [`Loop3D`]
+    </span><span class="kw">pub fn </span>inner(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>Loop3D, String&gt; {
+        <span class="kw">if </span>i &lt; <span class="self">self</span>.inner.len() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.inner[i]);
         }
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Index out of bounds when trying to retrieve inner loop&quot;</span>.<span class="ident">to_string</span>();
-        <span class="prelude-val">Err</span>(<span class="ident">msg</span>)
+        <span class="kw">let </span>msg = <span class="string">&quot;Index out of bounds when trying to retrieve inner loop&quot;</span>.to_string();
+        <span class="prelude-val">Err</span>(msg)
     }
 
-    <span class="doccomment">/// Checks whether a [`Point3D`] is inside the [`Polygon3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_point</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="comment">// Must be within the outer loop</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">outer</span>.<span class="ident">test_point</span>(<span class="ident">p</span>)<span class="question-mark">?</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+    <span class="doccomment">/// Checks whether a [`Point3D`] is inside the [`Polygon3D`]
+    </span><span class="kw">pub fn </span>test_point(<span class="kw-2">&amp;</span><span class="self">self</span>, p: Point3D) -&gt; <span class="prelude-ty">Result</span>&lt;bool, String&gt; {
+        <span class="comment">// Must be within the outer loop
+        </span><span class="kw">if </span>!<span class="self">self</span>.outer.test_point(p)<span class="question-mark">? </span>{
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
         }
 
-        <span class="comment">// And outside all inner loops.</span>
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="ident">lp</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>[<span class="ident">i</span>];
+        <span class="comment">// And outside all inner loops.
+        </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.inner.len() {
+            <span class="kw">let </span>lp = <span class="kw-2">&amp;</span><span class="self">self</span>.inner[i];
 
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">lp</span>.<span class="ident">test_point</span>(<span class="ident">p</span>);
+            <span class="kw">let </span>result = lp.test_point(p);
 
-            <span class="kw">let</span> <span class="ident">is_in</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">result</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+            <span class="kw">let </span>is_in = <span class="kw">match </span>result {
+                <span class="prelude-val">Ok</span>(b) =&gt; b,
+                <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(e),
             };
-            <span class="comment">// if it is in one of the inner loops, then it is outside</span>
-            <span class="comment">// the shape.</span>
-            <span class="kw">if</span> <span class="ident">is_in</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+            <span class="comment">// if it is in one of the inner loops, then it is outside
+            // the shape.
+            </span><span class="kw">if </span>is_in {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
             }
         }
-        <span class="comment">// If it was not in any of the inner loops, then it is in.</span>
-        <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
+        <span class="comment">// If it was not in any of the inner loops, then it is in.
+        </span><span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
     }
 
-    <span class="doccomment">/// Makes a hole shaped as a [`Loop3D`] in the [`Polygon3D`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cut_hole</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">hole</span>: <span class="ident">Loop3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="comment">// Check that the normals are the same</span>
+    <span class="doccomment">/// Makes a hole shaped as a [`Loop3D`] in the [`Polygon3D`].
+    </span><span class="kw">pub fn </span>cut_hole(<span class="kw-2">&amp;mut </span><span class="self">self</span>, hole: Loop3D) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="comment">// Check that the normals are the same
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">normal</span>.<span class="ident">is_parallel</span>(<span class="ident">hole</span>.<span class="ident">normal</span>()) {
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;The hole you are trying to cut and the Polygon3D that should receive it do not have parallel normals&quot;</span>.<span class="ident">to_string</span>();
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>);
+        </span><span class="kw">if </span>!<span class="self">self</span>.normal.is_parallel(hole.normal()) {
+            <span class="kw">let </span>msg = <span class="string">&quot;The hole you are trying to cut and the Polygon3D that should receive it do not have parallel normals&quot;</span>.to_string();
+            <span class="kw">return </span><span class="prelude-val">Err</span>(msg);
         }
 
-        <span class="comment">// Check that all the points are inside the polygon.point3d</span>
-        <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="ident">hole</span>.<span class="ident">vertices</span>() {
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">test_point</span>(<span class="kw-2">*</span><span class="ident">p</span>)<span class="question-mark">?</span> {
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;At least one of the points in your hole are not inside the polygon&quot;</span>
-                    .<span class="ident">to_string</span>();
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>);
+        <span class="comment">// Check that all the points are inside the polygon.point3d
+        </span><span class="kw">for </span>p <span class="kw">in </span>hole.vertices() {
+            <span class="kw">if </span>!<span class="self">self</span>.test_point(<span class="kw-2">*</span>p)<span class="question-mark">? </span>{
+                <span class="kw">let </span>msg = <span class="string">&quot;At least one of the points in your hole are not inside the polygon&quot;
+                    </span>.to_string();
+                <span class="kw">return </span><span class="prelude-val">Err</span>(msg);
             }
         }
 
-        <span class="comment">// Check that this hole does not contain another hole in it.</span>
-        <span class="kw">let</span> <span class="ident">n_inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">len</span>();
-        <span class="kw">for</span> <span class="ident">n_loop</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n_inner</span> {
-            <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>[<span class="ident">n_loop</span>];
+        <span class="comment">// Check that this hole does not contain another hole in it.
+        </span><span class="kw">let </span>n_inner = <span class="self">self</span>.inner.len();
+        <span class="kw">for </span>n_loop <span class="kw">in </span><span class="number">0</span>..n_inner {
+            <span class="kw">let </span>inner = <span class="kw-2">&amp;</span><span class="self">self</span>.inner[n_loop];
 
-            <span class="kw">for</span> <span class="ident">inner_p</span> <span class="kw">in</span> <span class="ident">inner</span>.<span class="ident">vertices</span>() {
-                <span class="comment">// Check point in the hole we are making</span>
-                <span class="kw">if</span> <span class="ident">hole</span>.<span class="ident">test_point</span>(<span class="kw-2">*</span><span class="ident">inner_p</span>)<span class="question-mark">?</span> {
-                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Apparently another hole in your Polygon3D would be inside the new hole you are making&quot;</span>.<span class="ident">to_string</span>();
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>);
+            <span class="kw">for </span>inner_p <span class="kw">in </span>inner.vertices() {
+                <span class="comment">// Check point in the hole we are making
+                </span><span class="kw">if </span>hole.test_point(<span class="kw-2">*</span>inner_p)<span class="question-mark">? </span>{
+                    <span class="kw">let </span>msg = <span class="string">&quot;Apparently another hole in your Polygon3D would be inside the new hole you are making&quot;</span>.to_string();
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(msg);
                 }
             }
         }
 
-        <span class="comment">// All good now! Add it.</span>
-        <span class="kw">let</span> <span class="ident">hole_area</span> <span class="op">=</span> <span class="ident">hole</span>.<span class="ident">area</span>()<span class="question-mark">?</span>;
+        <span class="comment">// All good now! Add it.
+        </span><span class="kw">let </span>hole_area = hole.area()<span class="question-mark">?</span>;
 
-        <span class="comment">// reduce area</span>
-        <span class="self">self</span>.<span class="ident">area</span> <span class="op">-</span><span class="op">=</span> <span class="ident">hole_area</span>;
+        <span class="comment">// reduce area
+        </span><span class="self">self</span>.area -= hole_area;
 
-        <span class="comment">// Add it to the inner</span>
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">push</span>(<span class="ident">hole</span>);
+        <span class="comment">// Add it to the inner
+        </span><span class="self">self</span>.inner.push(hole);
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Gets the area of the [`Polygon3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
-        <span class="self">self</span>.<span class="ident">area</span>
+    <span class="doccomment">/// Gets the area of the [`Polygon3D`]
+    </span><span class="kw">pub fn </span>area(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Float {
+        <span class="self">self</span>.area
     }
 
-    <span class="doccomment">/// Gets a single [`Loop3D`] representing the same [`Polygon3D`]</span>
-    <span class="doccomment">/// geometry, but without any holes</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is a pretty terible algorithm... but I doubt</span>
-    <span class="doccomment">/// it is the bottleneck in my applications.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is also not 100% guaranteed to work all the time, but</span>
-    <span class="doccomment">/// it has proven to be pretty robust for relatively normal</span>
-    <span class="doccomment">/// geometries.</span>
+    <span class="doccomment">/// Gets a single [`Loop3D`] representing the same [`Polygon3D`]
+    /// geometry, but without any holes
+    ///
+    /// This is a pretty terible algorithm... but I doubt
+    /// it is the bottleneck in my applications.
+    ///
+    /// It is also not 100% guaranteed to work all the time, but
+    /// it has proven to be pretty robust for relatively normal
+    /// geometries.
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_closed_loop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Loop3D</span> {
-        <span class="comment">//get the number of interior loops</span>
-        <span class="kw">let</span> <span class="ident">n_inner_loops</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">len</span>();
+    </span><span class="kw">pub fn </span>get_closed_loop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Loop3D {
+        <span class="comment">//get the number of interior loops
+        </span><span class="kw">let </span>n_inner_loops = <span class="self">self</span>.inner.len();
 
-        <span class="comment">//initialize the loop by cloning the current outer loop</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret_loop</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">outer</span>.<span class="ident">clone</span>();
-        <span class="ident">ret_loop</span>.<span class="ident">open</span>();
+        <span class="comment">//initialize the loop by cloning the current outer loop
+        </span><span class="kw">let </span><span class="kw-2">mut </span>ret_loop = <span class="self">self</span>.outer.clone();
+        ret_loop.open();
 
-        <span class="comment">// We will use this for checking whether the inner</span>
-        <span class="comment">// loop should be reversed or not.</span>
-        <span class="kw">let</span> <span class="ident">outer_normal</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">outer</span>.<span class="ident">normal</span>();
+        <span class="comment">// We will use this for checking whether the inner
+        // loop should be reversed or not.
+        </span><span class="kw">let </span>outer_normal = <span class="self">self</span>.outer.normal();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">processed_inner_loops</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>processed_inner_loops: Vec&lt;usize&gt; = Vec::new();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner_loop_id</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner_vertex_id</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>inner_loop_id = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>inner_vertex_id = <span class="number">0</span>;
 
-        <span class="comment">// This is done once per inner loop</span>
-        <span class="kw">for</span> <span class="ident">_i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n_inner_loops</span> {
-            <span class="comment">// find the minimum distance</span>
-            <span class="comment">// from interior to exterior</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">min_distance</span> <span class="op">=</span> <span class="number">9E14</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">min_inner_loop_id</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">min_ext_vertex_id</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="comment">//let mut min_int_vertex_id = 0;</span>
+        <span class="comment">// This is done once per inner loop
+        </span><span class="kw">for </span>_i <span class="kw">in </span><span class="number">0</span>..n_inner_loops {
+            <span class="comment">// find the minimum distance
+            // from interior to exterior
+            </span><span class="kw">let </span><span class="kw-2">mut </span>min_distance = <span class="number">9E14</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>min_inner_loop_id = <span class="number">0</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>min_ext_vertex_id = <span class="number">0</span>;
+            <span class="comment">//let mut min_int_vertex_id = 0;
 
-            <span class="kw">let</span> <span class="ident">n_ext_vertices</span> <span class="op">=</span> <span class="ident">ret_loop</span>.<span class="ident">len</span>();
-            <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n_ext_vertices</span> {
-                <span class="kw">let</span> <span class="ident">ext_vertex</span> <span class="op">=</span> <span class="ident">ret_loop</span>[<span class="ident">j</span>];
+            </span><span class="kw">let </span>n_ext_vertices = ret_loop.len();
+            <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n_ext_vertices {
+                <span class="kw">let </span>ext_vertex = ret_loop[j];
 
-                <span class="kw">for</span> <span class="ident">k</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n_inner_loops</span> {
-                    <span class="comment">// continue if already processed</span>
-                    <span class="kw">if</span> <span class="ident">processed_inner_loops</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>) {
+                <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..n_inner_loops {
+                    <span class="comment">// continue if already processed
+                    </span><span class="kw">if </span>processed_inner_loops.contains(<span class="kw-2">&amp;</span>k) {
                         <span class="kw">continue</span>;
                     }
 
-                    <span class="kw">let</span> <span class="ident">inner_loop</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>[<span class="ident">k</span>];
-                    <span class="kw">let</span> <span class="ident">n_inner_vertices</span> <span class="op">=</span> <span class="ident">inner_loop</span>.<span class="ident">len</span>();
-                    <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n_inner_vertices</span> {
-                        <span class="kw">let</span> <span class="ident">inner_vertex</span> <span class="op">=</span> <span class="ident">inner_loop</span>[<span class="ident">l</span>];
+                    <span class="kw">let </span>inner_loop = <span class="kw-2">&amp;</span><span class="self">self</span>.inner[k];
+                    <span class="kw">let </span>n_inner_vertices = inner_loop.len();
+                    <span class="kw">for </span>l <span class="kw">in </span><span class="number">0</span>..n_inner_vertices {
+                        <span class="kw">let </span>inner_vertex = inner_loop[l];
 
-                        <span class="comment">// we work with squared distances... the result is</span>
-                        <span class="comment">// the same but the calculation is faster.</span>
-                        <span class="kw">let</span> <span class="ident">distance</span> <span class="op">=</span> <span class="ident">ext_vertex</span>.<span class="ident">squared_distance</span>(<span class="ident">inner_vertex</span>);
+                        <span class="comment">// we work with squared distances... the result is
+                        // the same but the calculation is faster.
+                        </span><span class="kw">let </span>distance = ext_vertex.squared_distance(inner_vertex);
 
-                        <span class="kw">if</span> <span class="ident">distance</span> <span class="op">&lt;</span> <span class="ident">min_distance</span> {
-                            <span class="ident">min_distance</span> <span class="op">=</span> <span class="ident">distance</span>;
-                            <span class="ident">min_ext_vertex_id</span> <span class="op">=</span> <span class="ident">j</span>;
-                            <span class="comment">//min_int_vertex_id = l;</span>
-                            <span class="ident">min_inner_loop_id</span> <span class="op">=</span> <span class="ident">k</span>;
-                            <span class="ident">inner_loop_id</span> <span class="op">=</span> <span class="ident">k</span>;
-                            <span class="ident">inner_vertex_id</span> <span class="op">=</span> <span class="ident">l</span>;
+                        <span class="kw">if </span>distance &lt; min_distance {
+                            min_distance = distance;
+                            min_ext_vertex_id = j;
+                            <span class="comment">//min_int_vertex_id = l;
+                            </span>min_inner_loop_id = k;
+                            inner_loop_id = k;
+                            inner_vertex_id = l;
                         }
-                    } <span class="comment">//end iterating inner vertices</span>
-                } <span class="comment">// end iterating inner loops</span>
-            } <span class="comment">// end iterating exterior vertices</span>
+                    } <span class="comment">//end iterating inner vertices
+                </span>} <span class="comment">// end iterating inner loops
+            </span>} <span class="comment">// end iterating exterior vertices
 
-            <span class="comment">// Now, pass the inner loop to the exterior loop</span>
-            <span class="comment">// by connecting them</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">aux</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
+            // Now, pass the inner loop to the exterior loop
+            // by connecting them
+            </span><span class="kw">let </span><span class="kw-2">mut </span>aux = Loop3D::new();
 
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n_ext_vertices</span> {
-                <span class="comment">// Sequentially add all exterior vertices.</span>
-                <span class="kw">let</span> <span class="ident">ext_vertex</span> <span class="op">=</span> <span class="ident">ret_loop</span>[<span class="ident">i</span>];
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n_ext_vertices {
+                <span class="comment">// Sequentially add all exterior vertices.
+                </span><span class="kw">let </span>ext_vertex = ret_loop[i];
 
-                <span class="comment">// Add</span>
-                <span class="ident">aux</span>.<span class="ident">push</span>(<span class="ident">ext_vertex</span>).<span class="ident">unwrap</span>();
+                <span class="comment">// Add
+                </span>aux.push(ext_vertex).unwrap();
 
-                <span class="comment">// If we are in the vertex through which we want</span>
-                <span class="comment">// to connect the interior loop, then go inside.</span>
-                <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">min_ext_vertex_id</span> {
-                    <span class="comment">// add the interior loop... adding the first</span>
-                    <span class="comment">// point twice (hence the +1)</span>
-                    <span class="kw">let</span> <span class="ident">n_inner_loop_vertices</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>[<span class="ident">min_inner_loop_id</span>].<span class="ident">len</span>();
-                    <span class="kw">let</span> <span class="ident">inner_normal</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>[<span class="ident">min_inner_loop_id</span>].<span class="ident">normal</span>();
+                <span class="comment">// If we are in the vertex through which we want
+                // to connect the interior loop, then go inside.
+                </span><span class="kw">if </span>i == min_ext_vertex_id {
+                    <span class="comment">// add the interior loop... adding the first
+                    // point twice (hence the +1)
+                    </span><span class="kw">let </span>n_inner_loop_vertices = <span class="self">self</span>.inner[min_inner_loop_id].len();
+                    <span class="kw">let </span>inner_normal = <span class="self">self</span>.inner[min_inner_loop_id].normal();
 
-                    <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n_inner_loop_vertices</span> <span class="op">+</span> <span class="number">1</span> {
-                        <span class="kw">let</span> <span class="ident">vertex_to_add</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">outer_normal</span>.<span class="ident">is_same_direction</span>(<span class="ident">inner_normal</span>) {
-                            <span class="comment">// If both in the same direction, then we need to</span>
-                            <span class="comment">// add the interior in reverse.</span>
-                            (<span class="ident">inner_vertex_id</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="ident">j</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">n_inner_loop_vertices</span>
-                        } <span class="kw">else</span> {
-                            (<span class="ident">inner_vertex_id</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="ident">j</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">n_inner_loop_vertices</span>
+                    <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n_inner_loop_vertices + <span class="number">1 </span>{
+                        <span class="kw">let </span>vertex_to_add = <span class="kw">if </span>outer_normal.is_same_direction(inner_normal) {
+                            <span class="comment">// If both in the same direction, then we need to
+                            // add the interior in reverse.
+                            </span>(inner_vertex_id <span class="kw">as </span>i32 - j <span class="kw">as </span>i32) <span class="kw">as </span>usize % n_inner_loop_vertices
+                        } <span class="kw">else </span>{
+                            (inner_vertex_id <span class="kw">as </span>i32 + j <span class="kw">as </span>i32) <span class="kw">as </span>usize % n_inner_loop_vertices
                         };
 
-                        <span class="kw">let</span> <span class="ident">inner_vertex</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>[<span class="ident">min_inner_loop_id</span>][<span class="ident">vertex_to_add</span>];
+                        <span class="kw">let </span>inner_vertex = <span class="self">self</span>.inner[min_inner_loop_id][vertex_to_add];
 
-                        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">inner_vertex</span>.<span class="ident">x</span>;
-                        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">inner_vertex</span>.<span class="ident">y</span>;
-                        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">inner_vertex</span>.<span class="ident">z</span>;
+                        <span class="kw">let </span>x = inner_vertex.x;
+                        <span class="kw">let </span>y = inner_vertex.y;
+                        <span class="kw">let </span>z = inner_vertex.z;
 
-                        <span class="ident">aux</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">z</span>)).<span class="ident">unwrap</span>();
+                        aux.push(Point3D::new(x, y, z)).unwrap();
                     }
 
-                    <span class="comment">//return to exterior ret_loop</span>
-                    <span class="ident">aux</span>.<span class="ident">push</span>(<span class="ident">ext_vertex</span>).<span class="ident">unwrap</span>();
+                    <span class="comment">//return to exterior ret_loop
+                    </span>aux.push(ext_vertex).unwrap();
                 }
             }
 
-            <span class="ident">ret_loop</span> <span class="op">=</span> <span class="ident">aux</span>;
+            ret_loop = aux;
 
-            <span class="comment">// flag ret_loop as processed (instead of deleting it)</span>
-            <span class="ident">processed_inner_loops</span>.<span class="ident">push</span>(<span class="ident">inner_loop_id</span>);
-        } <span class="comment">// end iterating inner loops</span>
-          <span class="comment">// ret_loop.close().unwrap();</span>
-        <span class="ident">ret_loop</span>
-    } <span class="comment">// end of get_closed_polygon</span>
+            <span class="comment">// flag ret_loop as processed (instead of deleting it)
+            </span>processed_inner_loops.push(inner_loop_id);
+        } <span class="comment">// end iterating inner loops
+          // ret_loop.close().unwrap();
+        </span>ret_loop
+    } <span class="comment">// end of get_closed_polygon
 
-    <span class="doccomment">/// Checks whether the [`Polygon3D`] contains a certain [`Segment3D`]</span>
-    <span class="doccomment">/// in any of its loops</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">Segment3D</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">outer</span>.<span class="ident">contains_segment</span>(<span class="ident">s</span>) {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+    </span><span class="doccomment">/// Checks whether the [`Polygon3D`] contains a certain [`Segment3D`]
+    /// in any of its loops
+    </span><span class="kw">pub fn </span>contains_segment(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>Segment3D) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.outer.contains_segment(s) {
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
-        <span class="kw">for</span> <span class="ident">inner</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">iter</span>() {
-            <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">contains_segment</span>(<span class="ident">s</span>) {
-                <span class="kw">return</span> <span class="bool-val">true</span>;
+        <span class="kw">for </span>inner <span class="kw">in </span><span class="self">self</span>.inner.iter() {
+            <span class="kw">if </span>inner.contains_segment(s) {
+                <span class="kw">return </span><span class="bool-val">true</span>;
             }
         }
-        <span class="bool-val">false</span>
-    }
+        <span class="bool-val">false
+    </span>}
 }
 
-<span class="comment">/***********/</span>
-<span class="comment">/* TESTING */</span>
-<span class="comment">/***********/</span>
+<span class="comment">/***********/
+/* TESTING */
+/***********/
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">testing</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</span><span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>testing {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serde_ok</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="string">&quot;[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>serde_ok() {
+        <span class="kw">let </span>a = <span class="string">&quot;[
             0.0,0,0,  
             1.0,1,1,  
             2,3,-1
         ]&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">pol</span>: <span class="ident">Polygon3D</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">a</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pol</span>.<span class="ident">outer</span>;
+        <span class="kw">let </span>pol: Polygon3D = serde_json::from_str(a).unwrap();
+        <span class="kw">let </span>p = <span class="kw-2">&amp;</span>pol.outer;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>.<span class="ident">len</span>(), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(p.len(), <span class="number">3</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">0</span>].<span class="ident">x</span>, <span class="number">0.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">0</span>].<span class="ident">y</span>, <span class="number">0.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">0</span>].<span class="ident">z</span>, <span class="number">0.</span>);
+        <span class="macro">assert_eq!</span>(p[<span class="number">0</span>].x, <span class="number">0.</span>);
+        <span class="macro">assert_eq!</span>(p[<span class="number">0</span>].y, <span class="number">0.</span>);
+        <span class="macro">assert_eq!</span>(p[<span class="number">0</span>].z, <span class="number">0.</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">1</span>].<span class="ident">x</span>, <span class="number">1.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">1</span>].<span class="ident">y</span>, <span class="number">1.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">1</span>].<span class="ident">z</span>, <span class="number">1.</span>);
+        <span class="macro">assert_eq!</span>(p[<span class="number">1</span>].x, <span class="number">1.</span>);
+        <span class="macro">assert_eq!</span>(p[<span class="number">1</span>].y, <span class="number">1.</span>);
+        <span class="macro">assert_eq!</span>(p[<span class="number">1</span>].z, <span class="number">1.</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">2</span>].<span class="ident">x</span>, <span class="number">2.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">2</span>].<span class="ident">y</span>, <span class="number">3.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">2</span>].<span class="ident">z</span>, <span class="op">-</span><span class="number">1.</span>);
+        <span class="macro">assert_eq!</span>(p[<span class="number">2</span>].x, <span class="number">2.</span>);
+        <span class="macro">assert_eq!</span>(p[<span class="number">2</span>].y, <span class="number">3.</span>);
+        <span class="macro">assert_eq!</span>(p[<span class="number">2</span>].z, -<span class="number">1.</span>);
 
-        <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">pol</span>).<span class="ident">unwrap</span>());
+        <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, serde_json::to_string(<span class="kw-2">&amp;</span>pol).unwrap());
     }
 
-    <span class="comment">// use crate::vector3d::Vector3D;</span>
+    <span class="comment">// use crate::vector3d::Vector3D;
 
-    <span class="comment">// #[test]</span>
-    <span class="comment">// fn test_polygon_intersect() {</span>
-    <span class="comment">//     // It should not work if we don&#39;t close it.</span>
-    <span class="comment">//     let mut the_loop = Loop3D::new();</span>
-    <span class="comment">//     let l = 20. as Float;</span>
-    <span class="comment">//     the_loop.push(Point3D::new(-l, -l, 0.)).unwrap();</span>
-    <span class="comment">//     the_loop.push(Point3D::new(l, -l, 0.)).unwrap();</span>
-    <span class="comment">//     the_loop.push(Point3D::new(l, l, 0.)).unwrap();</span>
-    <span class="comment">//     the_loop.push(Point3D::new(-l, l, 0.)).unwrap();</span>
+    // #[test]
+    // fn test_polygon_intersect() {
+    //     // It should not work if we don&#39;t close it.
+    //     let mut the_loop = Loop3D::new();
+    //     let l = 20. as Float;
+    //     the_loop.push(Point3D::new(-l, -l, 0.)).unwrap();
+    //     the_loop.push(Point3D::new(l, -l, 0.)).unwrap();
+    //     the_loop.push(Point3D::new(l, l, 0.)).unwrap();
+    //     the_loop.push(Point3D::new(-l, l, 0.)).unwrap();
 
-    <span class="comment">//     the_loop.close().unwrap();</span>
+    //     the_loop.close().unwrap();
 
-    <span class="comment">//     let polygon = Polygon3D::new(the_loop).unwrap();</span>
+    //     let polygon = Polygon3D::new(the_loop).unwrap();
 
-    <span class="comment">//     let ray = Ray3D {</span>
-    <span class="comment">//         origin: Point3D::new(2.1, -3.1, 100.),</span>
-    <span class="comment">//         direction: Vector3D::new(0., 0., -1.),</span>
-    <span class="comment">//     };</span>
-    <span class="comment">//     if let Some(t) = polygon.intersect(&amp;ray) {</span>
-    <span class="comment">//         let (normal, side) = polygon.normal_at_intersection(&amp;ray, t);</span>
-    <span class="comment">//         assert_eq!(side, SurfaceSide::Front);</span>
-    <span class="comment">//         assert_eq!(normal, Vector3D::new(0., 0., 1.));</span>
-    <span class="comment">//         assert_eq!(t, 100.);</span>
-    <span class="comment">//     } else {</span>
-    <span class="comment">//         panic!(&quot;Did not intersect!&quot;)</span>
-    <span class="comment">//     }</span>
+    //     let ray = Ray3D {
+    //         origin: Point3D::new(2.1, -3.1, 100.),
+    //         direction: Vector3D::new(0., 0., -1.),
+    //     };
+    //     if let Some(t) = polygon.intersect(&amp;ray) {
+    //         let (normal, side) = polygon.normal_at_intersection(&amp;ray, t);
+    //         assert_eq!(side, SurfaceSide::Front);
+    //         assert_eq!(normal, Vector3D::new(0., 0., 1.));
+    //         assert_eq!(t, 100.);
+    //     } else {
+    //         panic!(&quot;Did not intersect!&quot;)
+    //     }
 
-    <span class="comment">//     let ray = Ray3D {</span>
-    <span class="comment">//         origin: Point3D::new(2.1, -3.1, -100.),</span>
-    <span class="comment">//         direction: Vector3D::new(0., 0., 1.),</span>
-    <span class="comment">//     };</span>
-    <span class="comment">//     if let Some(t) = polygon.intersect(&amp;ray) {</span>
-    <span class="comment">//         let (normal, side) = polygon.normal_at_intersection(&amp;ray, t);</span>
-    <span class="comment">//         assert_eq!(side, SurfaceSide::Back);</span>
-    <span class="comment">//         assert_eq!(normal, Vector3D::new(0., 0., -1.));</span>
-    <span class="comment">//         assert_eq!(t, 100.);</span>
-    <span class="comment">//     } else {</span>
-    <span class="comment">//         panic!(&quot;Did not intersect!&quot;)</span>
-    <span class="comment">//     }</span>
-    <span class="comment">// }</span>
+    //     let ray = Ray3D {
+    //         origin: Point3D::new(2.1, -3.1, -100.),
+    //         direction: Vector3D::new(0., 0., 1.),
+    //     };
+    //     if let Some(t) = polygon.intersect(&amp;ray) {
+    //         let (normal, side) = polygon.normal_at_intersection(&amp;ray, t);
+    //         assert_eq!(side, SurfaceSide::Back);
+    //         assert_eq!(normal, Vector3D::new(0., 0., -1.));
+    //         assert_eq!(t, 100.);
+    //     } else {
+    //         panic!(&quot;Did not intersect!&quot;)
+    //     }
+    // }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="comment">// It should not work if we don&#39;t close it.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">the_loop</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">2.</span> <span class="kw">as</span> <span class="ident">Float</span>;
-        <span class="ident">the_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span>, <span class="op">-</span><span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">the_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span>, <span class="op">-</span><span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">the_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span>, <span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">the_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span>, <span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="comment">// It should not work if we don&#39;t close it.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>the_loop = Loop3D::new();
+        <span class="kw">let </span>l = <span class="number">2. </span><span class="kw">as </span>Float;
+        the_loop.push(Point3D::new(-l, -l, <span class="number">0.</span>)).unwrap();
+        the_loop.push(Point3D::new(l, -l, <span class="number">0.</span>)).unwrap();
+        the_loop.push(Point3D::new(l, l, <span class="number">0.</span>)).unwrap();
+        the_loop.push(Point3D::new(-l, l, <span class="number">0.</span>)).unwrap();
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">Polygon3D::new</span>(<span class="ident">the_loop</span>).<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(!Polygon3D::new(the_loop).is_ok());
 
-        <span class="comment">// It should work if we close it.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">the_loop</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">2.</span> <span class="kw">as</span> <span class="ident">Float</span>;
-        <span class="ident">the_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span>, <span class="op">-</span><span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">the_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span>, <span class="op">-</span><span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">the_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span>, <span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">the_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span>, <span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">the_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
+        <span class="comment">// It should work if we close it.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>the_loop = Loop3D::new();
+        <span class="kw">let </span>l = <span class="number">2. </span><span class="kw">as </span>Float;
+        the_loop.push(Point3D::new(-l, -l, <span class="number">0.</span>)).unwrap();
+        the_loop.push(Point3D::new(l, -l, <span class="number">0.</span>)).unwrap();
+        the_loop.push(Point3D::new(l, l, <span class="number">0.</span>)).unwrap();
+        the_loop.push(Point3D::new(-l, l, <span class="number">0.</span>)).unwrap();
+        the_loop.close().unwrap();
 
-        <span class="kw">let</span> <span class="ident">poly</span> <span class="op">=</span> <span class="ident">Polygon3D::new</span>(<span class="ident">the_loop</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>((<span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">poly</span>.<span class="ident">area</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">poly</span>.<span class="ident">normal</span>.<span class="ident">is_zero</span>());
+        <span class="kw">let </span>poly = Polygon3D::new(the_loop).unwrap();
+        <span class="macro">assert!</span>((<span class="number">2. </span>* l * <span class="number">2. </span>* l - poly.area).abs() &lt; <span class="number">1e-4</span>);
+        <span class="macro">assert!</span>(!poly.normal.is_zero());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_test_cut_hole</span>() {
-        <span class="comment">// A square with the center at the origin.</span>
-        <span class="comment">/*****/</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">outer_loop</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">2.</span> <span class="kw">as</span> <span class="ident">Float</span>;
-        <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span>, <span class="op">-</span><span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span>, <span class="op">-</span><span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span>, <span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span>, <span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_test_cut_hole() {
+        <span class="comment">// A square with the center at the origin.
+        /*****/
+        </span><span class="kw">let </span><span class="kw-2">mut </span>outer_loop = Loop3D::new();
+        <span class="kw">let </span>l = <span class="number">2. </span><span class="kw">as </span>Float;
+        outer_loop.push(Point3D::new(-l, -l, <span class="number">0.</span>)).unwrap();
+        outer_loop.push(Point3D::new(l, -l, <span class="number">0.</span>)).unwrap();
+        outer_loop.push(Point3D::new(l, l, <span class="number">0.</span>)).unwrap();
+        outer_loop.push(Point3D::new(-l, l, <span class="number">0.</span>)).unwrap();
+        outer_loop.close().unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">poly</span> <span class="op">=</span> <span class="ident">Polygon3D::new</span>(<span class="ident">outer_loop</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>((<span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">poly</span>.<span class="ident">area</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">poly</span>.<span class="ident">inner</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>poly = Polygon3D::new(outer_loop).unwrap();
+        <span class="macro">assert!</span>((<span class="number">2. </span>* l * <span class="number">2. </span>* l - poly.area).abs() &lt; <span class="number">1e-4</span>);
+        <span class="macro">assert_eq!</span>(poly.inner.len(), <span class="number">0</span>);
 
-        <span class="comment">// Add hole</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hole</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">2.</span> <span class="kw">as</span> <span class="ident">Float</span>;
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
+        <span class="comment">// Add hole
+        </span><span class="kw">let </span><span class="kw-2">mut </span>hole = Loop3D::new();
+        <span class="kw">let </span>l = <span class="number">2. </span><span class="kw">as </span>Float;
+        hole.push(Point3D::new(-l / <span class="number">2.</span>, -l / <span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        hole.push(Point3D::new(l / <span class="number">2.</span>, -l / <span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        hole.push(Point3D::new(l / <span class="number">2.</span>, l / <span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        hole.push(Point3D::new(-l / <span class="number">2.</span>, l / <span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        hole.close().unwrap();
 
-        <span class="ident">poly</span>.<span class="ident">cut_hole</span>(<span class="ident">hole</span>).<span class="ident">unwrap</span>();
+        poly.cut_hole(hole).unwrap();
 
         <span class="macro">assert!</span>(
-            (<span class="ident">poly</span>.<span class="ident">area</span> <span class="op">-</span> (<span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">l</span> <span class="op">*</span> <span class="ident">l</span>)).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>,
+            (poly.area - (<span class="number">2. </span>* l * <span class="number">2. </span>* l - l * l)).abs() &lt; <span class="number">1e-4</span>,
             <span class="string">&quot;err is {}&quot;</span>,
-            (<span class="ident">poly</span>.<span class="ident">area</span> <span class="op">-</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">*</span> <span class="number">2.</span> <span class="op">*</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">l</span> <span class="op">*</span> <span class="ident">l</span>).<span class="ident">abs</span>()
+            (poly.area - <span class="number">2. </span>* l * <span class="number">2. </span>* l - l * l).abs()
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">poly</span>.<span class="ident">inner</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(poly.inner.len(), <span class="number">1</span>);
 
-        <span class="comment">/* Add hole in a different plane */</span>
-        <span class="comment">/*****/</span>
+        <span class="comment">/* Add hole in a different plane */
+        /*****/
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">outer_loop</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">2.</span> <span class="kw">as</span> <span class="ident">Float</span>;
-        <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span>, <span class="op">-</span><span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span>, <span class="op">-</span><span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span>, <span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span>, <span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
+        </span><span class="kw">let </span><span class="kw-2">mut </span>outer_loop = Loop3D::new();
+        <span class="kw">let </span>l = <span class="number">2. </span><span class="kw">as </span>Float;
+        outer_loop.push(Point3D::new(-l, -l, <span class="number">0.</span>)).unwrap();
+        outer_loop.push(Point3D::new(l, -l, <span class="number">0.</span>)).unwrap();
+        outer_loop.push(Point3D::new(l, l, <span class="number">0.</span>)).unwrap();
+        outer_loop.push(Point3D::new(-l, l, <span class="number">0.</span>)).unwrap();
+        outer_loop.close().unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">poly</span> <span class="op">=</span> <span class="ident">Polygon3D::new</span>(<span class="ident">outer_loop</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>poly = Polygon3D::new(outer_loop).unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hole</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">2.</span> <span class="kw">as</span> <span class="ident">Float</span>;
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="ident">l</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>hole = Loop3D::new();
+        <span class="kw">let </span>l = <span class="number">2. </span><span class="kw">as </span>Float;
+        hole.push(Point3D::new(-l / <span class="number">2.</span>, -l / <span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        hole.push(Point3D::new(l / <span class="number">2.</span>, -l / <span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        hole.push(Point3D::new(<span class="number">0.</span>, l / <span class="number">2.</span>, l)).unwrap();
+        hole.close().unwrap();
 
-        <span class="comment">// should fail</span>
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">poly</span>.<span class="ident">cut_hole</span>(<span class="ident">hole</span>).<span class="ident">is_ok</span>());
+        <span class="comment">// should fail
+        </span><span class="macro">assert!</span>(!poly.cut_hole(hole).is_ok());
 
-        <span class="comment">/* Add hole that contains another whole */</span>
-        <span class="comment">/*****/</span>
+        <span class="comment">/* Add hole that contains another whole */
+        /*****/
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">outer_loop</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">2.</span> <span class="kw">as</span> <span class="ident">Float</span>;
-        <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span>, <span class="op">-</span><span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span>, <span class="op">-</span><span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span>, <span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span>, <span class="ident">l</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">poly</span> <span class="op">=</span> <span class="ident">Polygon3D::new</span>(<span class="ident">outer_loop</span>).<span class="ident">unwrap</span>();
+        </span><span class="kw">let </span><span class="kw-2">mut </span>outer_loop = Loop3D::new();
+        <span class="kw">let </span>l = <span class="number">2. </span><span class="kw">as </span>Float;
+        outer_loop.push(Point3D::new(-l, -l, <span class="number">0.</span>)).unwrap();
+        outer_loop.push(Point3D::new(l, -l, <span class="number">0.</span>)).unwrap();
+        outer_loop.push(Point3D::new(l, l, <span class="number">0.</span>)).unwrap();
+        outer_loop.push(Point3D::new(-l, l, <span class="number">0.</span>)).unwrap();
+        outer_loop.close().unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>poly = Polygon3D::new(outer_loop).unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hole</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">2.</span> <span class="kw">as</span> <span class="ident">Float</span>;
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="ident">l</span> <span class="op">/</span> <span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
-        <span class="ident">poly</span>.<span class="ident">cut_hole</span>(<span class="ident">hole</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>hole = Loop3D::new();
+        <span class="kw">let </span>l = <span class="number">2. </span><span class="kw">as </span>Float;
+        hole.push(Point3D::new(-l / <span class="number">2.</span>, -l / <span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        hole.push(Point3D::new(l / <span class="number">2.</span>, -l / <span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        hole.push(Point3D::new(l / <span class="number">2.</span>, l / <span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        hole.push(Point3D::new(-l / <span class="number">2.</span>, l / <span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        hole.close().unwrap();
+        poly.cut_hole(hole).unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hole</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">2.</span> <span class="kw">as</span> <span class="ident">Float</span>;
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">1.5</span>, <span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">1.5</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span> <span class="op">/</span> <span class="number">1.5</span>, <span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">1.5</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="ident">l</span> <span class="op">/</span> <span class="number">1.5</span>, <span class="ident">l</span> <span class="op">/</span> <span class="number">1.5</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span> <span class="op">/</span> <span class="number">1.5</span>, <span class="ident">l</span> <span class="op">/</span> <span class="number">1.5</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">hole</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>hole = Loop3D::new();
+        <span class="kw">let </span>l = <span class="number">2. </span><span class="kw">as </span>Float;
+        hole.push(Point3D::new(-l / <span class="number">1.5</span>, -l / <span class="number">1.5</span>, <span class="number">0.</span>)).unwrap();
+        hole.push(Point3D::new(l / <span class="number">1.5</span>, -l / <span class="number">1.5</span>, <span class="number">0.</span>)).unwrap();
+        hole.push(Point3D::new(l / <span class="number">1.5</span>, l / <span class="number">1.5</span>, <span class="number">0.</span>)).unwrap();
+        hole.push(Point3D::new(-l / <span class="number">1.5</span>, l / <span class="number">1.5</span>, <span class="number">0.</span>)).unwrap();
+        hole.close().unwrap();
 
-        <span class="comment">// should fail</span>
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">poly</span>.<span class="ident">cut_hole</span>(<span class="ident">hole</span>).<span class="ident">is_ok</span>());
+        <span class="comment">// should fail
+        </span><span class="macro">assert!</span>(!poly.cut_hole(hole).is_ok());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_get_closed_loop</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">outer</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_get_closed_loop() {
+        <span class="kw">let </span><span class="kw-2">mut </span>outer = Loop3D::new();
 
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">6.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">6.</span>, <span class="number">6.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="number">6.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
+        outer.push(Point3D::new(-<span class="number">2.</span>, -<span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        outer.push(Point3D::new(<span class="number">6.</span>, -<span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        outer.push(Point3D::new(<span class="number">6.</span>, <span class="number">6.</span>, <span class="number">0.</span>)).unwrap();
+        outer.push(Point3D::new(-<span class="number">2.</span>, <span class="number">6.</span>, <span class="number">0.</span>)).unwrap();
 
-        <span class="ident">outer</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
+        outer.close().unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Polygon3D::new</span>(<span class="ident">outer</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>p = Polygon3D::new(outer).unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="ident">inner</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>(); <span class="comment">// 3</span>
-        <span class="ident">inner</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>(); <span class="comment">// 2</span>
-        <span class="ident">inner</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>(); <span class="comment">// 1</span>
-        <span class="ident">inner</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>(); <span class="comment">// 0</span>
-        <span class="ident">inner</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = Loop3D::new();
+        inner.push(Point3D::new(-<span class="number">1.</span>, -<span class="number">1.</span>, <span class="number">0.</span>)).unwrap(); <span class="comment">// 3
+        </span>inner.push(Point3D::new(<span class="number">1.</span>, -<span class="number">1.</span>, <span class="number">0.</span>)).unwrap(); <span class="comment">// 2
+        </span>inner.push(Point3D::new(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).unwrap(); <span class="comment">// 1
+        </span>inner.push(Point3D::new(-<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).unwrap(); <span class="comment">// 0
+        </span>inner.close().unwrap();
 
-        <span class="ident">p</span>.<span class="ident">cut_hole</span>(<span class="ident">inner</span>).<span class="ident">unwrap</span>();
+        p.cut_hole(inner).unwrap();
 
-        <span class="kw">let</span> <span class="ident">closed</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">get_closed_loop</span>();
+        <span class="kw">let </span>closed = p.get_closed_loop();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">closed</span>.<span class="ident">len</span>(), <span class="number">10</span>);
+        <span class="macro">assert_eq!</span>(closed.len(), <span class="number">10</span>);
 
-        <span class="comment">// 0</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">0</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 0
+        </span><span class="kw">let </span>p = closed[<span class="number">0</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(-<span class="number">2.</span>, -<span class="number">2.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 1</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">1</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 1
+        </span><span class="kw">let </span>p = closed[<span class="number">1</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(-<span class="number">1.</span>, -<span class="number">1.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 2</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">2</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 2
+        </span><span class="kw">let </span>p = closed[<span class="number">2</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(-<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 3</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">3</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 3
+        </span><span class="kw">let </span>p = closed[<span class="number">3</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 4</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">4</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 4
+        </span><span class="kw">let </span>p = closed[<span class="number">4</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(<span class="number">1.</span>, -<span class="number">1.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 5</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">5</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 5
+        </span><span class="kw">let </span>p = closed[<span class="number">5</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(-<span class="number">1.</span>, -<span class="number">1.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 6... Back to exterior</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">6</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 6... Back to exterior
+        </span><span class="kw">let </span>p = closed[<span class="number">6</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(-<span class="number">2.</span>, -<span class="number">2.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 7.</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">7</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">6.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 7.
+        </span><span class="kw">let </span>p = closed[<span class="number">7</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(<span class="number">6.</span>, -<span class="number">2.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 8</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">8</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">6.</span>, <span class="number">6.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 8
+        </span><span class="kw">let </span>p = closed[<span class="number">8</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(<span class="number">6.</span>, <span class="number">6.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 9</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">9</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="number">6.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 9
+        </span><span class="kw">let </span>p = closed[<span class="number">9</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(-<span class="number">2.</span>, <span class="number">6.</span>, <span class="number">0.</span>)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_get_closed_loop_with_clean</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">outer</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>(); <span class="comment">// colinear point</span>
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">6.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">6.</span>, <span class="number">6.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="number">6.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">outer</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_get_closed_loop_with_clean() {
+        <span class="kw">let </span><span class="kw-2">mut </span>outer = Loop3D::new();
+        outer.push(Point3D::new(-<span class="number">2.</span>, -<span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        outer.push(Point3D::new(<span class="number">0.</span>, -<span class="number">2.</span>, <span class="number">0.</span>)).unwrap(); <span class="comment">// colinear point
+        </span>outer.push(Point3D::new(<span class="number">6.</span>, -<span class="number">2.</span>, <span class="number">0.</span>)).unwrap();
+        outer.push(Point3D::new(<span class="number">6.</span>, <span class="number">6.</span>, <span class="number">0.</span>)).unwrap();
+        outer.push(Point3D::new(-<span class="number">2.</span>, <span class="number">6.</span>, <span class="number">0.</span>)).unwrap();
+        outer.close().unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Polygon3D::new</span>(<span class="ident">outer</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>p = Polygon3D::new(outer).unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner_loop</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="ident">inner_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>(); <span class="comment">// 0</span>
-        <span class="ident">inner_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>(); <span class="comment">// 1</span>
-        <span class="ident">inner_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>(); <span class="comment">// 2. colinear point</span>
-        <span class="ident">inner_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>(); <span class="comment">// 3</span>
-        <span class="ident">inner_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>(); <span class="comment">// 4</span>
-        <span class="ident">inner_loop</span>.<span class="ident">push</span>(<span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).<span class="ident">unwrap</span>(); <span class="comment">// 5. colinear point</span>
-        <span class="ident">inner_loop</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>inner_loop = Loop3D::new();
+        inner_loop.push(Point3D::new(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).unwrap(); <span class="comment">// 0
+        </span>inner_loop.push(Point3D::new(<span class="number">1.</span>, -<span class="number">1.</span>, <span class="number">0.</span>)).unwrap(); <span class="comment">// 1
+        </span>inner_loop.push(Point3D::new(<span class="number">0.</span>, -<span class="number">1.</span>, <span class="number">0.</span>)).unwrap(); <span class="comment">// 2. colinear point
+        </span>inner_loop.push(Point3D::new(-<span class="number">1.</span>, -<span class="number">1.</span>, <span class="number">0.</span>)).unwrap(); <span class="comment">// 3
+        </span>inner_loop.push(Point3D::new(-<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).unwrap(); <span class="comment">// 4
+        </span>inner_loop.push(Point3D::new(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>)).unwrap(); <span class="comment">// 5. colinear point
+        </span>inner_loop.close().unwrap();
 
-        <span class="ident">p</span>.<span class="ident">cut_hole</span>(<span class="ident">inner_loop</span>).<span class="ident">unwrap</span>();
+        p.cut_hole(inner_loop).unwrap();
 
-        <span class="kw">let</span> <span class="ident">closed</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">get_closed_loop</span>();
+        <span class="kw">let </span>closed = p.get_closed_loop();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">closed</span>.<span class="ident">len</span>(), <span class="number">10</span>);
+        <span class="macro">assert_eq!</span>(closed.len(), <span class="number">10</span>);
 
-        <span class="comment">// 0</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">0</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 0
+        </span><span class="kw">let </span>p = closed[<span class="number">0</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(-<span class="number">2.</span>, -<span class="number">2.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 1</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">1</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 1
+        </span><span class="kw">let </span>p = closed[<span class="number">1</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(-<span class="number">1.</span>, -<span class="number">1.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 2</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">2</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 2
+        </span><span class="kw">let </span>p = closed[<span class="number">2</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(-<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 3</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">3</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 3
+        </span><span class="kw">let </span>p = closed[<span class="number">3</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 4</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">4</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 4
+        </span><span class="kw">let </span>p = closed[<span class="number">4</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(<span class="number">1.</span>, -<span class="number">1.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 5</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">5</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 5
+        </span><span class="kw">let </span>p = closed[<span class="number">5</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(-<span class="number">1.</span>, -<span class="number">1.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 6... Back to exterior</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">6</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 6... Back to exterior
+        </span><span class="kw">let </span>p = closed[<span class="number">6</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(-<span class="number">2.</span>, -<span class="number">2.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 7.</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">7</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">6.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 7.
+        </span><span class="kw">let </span>p = closed[<span class="number">7</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(<span class="number">6.</span>, -<span class="number">2.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 8</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">8</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">6.</span>, <span class="number">6.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 8
+        </span><span class="kw">let </span>p = closed[<span class="number">8</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(<span class="number">6.</span>, <span class="number">6.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// 9</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">closed</span>[<span class="number">9</span>];
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="number">6.</span>, <span class="number">0.</span>)));
+        <span class="comment">// 9
+        </span><span class="kw">let </span>p = closed[<span class="number">9</span>];
+        <span class="macro">assert!</span>(p.compare(Point3D::new(-<span class="number">2.</span>, <span class="number">6.</span>, <span class="number">0.</span>)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_contains_segment</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">outer</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="kw">let</span> <span class="ident">p0</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">p1</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">2.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">p2</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">p3</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">2.</span>, <span class="number">2.</span>, <span class="number">0.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_contains_segment() {
+        <span class="kw">let </span><span class="kw-2">mut </span>outer = Loop3D::new();
+        <span class="kw">let </span>p0 = Point3D::new(-<span class="number">2.</span>, -<span class="number">2.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>p1 = Point3D::new(<span class="number">2.</span>, -<span class="number">2.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>p2 = Point3D::new(<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>p3 = Point3D::new(-<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">0.</span>);
 
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">p0</span>).<span class="ident">unwrap</span>(); <span class="comment">// 0</span>
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">p1</span>).<span class="ident">unwrap</span>(); <span class="comment">// 1</span>
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">p2</span>).<span class="ident">unwrap</span>(); <span class="comment">// 2</span>
-        <span class="ident">outer</span>.<span class="ident">push</span>(<span class="ident">p3</span>).<span class="ident">unwrap</span>(); <span class="comment">// 3</span>
-        <span class="ident">outer</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
+        outer.push(p0).unwrap(); <span class="comment">// 0
+        </span>outer.push(p1).unwrap(); <span class="comment">// 1
+        </span>outer.push(p2).unwrap(); <span class="comment">// 2
+        </span>outer.push(p3).unwrap(); <span class="comment">// 3
+        </span>outer.close().unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Loop3D::new</span>();
-        <span class="kw">let</span> <span class="ident">ip0</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">ip1</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">ip2</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">ip3</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>);
-        <span class="ident">inner</span>.<span class="ident">push</span>(<span class="ident">ip0</span>).<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>.<span class="ident">push</span>(<span class="ident">ip1</span>).<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>.<span class="ident">push</span>(<span class="ident">ip2</span>).<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>.<span class="ident">push</span>(<span class="ident">ip3</span>).<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = Loop3D::new();
+        <span class="kw">let </span>ip0 = Point3D::new(-<span class="number">1.</span>, -<span class="number">1.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>ip1 = Point3D::new(<span class="number">1.</span>, -<span class="number">1.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>ip2 = Point3D::new(<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>ip3 = Point3D::new(-<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">0.</span>);
+        inner.push(ip0).unwrap();
+        inner.push(ip1).unwrap();
+        inner.push(ip2).unwrap();
+        inner.push(ip3).unwrap();
+        inner.close().unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident">Polygon3D::new</span>(<span class="ident">outer</span>).<span class="ident">unwrap</span>();
-        <span class="ident">l</span>.<span class="ident">cut_hole</span>(<span class="ident">inner</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>l = Polygon3D::new(outer).unwrap();
+        l.cut_hole(inner).unwrap();
 
-        <span class="comment">// Existing segments, in both directions</span>
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">p0</span>, <span class="ident">p1</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">p1</span>, <span class="ident">p2</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">p2</span>, <span class="ident">p3</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">p3</span>, <span class="ident">p0</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">p3</span>, <span class="ident">p2</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">p2</span>, <span class="ident">p1</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">p1</span>, <span class="ident">p0</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">p0</span>, <span class="ident">p3</span>)));
+        <span class="comment">// Existing segments, in both directions
+        </span><span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(p0, p1)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(p1, p2)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(p2, p3)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(p3, p0)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(p3, p2)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(p2, p1)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(p1, p0)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(p0, p3)));
 
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">ip0</span>, <span class="ident">ip1</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">ip1</span>, <span class="ident">ip2</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">ip2</span>, <span class="ident">ip3</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">ip3</span>, <span class="ident">ip0</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">ip3</span>, <span class="ident">ip2</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">ip2</span>, <span class="ident">ip1</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">ip1</span>, <span class="ident">ip0</span>)));
-        <span class="macro">assert!</span>(<span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">ip0</span>, <span class="ident">ip3</span>)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(ip0, ip1)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(ip1, ip2)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(ip2, ip3)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(ip3, ip0)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(ip3, ip2)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(ip2, ip1)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(ip1, ip0)));
+        <span class="macro">assert!</span>(l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(ip0, ip3)));
 
-        <span class="comment">// Diagonals</span>
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">p1</span>, <span class="ident">p3</span>)));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">p3</span>, <span class="ident">p1</span>)));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">p0</span>, <span class="ident">p2</span>)));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">p2</span>, <span class="ident">p0</span>)));
+        <span class="comment">// Diagonals
+        </span><span class="macro">assert!</span>(!l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(p1, p3)));
+        <span class="macro">assert!</span>(!l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(p3, p1)));
+        <span class="macro">assert!</span>(!l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(p0, p2)));
+        <span class="macro">assert!</span>(!l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(p2, p0)));
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">ip1</span>, <span class="ident">ip3</span>)));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">ip3</span>, <span class="ident">ip1</span>)));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">ip0</span>, <span class="ident">ip2</span>)));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">ip2</span>, <span class="ident">ip0</span>)));
+        <span class="macro">assert!</span>(!l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(ip1, ip3)));
+        <span class="macro">assert!</span>(!l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(ip3, ip1)));
+        <span class="macro">assert!</span>(!l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(ip0, ip2)));
+        <span class="macro">assert!</span>(!l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(ip2, ip0)));
 
-        <span class="comment">// Segment inside</span>
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(
-            <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">0.5</span>, <span class="op">-</span><span class="number">0.5</span>, <span class="number">0.</span>),
-            <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.</span>),
+        <span class="comment">// Segment inside
+        </span><span class="macro">assert!</span>(!l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(
+            Point3D::new(-<span class="number">0.5</span>, -<span class="number">0.5</span>, <span class="number">0.</span>),
+            Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.</span>),
         )));
 
-        <span class="comment">// Segment that crosses from in to out</span>
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(
-            <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">0.5</span>, <span class="op">-</span><span class="number">0.5</span>, <span class="number">0.</span>),
-            <span class="ident">Point3D::new</span>(<span class="number">10.5</span>, <span class="number">10.5</span>, <span class="number">0.</span>),
+        <span class="comment">// Segment that crosses from in to out
+        </span><span class="macro">assert!</span>(!l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(
+            Point3D::new(-<span class="number">0.5</span>, -<span class="number">0.5</span>, <span class="number">0.</span>),
+            Point3D::new(<span class="number">10.5</span>, <span class="number">10.5</span>, <span class="number">0.</span>),
         )));
 
-        <span class="comment">// Segment contained in another segment</span>
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">l</span>.<span class="ident">contains_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(
-            <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="number">1.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>),
-            <span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="op">-</span><span class="number">2.</span>, <span class="number">0.</span>),
+        <span class="comment">// Segment contained in another segment
+        </span><span class="macro">assert!</span>(!l.contains_segment(<span class="kw-2">&amp;</span>Segment3D::new(
+            Point3D::new(-<span class="number">1.</span>, -<span class="number">2.</span>, <span class="number">0.</span>),
+            Point3D::new(<span class="number">1.</span>, -<span class="number">2.</span>, <span class="number">0.</span>),
         )));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

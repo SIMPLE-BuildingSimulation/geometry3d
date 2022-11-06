@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/plane3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>plane3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/plane3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>plane3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>
 <script>
   "use strict";
@@ -197,126 +197,126 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/</span>
+*/
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::Float;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Point3D</span>, <span class="ident">Ray3D</span>, <span class="ident">Vector3D</span>};
+<span class="kw">use crate</span>::{Point3D, Ray3D, Vector3D};
 
-<span class="doccomment">/// Describes a plane based on a [`Point3D`] (`P`) contained in the plane and</span>
-<span class="doccomment">/// a [`Vector3D`] (`N`) normal to the plane.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A vector of these characteristics can also be described by an equation</span>
-<span class="doccomment">/// ```math</span>
-<span class="doccomment">/// 0 = Ax+By+Cz+D</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Where $`A = \vec{N}_x`$, $`B = \vec{N}_y`$, $`C = \vec{N}_z`$ and $`D = \vec{N}\cdot\vec{P}`$,</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Plane3D</span> {
-    <span class="comment">// A point contained in the plane</span>
-    <span class="comment">//point: Point3D,</span>
-    <span class="doccomment">/// Normal to the plane</span>
-    <span class="kw">pub</span> <span class="ident">normal</span>: <span class="ident">Vector3D</span>,
+<span class="doccomment">/// Describes a plane based on a [`Point3D`] (`P`) contained in the plane and
+/// a [`Vector3D`] (`N`) normal to the plane.
+///
+/// A vector of these characteristics can also be described by an equation
+/// ```math
+/// 0 = Ax+By+Cz+D
+/// ```
+/// Where $`A = \vec{N}_x`$, $`B = \vec{N}_y`$, $`C = \vec{N}_z`$ and $`D = \vec{N}\cdot\vec{P}`$,
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Plane3D {
+    <span class="comment">// A point contained in the plane
+    //point: Point3D,
+    </span><span class="doccomment">/// Normal to the plane
+    </span><span class="kw">pub </span>normal: Vector3D,
 
-    <span class="doccomment">/// The D coefficient in the equation explained earlier.    </span>
-    <span class="kw">pub</span> <span class="ident">d</span>: <span class="ident">Float</span>,
+    <span class="doccomment">/// The D coefficient in the equation explained earlier.    
+    </span><span class="kw">pub </span>d: Float,
 }
 
-<span class="kw">impl</span> <span class="ident">Plane3D</span> {
-    <span class="doccomment">/// Creates a new plane</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">point</span>: <span class="ident">Point3D</span>, <span class="ident">normal</span>: <span class="ident">Vector3D</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">normal</span> <span class="op">=</span> <span class="ident">normal</span>;
-        <span class="ident">normal</span>.<span class="ident">normalize</span>();
-        <span class="self">Self</span> {
-            <span class="ident">normal</span>,
-            <span class="comment">// point,</span>
-            <span class="ident">d</span>: <span class="ident">normal</span> <span class="op">*</span> <span class="ident">point</span>,
+<span class="kw">impl </span>Plane3D {
+    <span class="doccomment">/// Creates a new plane
+    </span><span class="kw">pub fn </span>new(point: Point3D, normal: Vector3D) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>normal = normal;
+        normal.normalize();
+        <span class="self">Self </span>{
+            normal,
+            <span class="comment">// point,
+            </span>d: normal * point,
         }
     }
 
-    <span class="doccomment">/// Tests whether a point is in a certain plane or not</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_point</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">point</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="ident">normal</span> <span class="op">*</span> <span class="ident">point</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">d</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span>
+    <span class="doccomment">/// Tests whether a point is in a certain plane or not
+    </span><span class="kw">pub fn </span>test_point(<span class="kw-2">&amp;</span><span class="self">self</span>, point: Point3D) -&gt; bool {
+        (<span class="self">self</span>.normal * point - <span class="self">self</span>.d).abs() &lt; Float::EPSILON
     }
 
-    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,</span>
-    <span class="doccomment">/// returning the distance to the plane.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">den</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">normal</span> <span class="op">*</span> <span class="ident">ray</span>.<span class="ident">direction</span>;
-        <span class="comment">// They do not intercect</span>
-        <span class="kw">if</span> <span class="ident">den</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">Float::EPSILON</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
+    /// returning the distance to the plane.
+    </span><span class="kw">pub fn </span>intersect(<span class="kw-2">&amp;</span><span class="self">self</span>, ray: <span class="kw-2">&amp;</span>Ray3D) -&gt; <span class="prelude-ty">Option</span>&lt;Float&gt; {
+        <span class="kw">let </span>den = <span class="self">self</span>.normal * ray.direction;
+        <span class="comment">// They do not intercect
+        </span><span class="kw">if </span>den.abs() &lt; Float::EPSILON {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">d</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">normal</span> <span class="op">*</span> <span class="ident">ray</span>.<span class="ident">origin</span>) <span class="op">/</span> <span class="ident">den</span>;
-        <span class="kw">if</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="number">0.</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// return</span>
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>)
+        <span class="kw">let </span>t = (<span class="self">self</span>.d - <span class="self">self</span>.normal * ray.origin) / den;
+        <span class="kw">if </span>t &lt; <span class="number">0. </span>{
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="comment">// return
+            </span><span class="prelude-val">Some</span>(t)
         }
     }
 }
 
-<span class="comment">// impl Intersect for Plane3D {</span>
+<span class="comment">// impl Intersect for Plane3D {
 
-<span class="comment">//     fn id(&amp;self)-&gt;&amp;&#39;static str{</span>
-<span class="comment">//         &quot;plane&quot;</span>
-<span class="comment">//     }</span>
+//     fn id(&amp;self)-&gt;&amp;&#39;static str{
+//         &quot;plane&quot;
+//     }
 
-<span class="comment">//     fn intersect(&amp;self, ray: &amp;Ray3D) -&gt; Option&lt;Float&gt; {</span>
-<span class="comment">//         let den = self.normal * ray.direction;</span>
-<span class="comment">//         // They do not intercect</span>
-<span class="comment">//         if den.abs() &lt; Float::EPSILON {</span>
-<span class="comment">//             return None;</span>
-<span class="comment">//         }</span>
-<span class="comment">//         let t = (self.d - self.normal * ray.origin) / den;</span>
-<span class="comment">//         if t &lt; 0. {</span>
-<span class="comment">//             None</span>
-<span class="comment">//         } else {</span>
-<span class="comment">//             // return</span>
-<span class="comment">//             Some(t)</span>
-<span class="comment">//         }</span>
-<span class="comment">//     }</span>
+//     fn intersect(&amp;self, ray: &amp;Ray3D) -&gt; Option&lt;Float&gt; {
+//         let den = self.normal * ray.direction;
+//         // They do not intercect
+//         if den.abs() &lt; Float::EPSILON {
+//             return None;
+//         }
+//         let t = (self.d - self.normal * ray.origin) / den;
+//         if t &lt; 0. {
+//             None
+//         } else {
+//             // return
+//             Some(t)
+//         }
+//     }
 
-<span class="comment">//     fn normal_at_intersection(&amp;self, ray: &amp;Ray3D, _t: Float) -&gt; (Vector3D, SurfaceSide) {</span>
-<span class="comment">//         let (side, normal) = SurfaceSide::get_side(self.normal, ray.direction);</span>
-<span class="comment">//         (normal, side)</span>
-<span class="comment">//     }</span>
-<span class="comment">// }</span>
+//     fn normal_at_intersection(&amp;self, ray: &amp;Ray3D, _t: Float) -&gt; (Vector3D, SurfaceSide) {
+//         let (side, normal) = SurfaceSide::get_side(self.normal, ray.direction);
+//         (normal, side)
+//     }
+// }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">testing</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</span><span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>testing {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">1.2</span>, <span class="number">2.2</span>, <span class="number">2.1</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">1.2</span>, <span class="number">3.1</span>, <span class="number">2.3</span>);
-        <span class="ident">n</span>.<span class="ident">normalize</span>();
-        <span class="kw">let</span> <span class="ident">plane</span> <span class="op">=</span> <span class="ident">Plane3D::new</span>(<span class="ident">p</span>, <span class="ident">n</span>);
-        <span class="macro">assert!</span>((<span class="ident">plane</span>.<span class="ident">d</span> <span class="op">-</span> <span class="ident">n</span> <span class="op">*</span> <span class="ident">p</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-4</span>);
-        <span class="comment">// assert_eq!(plane.d, n * p);</span>
-    }
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>p = Point3D::new(<span class="number">1.2</span>, <span class="number">2.2</span>, <span class="number">2.1</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>n = Vector3D::new(<span class="number">1.2</span>, <span class="number">3.1</span>, <span class="number">2.3</span>);
+        n.normalize();
+        <span class="kw">let </span>plane = Plane3D::new(p, n);
+        <span class="macro">assert!</span>((plane.d - n * p).abs() &lt; <span class="number">1e-4</span>);
+        <span class="comment">// assert_eq!(plane.d, n * p);
+    </span>}
 
-    <span class="comment">// #[test]</span>
-    <span class="comment">// fn test_plane_intersect() {</span>
-    <span class="comment">//     let p = Point3D::new(1.2, 2.2, 2.1);</span>
-    <span class="comment">//     let mut n = Vector3D::new(0., 0., 1.);</span>
-    <span class="comment">//     n.normalize();</span>
-    <span class="comment">//     let plane = Plane3D::new(p, n);</span>
-    <span class="comment">//     let ray = Ray3D {</span>
-    <span class="comment">//         origin: Point3D::new(2.1, -3.1, 100.),</span>
-    <span class="comment">//         direction: Vector3D::new(0., 0., -1.),</span>
-    <span class="comment">//     };</span>
-    <span class="comment">//     if let Some(t) = plane.intersect(&amp;ray) {</span>
-    <span class="comment">//         let (normal, side) = plane.normal_at_intersection(&amp;ray, t);</span>
-    <span class="comment">//         assert_eq!(side, SurfaceSide::Front);</span>
-    <span class="comment">//         assert_eq!(normal, plane.normal);</span>
-    <span class="comment">//         assert_eq!(t, 100. - p.z);</span>
-    <span class="comment">//     } else {</span>
-    <span class="comment">//         panic!(&quot;Did not intersect!&quot;)</span>
-    <span class="comment">//     }</span>
-    <span class="comment">// }</span>
-}
+    <span class="comment">// #[test]
+    // fn test_plane_intersect() {
+    //     let p = Point3D::new(1.2, 2.2, 2.1);
+    //     let mut n = Vector3D::new(0., 0., 1.);
+    //     n.normalize();
+    //     let plane = Plane3D::new(p, n);
+    //     let ray = Ray3D {
+    //         origin: Point3D::new(2.1, -3.1, 100.),
+    //         direction: Vector3D::new(0., 0., -1.),
+    //     };
+    //     if let Some(t) = plane.intersect(&amp;ray) {
+    //         let (normal, side) = plane.normal_at_intersection(&amp;ray, t);
+    //         assert_eq!(side, SurfaceSide::Front);
+    //         assert_eq!(normal, plane.normal);
+    //         assert_eq!(t, 100. - p.z);
+    //     } else {
+    //         panic!(&quot;Did not intersect!&quot;)
+    //     }
+    // }
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

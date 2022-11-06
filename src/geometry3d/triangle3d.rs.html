@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/triangle3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>triangle3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/triangle3d.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>triangle3d.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.9.0/dist/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>
 <script>
   "use strict";
@@ -937,866 +937,866 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/</span>
+*/
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::intersection</span>::{<span class="ident">IntersectionInfo</span>, <span class="ident">SurfaceSide</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RefCount</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::intersection::{IntersectionInfo, SurfaceSide};
+<span class="kw">use </span><span class="kw">crate</span>::RefCount;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Float</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">BBox3D</span>, <span class="ident">Point3D</span>, <span class="ident">Ray3D</span>, <span class="ident">Segment3D</span>, <span class="ident">Transform</span>, <span class="ident">Vector3D</span>};
+<span class="kw">use </span><span class="kw">crate</span>::Float;
+<span class="kw">use crate</span>::{BBox3D, Point3D, Ray3D, Segment3D, Transform, Vector3D};
 
-<span class="doccomment">/// Intersects a [`Ray3D`] in local coordinates with Triangle described by the</span>
-<span class="doccomment">/// [`Point3D`] `a`, `b`, and `c`. We use the [Möller–Trumbore intersection algorithm](https://en.wikipedia.org/wiki/Möller–Trumbore_intersection_algorithm).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns the [`Point3D`] of intersection and the values `u` and `v`, indicating</span>
-<span class="doccomment">/// the parametric coordinates of the point of intersection</span>
-<span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersect_triangle</span>(
-    <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
-    <span class="ident">vertex0</span>: <span class="ident">Point3D</span>,
-    <span class="ident">vertex1</span>: <span class="ident">Point3D</span>,
-    <span class="ident">vertex2</span>: <span class="ident">Point3D</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Point3D</span>, <span class="ident">Float</span>, <span class="ident">Float</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">edge1</span> <span class="op">=</span> <span class="ident">vertex1</span> <span class="op">-</span> <span class="ident">vertex0</span>;
-    <span class="kw">let</span> <span class="ident">edge2</span> <span class="op">=</span> <span class="ident">vertex2</span> <span class="op">-</span> <span class="ident">vertex0</span>;
-    <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">ray</span>.<span class="ident">direction</span>.<span class="ident">cross</span>(<span class="ident">edge2</span>);
-    <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">edge1</span> <span class="op">*</span> <span class="ident">h</span>;
-    <span class="kw">const</span> <span class="ident">TINY</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">100.</span> <span class="op">*</span> <span class="ident">Float::EPSILON</span>;
-    <span class="kw">if</span> <span class="ident">a</span> <span class="op">&gt;</span> <span class="op">-</span><span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="ident">a</span> <span class="op">&lt;</span> <span class="ident">TINY</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="doccomment">/// Intersects a [`Ray3D`] in local coordinates with Triangle described by the
+/// [`Point3D`] `a`, `b`, and `c`. We use the [Möller–Trumbore intersection algorithm](https://en.wikipedia.org/wiki/Möller–Trumbore_intersection_algorithm).
+///
+/// Returns the [`Point3D`] of intersection and the values `u` and `v`, indicating
+/// the parametric coordinates of the point of intersection
+///
+</span><span class="kw">pub fn </span>intersect_triangle(
+    ray: <span class="kw-2">&amp;</span>Ray3D,
+    vertex0: Point3D,
+    vertex1: Point3D,
+    vertex2: Point3D,
+) -&gt; <span class="prelude-ty">Option</span>&lt;(Point3D, Float, Float)&gt; {
+    <span class="kw">let </span>edge1 = vertex1 - vertex0;
+    <span class="kw">let </span>edge2 = vertex2 - vertex0;
+    <span class="kw">let </span>h = ray.direction.cross(edge2);
+    <span class="kw">let </span>a = edge1 * h;
+    <span class="kw">const </span>TINY: Float = <span class="number">100. </span>* Float::EPSILON;
+    <span class="kw">if </span>a &gt; -TINY &amp;&amp; a &lt; TINY {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
-    <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="number">1.</span> <span class="op">/</span> <span class="ident">a</span>;
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">ray</span>.<span class="ident">origin</span> <span class="op">-</span> <span class="ident">vertex0</span>;
-    <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">f</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">*</span> <span class="ident">h</span>);
-    <span class="kw">if</span> <span class="op">!</span>(<span class="number">0.0</span>..<span class="op">=</span><span class="number">1.</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">u</span>) {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">let </span>f = <span class="number">1. </span>/ a;
+    <span class="kw">let </span>s = ray.origin - vertex0;
+    <span class="kw">let </span>u = f * (s * h);
+    <span class="kw">if </span>!(<span class="number">0.0</span>..=<span class="number">1.</span>).contains(<span class="kw-2">&amp;</span>u) {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
-    <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">cross</span>(<span class="ident">edge1</span>);
-    <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">f</span> <span class="op">*</span> (<span class="ident">ray</span>.<span class="ident">direction</span> <span class="op">*</span> <span class="ident">q</span>);
+    <span class="kw">let </span>q = s.cross(edge1);
+    <span class="kw">let </span>v = f * (ray.direction * q);
 
-    <span class="kw">if</span> <span class="op">!</span>(<span class="number">0.0</span>..<span class="op">=</span><span class="number">1.0</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>) {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">if </span>!(<span class="number">0.0</span>..=<span class="number">1.0</span>).contains(<span class="kw-2">&amp;</span>v) {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
-    <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">f</span> <span class="op">*</span> (<span class="ident">edge2</span> <span class="op">*</span> <span class="ident">q</span>);
-    <span class="kw">if</span> <span class="ident">t</span> <span class="op">&gt;</span> <span class="ident">TINY</span> {
-        <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">ray</span>.<span class="ident">project</span>(<span class="ident">t</span>), <span class="ident">u</span>, <span class="ident">v</span>));
+    <span class="kw">let </span>t = f * (edge2 * q);
+    <span class="kw">if </span>t &gt; TINY {
+        <span class="kw">return </span><span class="prelude-val">Some</span>((ray.project(t), u, v));
     }
-    <span class="prelude-val">None</span>
+    <span class="prelude-val">None
+</span>}
+
+<span class="doccomment">/// A simple 3-dimentional Triangle.
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub struct </span>Triangle3D {
+    <span class="doccomment">/// First vertex
+    </span>a: Point3D,
+    <span class="doccomment">/// Second vertex
+    </span>b: Point3D,
+    <span class="doccomment">/// Third vertex
+    </span>c: Point3D,
+    <span class="doccomment">/// The normal, following right-hand convention
+    </span>normal: Vector3D,
+    <span class="doccomment">/// The area of the triangle
+    </span>area: Float,
 }
 
-<span class="doccomment">/// A simple 3-dimentional Triangle.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Triangle3D</span> {
-    <span class="doccomment">/// First vertex</span>
-    <span class="ident">a</span>: <span class="ident">Point3D</span>,
-    <span class="doccomment">/// Second vertex</span>
-    <span class="ident">b</span>: <span class="ident">Point3D</span>,
-    <span class="doccomment">/// Third vertex</span>
-    <span class="ident">c</span>: <span class="ident">Point3D</span>,
-    <span class="doccomment">/// The normal, following right-hand convention</span>
-    <span class="ident">normal</span>: <span class="ident">Vector3D</span>,
-    <span class="doccomment">/// The area of the triangle</span>
-    <span class="ident">area</span>: <span class="ident">Float</span>,
+<span class="doccomment">/// Represents the position of a [`Point3D`] in a [`Triangle3D`].
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>PointInTriangle {
+    <span class="doccomment">/// The point is in vertex A
+    </span>VertexA,
+    <span class="doccomment">/// The point is in vertex B
+    </span>VertexB,
+    <span class="doccomment">/// The point is in vertex C
+    </span>VertexC,
+    <span class="doccomment">/// The point is in the edge between A and B
+    </span>EdgeAB,
+    <span class="doccomment">/// The point is in the edge between B and C
+    </span>EdgeBC,
+    <span class="doccomment">/// The point is in the edge between A and C
+    </span>EdgeAC,
+    <span class="doccomment">/// The point is inside of the [`Triangle3D`]
+    </span>Inside,
+    <span class="doccomment">/// The point is outside of the [`Triangle3D`]
+    </span>Outside,
 }
 
-<span class="doccomment">/// Represents the position of a [`Point3D`] in a [`Triangle3D`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PointInTriangle</span> {
-    <span class="doccomment">/// The point is in vertex A</span>
-    <span class="ident">VertexA</span>,
-    <span class="doccomment">/// The point is in vertex B</span>
-    <span class="ident">VertexB</span>,
-    <span class="doccomment">/// The point is in vertex C</span>
-    <span class="ident">VertexC</span>,
-    <span class="doccomment">/// The point is in the edge between A and B</span>
-    <span class="ident">EdgeAB</span>,
-    <span class="doccomment">/// The point is in the edge between B and C</span>
-    <span class="ident">EdgeBC</span>,
-    <span class="doccomment">/// The point is in the edge between A and C</span>
-    <span class="ident">EdgeAC</span>,
-    <span class="doccomment">/// The point is inside of the [`Triangle3D`]</span>
-    <span class="ident">Inside</span>,
-    <span class="doccomment">/// The point is outside of the [`Triangle3D`]</span>
-    <span class="ident">Outside</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">PointInTriangle</span> {
-    <span class="doccomment">/// Checks whether a [`PointInTriangle`] lies in a vertex</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::VertexA</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::VertexB</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::VertexC</span>)
+<span class="kw">impl </span>PointInTriangle {
+    <span class="doccomment">/// Checks whether a [`PointInTriangle`] lies in a vertex
+    </span><span class="kw">pub fn </span>is_vertex(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::VertexA | <span class="self">Self</span>::VertexB | <span class="self">Self</span>::VertexC)
     }
 
-    <span class="doccomment">/// Checks whether a [`PointInTriangle`] lies in an edge</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_edge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::EdgeAB</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::EdgeAC</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::EdgeBC</span>)
+    <span class="doccomment">/// Checks whether a [`PointInTriangle`] lies in an edge
+    </span><span class="kw">pub fn </span>is_edge(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::EdgeAB | <span class="self">Self</span>::EdgeAC | <span class="self">Self</span>::EdgeBC)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Triangle3D</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>Triangle3D {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;Triangle3D[\n\t{}\n\t{}\n\t{}\n]\n&quot;</span>,
-            <span class="self">self</span>.<span class="ident">a</span>, <span class="self">self</span>.<span class="ident">b</span>, <span class="self">self</span>.<span class="ident">c</span>
+            <span class="self">self</span>.a, <span class="self">self</span>.b, <span class="self">self</span>.c
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Triangle3D</span> {
-    <span class="doccomment">/// Creates a new [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vertex_a</span>: <span class="ident">Point3D</span>, <span class="ident">vertex_b</span>: <span class="ident">Point3D</span>, <span class="ident">vertex_c</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="comment">// check that points are not the same</span>
-        <span class="kw">if</span> <span class="ident">vertex_a</span>.<span class="ident">compare</span>(<span class="ident">vertex_b</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">vertex_a</span>.<span class="ident">compare</span>(<span class="ident">vertex_c</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">vertex_b</span>.<span class="ident">compare</span>(<span class="ident">vertex_c</span>) {
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Trying to build a Triangle3D with two equal points&quot;</span>.<span class="ident">to_string</span>();
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>);
+<span class="kw">impl </span>Triangle3D {
+    <span class="doccomment">/// Creates a new [`Triangle3D`]
+    </span><span class="kw">pub fn </span>new(vertex_a: Point3D, vertex_b: Point3D, vertex_c: Point3D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, String&gt; {
+        <span class="comment">// check that points are not the same
+        </span><span class="kw">if </span>vertex_a.compare(vertex_b) || vertex_a.compare(vertex_c) || vertex_b.compare(vertex_c) {
+            <span class="kw">let </span>msg = <span class="string">&quot;Trying to build a Triangle3D with two equal points&quot;</span>.to_string();
+            <span class="kw">return </span><span class="prelude-val">Err</span>(msg);
         }
 
-        <span class="comment">// Check that they are not collinear</span>
-        <span class="kw">if</span> <span class="ident">vertex_a</span>.<span class="ident">is_collinear</span>(<span class="ident">vertex_b</span>, <span class="ident">vertex_c</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Trying to build a Triangle3D from collinear points&quot;</span>.<span class="ident">to_string</span>();
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>);
+        <span class="comment">// Check that they are not collinear
+        </span><span class="kw">if </span>vertex_a.is_collinear(vertex_b, vertex_c).unwrap() {
+            <span class="kw">let </span>msg = <span class="string">&quot;Trying to build a Triangle3D from collinear points&quot;</span>.to_string();
+            <span class="kw">return </span><span class="prelude-val">Err</span>(msg);
         }
 
-        <span class="comment">// Build the triangle</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">Triangle3D</span> {
-            <span class="ident">a</span>: <span class="ident">vertex_a</span>,
-            <span class="ident">b</span>: <span class="ident">vertex_b</span>,
-            <span class="ident">c</span>: <span class="ident">vertex_c</span>,
+        <span class="comment">// Build the triangle
+        </span><span class="kw">let </span><span class="kw-2">mut </span>t = Triangle3D {
+            a: vertex_a,
+            b: vertex_b,
+            c: vertex_c,
 
-            <span class="ident">area</span>: <span class="op">-</span><span class="number">1.</span>,
-            <span class="ident">normal</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+            area: -<span class="number">1.</span>,
+            normal: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
         };
 
-        <span class="ident">t</span>.<span class="ident">set_area</span>();
-        <span class="ident">t</span>.<span class="ident">set_normal</span>();
+        t.set_area();
+        t.set_normal();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">t</span>)
+        <span class="prelude-val">Ok</span>(t)
     }
 
-    <span class="comment">/* Normal */</span>
+    <span class="comment">/* Normal */
 
-    <span class="doccomment">/// Calculates the normal of the Triangle</span>
-    <span class="kw">fn</span> <span class="ident">set_normal</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">b_a</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">a</span>;
-        <span class="kw">let</span> <span class="ident">c_a</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">c</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">b</span>;
-        <span class="self">self</span>.<span class="ident">normal</span> <span class="op">=</span> <span class="ident">b_a</span>.<span class="ident">cross</span>(<span class="ident">c_a</span>);
-        <span class="self">self</span>.<span class="ident">normal</span>.<span class="ident">normalize</span>();
+    </span><span class="doccomment">/// Calculates the normal of the Triangle
+    </span><span class="kw">fn </span>set_normal(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>b_a = <span class="self">self</span>.b - <span class="self">self</span>.a;
+        <span class="kw">let </span>c_a = <span class="self">self</span>.c - <span class="self">self</span>.b;
+        <span class="self">self</span>.normal = b_a.cross(c_a);
+        <span class="self">self</span>.normal.normalize();
     }
 
-    <span class="doccomment">/// Gets the normal of the [`Triangle3D`]. This value is</span>
-    <span class="doccomment">/// cached, so this should be fast.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vector3D</span> {
-        <span class="self">self</span>.<span class="ident">normal</span>
+    <span class="doccomment">/// Gets the normal of the [`Triangle3D`]. This value is
+    /// cached, so this should be fast.
+    </span><span class="kw">pub fn </span>normal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vector3D {
+        <span class="self">self</span>.normal
     }
 
-    <span class="doccomment">/// Sets the area of the [`Triangle3D`]. This is used when</span>
-    <span class="doccomment">/// constructing the [`Triangle3D`]</span>
-    <span class="kw">fn</span> <span class="ident">set_area</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ab</span>().<span class="ident">length</span>();
-        <span class="kw">let</span> <span class="ident">bc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bc</span>().<span class="ident">length</span>();
-        <span class="kw">let</span> <span class="ident">ca</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ca</span>().<span class="ident">length</span>();
+    <span class="doccomment">/// Sets the area of the [`Triangle3D`]. This is used when
+    /// constructing the [`Triangle3D`]
+    </span><span class="kw">fn </span>set_area(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>ab = <span class="self">self</span>.ab().length();
+        <span class="kw">let </span>bc = <span class="self">self</span>.bc().length();
+        <span class="kw">let </span>ca = <span class="self">self</span>.ca().length();
 
-        <span class="self">self</span>.<span class="ident">area</span> <span class="op">=</span> ((<span class="ident">ca</span> <span class="op">+</span> <span class="ident">bc</span> <span class="op">+</span> <span class="ident">ab</span>)
-            <span class="op">*</span> ((<span class="ident">ca</span> <span class="op">+</span> <span class="ident">bc</span> <span class="op">+</span> <span class="ident">ab</span>) <span class="op">/</span> <span class="number">2.</span> <span class="op">-</span> <span class="ident">ab</span>)
-            <span class="op">*</span> ((<span class="ident">ca</span> <span class="op">+</span> <span class="ident">bc</span> <span class="op">+</span> <span class="ident">ab</span>) <span class="op">/</span> <span class="number">2.</span> <span class="op">-</span> <span class="ident">bc</span>)
-            <span class="op">*</span> ((<span class="ident">ca</span> <span class="op">+</span> <span class="ident">bc</span> <span class="op">+</span> <span class="ident">ab</span>) <span class="op">/</span> <span class="number">2.</span> <span class="op">-</span> <span class="ident">ca</span>)
-            <span class="op">/</span> <span class="number">2.</span>)
-            .<span class="ident">sqrt</span>();
+        <span class="self">self</span>.area = ((ca + bc + ab)
+            * ((ca + bc + ab) / <span class="number">2. </span>- ab)
+            * ((ca + bc + ab) / <span class="number">2. </span>- bc)
+            * ((ca + bc + ab) / <span class="number">2. </span>- ca)
+            / <span class="number">2.</span>)
+            .sqrt();
     }
 
-    <span class="doccomment">/// Gets the Area of the [`Triangle3D`]... it is cached when creater</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">area</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
-        <span class="self">self</span>.<span class="ident">area</span>
+    <span class="doccomment">/// Gets the Area of the [`Triangle3D`]... it is cached when creater
+    </span><span class="kw">pub fn </span>area(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Float {
+        <span class="self">self</span>.area
     }
 
-    <span class="doccomment">/// Gets the Circumradus of the [`Triangle3D`]. This value</span>
-    <span class="doccomment">/// is not cached, so it might be slow to rely on this</span>
-    <span class="doccomment">/// too often.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">circumradius</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ab</span>().<span class="ident">length</span>();
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bc</span>().<span class="ident">length</span>();
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ca</span>().<span class="ident">length</span>();
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> (<span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">+</span> <span class="ident">c</span>) <span class="op">*</span> (<span class="ident">b</span> <span class="op">+</span> <span class="ident">c</span> <span class="op">-</span> <span class="ident">a</span>) <span class="op">*</span> (<span class="ident">c</span> <span class="op">+</span> <span class="ident">a</span> <span class="op">-</span> <span class="ident">b</span>) <span class="op">*</span> (<span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">-</span> <span class="ident">c</span>);
+    <span class="doccomment">/// Gets the Circumradus of the [`Triangle3D`]. This value
+    /// is not cached, so it might be slow to rely on this
+    /// too often.
+    </span><span class="kw">pub fn </span>circumradius(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Float {
+        <span class="kw">let </span>a = <span class="self">self</span>.ab().length();
+        <span class="kw">let </span>b = <span class="self">self</span>.bc().length();
+        <span class="kw">let </span>c = <span class="self">self</span>.ca().length();
+        <span class="kw">let </span>s = (a + b + c) * (b + c - a) * (c + a - b) * (a + b - c);
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quick_inv_sqrt&quot;</span>))]</span>
-        <span class="kw">return</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">c</span> <span class="op">/</span> <span class="ident">s</span>.<span class="ident">sqrt</span>();
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;quick_inv_sqrt&quot;</span>))]
+        </span><span class="kw">return </span>a * b * c / s.sqrt();
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quick_inv_sqrt&quot;</span>)]</span>
-        <span class="kw">return</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">c</span> <span class="op">*</span> <span class="ident"><span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt</span>(<span class="ident">s</span>);
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;quick_inv_sqrt&quot;</span>)]
+        </span><span class="kw">return </span>a * b * c * <span class="kw">crate</span>::quick_inverse_sqrt::quick_inv_sqrt(s);
     }
 
-    <span class="doccomment">/// Gets the Aspect Ratio of the [`Triangle3D`]. This is useful</span>
-    <span class="doccomment">/// for triangulating polygons.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">aspect_ratio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Float</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">min_segment</span> <span class="op">=</span> <span class="number">1E19</span>;
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">3</span> {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">segment</span>(<span class="ident">i</span>).<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">length</span>() <span class="op">&lt;</span> <span class="ident">min_segment</span> {
-                <span class="ident">min_segment</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">length</span>();
+    <span class="doccomment">/// Gets the Aspect Ratio of the [`Triangle3D`]. This is useful
+    /// for triangulating polygons.
+    </span><span class="kw">pub fn </span>aspect_ratio(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Float {
+        <span class="kw">let </span><span class="kw-2">mut </span>min_segment = <span class="number">1E19</span>;
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
+            <span class="kw">let </span>s = <span class="self">self</span>.segment(i).unwrap();
+            <span class="kw">if </span>s.length() &lt; min_segment {
+                min_segment = s.length();
             }
         }
-        <span class="comment">// return</span>
-        <span class="self">self</span>.<span class="ident">circumradius</span>() <span class="op">/</span> <span class="ident">min_segment</span>
+        <span class="comment">// return
+        </span><span class="self">self</span>.circumradius() / min_segment
     }
 
-    <span class="doccomment">/// retrieves the Circumcenter</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">circumcenter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
-        <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">a</span>;
-        <span class="kw">let</span> <span class="ident">ac</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">c</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">a</span>;
+    <span class="doccomment">/// retrieves the Circumcenter
+    </span><span class="kw">pub fn </span>circumcenter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Point3D {
+        <span class="kw">let </span>ab = <span class="self">self</span>.b - <span class="self">self</span>.a;
+        <span class="kw">let </span>ac = <span class="self">self</span>.c - <span class="self">self</span>.a;
 
-        <span class="kw">let</span> <span class="ident">ab_cross_ac</span> <span class="op">=</span> <span class="ident">ab</span>.<span class="ident">cross</span>(<span class="ident">ac</span>);
+        <span class="kw">let </span>ab_cross_ac = ab.cross(ac);
 
-        <span class="kw">let</span> <span class="ident">ac_sq_length</span> <span class="op">=</span> <span class="ident">ac</span>.<span class="ident">length</span>() <span class="op">*</span> <span class="ident">ac</span>.<span class="ident">length</span>();
-        <span class="kw">let</span> <span class="ident">ab_sq_length</span> <span class="op">=</span> <span class="ident">ab</span>.<span class="ident">length</span>() <span class="op">*</span> <span class="ident">ab</span>.<span class="ident">length</span>();
-        <span class="kw">let</span> <span class="ident">ab_x_ac_sq_length</span> <span class="op">=</span> <span class="ident">ab_cross_ac</span>.<span class="ident">length</span>() <span class="op">*</span> <span class="ident">ab_cross_ac</span>.<span class="ident">length</span>();
+        <span class="kw">let </span>ac_sq_length = ac.length() * ac.length();
+        <span class="kw">let </span>ab_sq_length = ab.length() * ab.length();
+        <span class="kw">let </span>ab_x_ac_sq_length = ab_cross_ac.length() * ab_cross_ac.length();
 
-        <span class="kw">let</span> <span class="ident">a_center</span> <span class="op">=</span> ((<span class="ident">ab_cross_ac</span>.<span class="ident">cross</span>(<span class="ident">ab</span>)) <span class="op">*</span> <span class="ident">ac_sq_length</span>
-            <span class="op">+</span> <span class="ident">ac</span>.<span class="ident">cross</span>(<span class="ident">ab_cross_ac</span>) <span class="op">*</span> <span class="ident">ab_sq_length</span>)
-            <span class="op">/</span> (<span class="number">2.</span> <span class="op">*</span> <span class="ident">ab_x_ac_sq_length</span>);
+        <span class="kw">let </span>a_center = ((ab_cross_ac.cross(ab)) * ac_sq_length
+            + ac.cross(ab_cross_ac) * ab_sq_length)
+            / (<span class="number">2. </span>* ab_x_ac_sq_length);
 
-        <span class="self">self</span>.<span class="ident">a</span> <span class="op">+</span> <span class="ident">a_center</span>
+        <span class="self">self</span>.a + a_center
     }
 
-    <span class="doccomment">/// Gets the centroid of the [`Triangle3D`]. This value</span>
-    <span class="doccomment">/// is not cached, so it might be slow to rely on this</span>
-    <span class="doccomment">/// too often.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">centroid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
-        <span class="kw">let</span> <span class="ident">dx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">c</span>.<span class="ident">x</span>;
-        <span class="kw">let</span> <span class="ident">dy</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">y</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">y</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">c</span>.<span class="ident">y</span>;
-        <span class="kw">let</span> <span class="ident">dz</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">z</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">z</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">c</span>.<span class="ident">z</span>;
+    <span class="doccomment">/// Gets the centroid of the [`Triangle3D`]. This value
+    /// is not cached, so it might be slow to rely on this
+    /// too often.
+    </span><span class="kw">pub fn </span>centroid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Point3D {
+        <span class="kw">let </span>dx = <span class="self">self</span>.a.x + <span class="self">self</span>.b.x + <span class="self">self</span>.c.x;
+        <span class="kw">let </span>dy = <span class="self">self</span>.a.y + <span class="self">self</span>.b.y + <span class="self">self</span>.c.y;
+        <span class="kw">let </span>dz = <span class="self">self</span>.a.z + <span class="self">self</span>.b.z + <span class="self">self</span>.c.z;
 
-        <span class="ident">Point3D::new</span>(<span class="ident">dx</span> <span class="op">/</span> <span class="number">3.</span>, <span class="ident">dy</span> <span class="op">/</span> <span class="number">3.</span>, <span class="ident">dz</span> <span class="op">/</span> <span class="number">3.</span>)
+        Point3D::new(dx / <span class="number">3.</span>, dy / <span class="number">3.</span>, dz / <span class="number">3.</span>)
     }
 
-    <span class="doccomment">/// Gets  a specific vertex. Returns an error if the number</span>
-    <span class="doccomment">/// of the vertex is greater than 2 (i.e., valid vertices are 0, 1, 2)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Point3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">i</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">a</span>),
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">b</span>),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">c</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
+    <span class="doccomment">/// Gets  a specific vertex. Returns an error if the number
+    /// of the vertex is greater than 2 (i.e., valid vertices are 0, 1, 2)
+    </span><span class="kw">pub fn </span>vertex(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; <span class="prelude-ty">Result</span>&lt;Point3D, String&gt; {
+        <span class="kw">match </span>i {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.a),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.b),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.c),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;Trying to get vertex with index &#39;{}&#39;... it is out of bounds&quot;</span>,
-                <span class="ident">i</span>
+                i
             )),
         }
     }
 
-    <span class="doccomment">/// Retrieves the first vertex of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">a</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
-        <span class="self">self</span>.<span class="ident">a</span>
+    <span class="doccomment">/// Retrieves the first vertex of an A,B,C [`Triangle3D`]
+    </span><span class="kw">pub fn </span>a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Point3D {
+        <span class="self">self</span>.a
     }
 
-    <span class="doccomment">/// Retrieves the second vertex of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">b</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
-        <span class="self">self</span>.<span class="ident">b</span>
+    <span class="doccomment">/// Retrieves the second vertex of an A,B,C [`Triangle3D`]
+    </span><span class="kw">pub fn </span>b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Point3D {
+        <span class="self">self</span>.b
     }
 
-    <span class="doccomment">/// Retrieves the third vertex of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">c</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Point3D</span> {
-        <span class="self">self</span>.<span class="ident">c</span>
+    <span class="doccomment">/// Retrieves the third vertex of an A,B,C [`Triangle3D`]
+    </span><span class="kw">pub fn </span>c(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Point3D {
+        <span class="self">self</span>.c
     }
 
-    <span class="doccomment">/// Retrieves a segment of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">segment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Segment3D</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">i</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">ab</span>()),
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">bc</span>()),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">ca</span>()),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
+    <span class="doccomment">/// Retrieves a segment of an A,B,C [`Triangle3D`]
+    </span><span class="kw">pub fn </span>segment(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; <span class="prelude-ty">Result</span>&lt;Segment3D, String&gt; {
+        <span class="kw">match </span>i {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.ab()),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.bc()),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.ca()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;Trying to get Segment with index &#39;{}&#39;... it is out of bounds&quot;</span>,
-                <span class="ident">i</span>
+                i
             )),
         }
     }
 
-    <span class="doccomment">/// Retrieves the first segment of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ab</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Segment3D</span> {
-        <span class="ident">Segment3D::new</span>(<span class="self">self</span>.<span class="ident">a</span>, <span class="self">self</span>.<span class="ident">b</span>)
+    <span class="doccomment">/// Retrieves the first segment of an A,B,C [`Triangle3D`]
+    </span><span class="kw">pub fn </span>ab(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Segment3D {
+        Segment3D::new(<span class="self">self</span>.a, <span class="self">self</span>.b)
     }
 
-    <span class="doccomment">/// Retrieves the second segment of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Segment3D</span> {
-        <span class="ident">Segment3D::new</span>(<span class="self">self</span>.<span class="ident">b</span>, <span class="self">self</span>.<span class="ident">c</span>)
+    <span class="doccomment">/// Retrieves the second segment of an A,B,C [`Triangle3D`]
+    </span><span class="kw">pub fn </span>bc(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Segment3D {
+        Segment3D::new(<span class="self">self</span>.b, <span class="self">self</span>.c)
     }
 
-    <span class="doccomment">/// Retrieves the third segment of an A,B,C [`Triangle3D`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ca</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Segment3D</span> {
-        <span class="ident">Segment3D::new</span>(<span class="self">self</span>.<span class="ident">c</span>, <span class="self">self</span>.<span class="ident">a</span>)
+    <span class="doccomment">/// Retrieves the third segment of an A,B,C [`Triangle3D`]
+    </span><span class="kw">pub fn </span>ca(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Segment3D {
+        Segment3D::new(<span class="self">self</span>.c, <span class="self">self</span>.a)
     }
 
-    <span class="doccomment">/// Tests whether a point—which is assumed to be within the plane</span>
-    <span class="doccomment">/// of the triangle—is inside the triangle.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Explanation</span>
-    <span class="doccomment">/// This is not something I made up. I found it [here](http://blackpawn.com/texts/pointinpoly/)</span>
-    <span class="doccomment">/// and also in other places. (the explanation is here not as novelty)</span>
-    <span class="doccomment">///  </span>
-    <span class="doccomment">/// If a triangle in 3 dimentions as vertices $`\vec{A}`$, $`\vec{B}`$, and $`\vec{C}`$, then any</span>
-    <span class="doccomment">/// point in the plane of the triangle can be described by the following equation:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```math</span>
-    <span class="doccomment">/// \vec{P} = \vec{A} + \alpha \left(\vec{B}-\vec{A}\right)+\beta \left(\vec{C}-\vec{A}\right)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// Or, after stating that $`\hat{e}_1=\left(\vec{B}-\vec{A}\right)`$ and $`\hat{e}_2 = \left(\vec{C}-\vec{A}\right)`$</span>
-    <span class="doccomment">/// and rearranging, we can express the same equation as:</span>
-    <span class="doccomment">///     </span>
-    <span class="doccomment">/// ```math</span>
-    <span class="doccomment">/// \vec{P} - \vec{A}=  \alpha \hat{e}_1+\beta \hat{e}_2</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Since this is a 3D equation,  it is actually three equations and there are only two incognita</span>
-    <span class="doccomment">/// ($`\alpha`$ and $`\beta`$). So, we can multiply it by $`\hat{e}_1`$ and $`\hat{e}_2`$ and produce</span>
-    <span class="doccomment">/// a system of equations that we can solve. After doing this, the equation above becomes:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```math</span>
-    <span class="doccomment">/// \hat{e}_1\left(\vec{P} - \vec{A}\right)=  \alpha \hat{e}_1\hat{e}_1+\beta \hat{e}_1\hat{e}_2</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// and</span>
-    <span class="doccomment">/// ```math</span>
-    <span class="doccomment">/// \hat{e}_2\left(\vec{P} - \vec{A}\right)=  \alpha \hat{e}_1\hat{e}_2+\beta \hat{e}_2\hat{e}_2</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Which can be represented in matrix form as follows:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```math</span>
-    <span class="doccomment">/// \begin{Bmatrix}\hat{e}_1\left(\vec{P} - \vec{A}\right)\\\hat{e}_2\left(\vec{P} - \vec{A}\right)\end{Bmatrix}=\begin{pmatrix}\hat{e}_1\hat{e}_1&amp;\hat{e}_1\hat{e}_2\\\hat{e}_1\hat{e}_2&amp;\hat{e}_2\hat{e}_2\end{pmatrix}\begin{Bmatrix}\alpha\\\beta\end{Bmatrix}</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// What is left from here is to interpret the values of $`\alpha`$ and $`\beta`$ from the equations,</span>
-    <span class="doccomment">/// which allows us to position the point within the triangle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_point</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">PointInTriangle</span> {
-        <span class="comment">// get vertices</span>
-        <span class="kw">let</span> <span class="ident">vertex_a</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a</span>;
-        <span class="kw">let</span> <span class="ident">vertex_b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span>;
-        <span class="kw">let</span> <span class="ident">vertex_c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">c</span>;
+    <span class="doccomment">/// Tests whether a point—which is assumed to be within the plane
+    /// of the triangle—is inside the triangle.
+    ///
+    /// # Explanation
+    /// This is not something I made up. I found it [here](http://blackpawn.com/texts/pointinpoly/)
+    /// and also in other places. (the explanation is here not as novelty)
+    ///  
+    /// If a triangle in 3 dimentions as vertices $`\vec{A}`$, $`\vec{B}`$, and $`\vec{C}`$, then any
+    /// point in the plane of the triangle can be described by the following equation:
+    ///
+    /// ```math
+    /// \vec{P} = \vec{A} + \alpha \left(\vec{B}-\vec{A}\right)+\beta \left(\vec{C}-\vec{A}\right)
+    /// ```
+    /// Or, after stating that $`\hat{e}_1=\left(\vec{B}-\vec{A}\right)`$ and $`\hat{e}_2 = \left(\vec{C}-\vec{A}\right)`$
+    /// and rearranging, we can express the same equation as:
+    ///     
+    /// ```math
+    /// \vec{P} - \vec{A}=  \alpha \hat{e}_1+\beta \hat{e}_2
+    /// ```
+    ///
+    /// Since this is a 3D equation,  it is actually three equations and there are only two incognita
+    /// ($`\alpha`$ and $`\beta`$). So, we can multiply it by $`\hat{e}_1`$ and $`\hat{e}_2`$ and produce
+    /// a system of equations that we can solve. After doing this, the equation above becomes:
+    ///
+    /// ```math
+    /// \hat{e}_1\left(\vec{P} - \vec{A}\right)=  \alpha \hat{e}_1\hat{e}_1+\beta \hat{e}_1\hat{e}_2
+    /// ```
+    /// and
+    /// ```math
+    /// \hat{e}_2\left(\vec{P} - \vec{A}\right)=  \alpha \hat{e}_1\hat{e}_2+\beta \hat{e}_2\hat{e}_2
+    /// ```
+    ///
+    /// Which can be represented in matrix form as follows:
+    ///
+    /// ```math
+    /// \begin{Bmatrix}\hat{e}_1\left(\vec{P} - \vec{A}\right)\\\hat{e}_2\left(\vec{P} - \vec{A}\right)\end{Bmatrix}=\begin{pmatrix}\hat{e}_1\hat{e}_1&amp;\hat{e}_1\hat{e}_2\\\hat{e}_1\hat{e}_2&amp;\hat{e}_2\hat{e}_2\end{pmatrix}\begin{Bmatrix}\alpha\\\beta\end{Bmatrix}
+    /// ```
+    ///
+    /// What is left from here is to interpret the values of $`\alpha`$ and $`\beta`$ from the equations,
+    /// which allows us to position the point within the triangle.
+    </span><span class="kw">pub fn </span>test_point(<span class="kw-2">&amp;</span><span class="self">self</span>, p: Point3D) -&gt; PointInTriangle {
+        <span class="comment">// get vertices
+        </span><span class="kw">let </span>vertex_a = <span class="self">self</span>.a;
+        <span class="kw">let </span>vertex_b = <span class="self">self</span>.b;
+        <span class="kw">let </span>vertex_c = <span class="self">self</span>.c;
 
-        <span class="comment">// Compute vectors</span>
-        <span class="kw">let</span> <span class="ident">e1</span> <span class="op">=</span> <span class="ident">vertex_b</span> <span class="op">-</span> <span class="ident">vertex_a</span>;
-        <span class="kw">let</span> <span class="ident">e2</span> <span class="op">=</span> <span class="ident">vertex_c</span> <span class="op">-</span> <span class="ident">vertex_a</span>;
-        <span class="kw">let</span> <span class="ident">p_minus_a</span> <span class="op">=</span> <span class="ident">p</span> <span class="op">-</span> <span class="ident">vertex_a</span>;
+        <span class="comment">// Compute vectors
+        </span><span class="kw">let </span>e1 = vertex_b - vertex_a;
+        <span class="kw">let </span>e2 = vertex_c - vertex_a;
+        <span class="kw">let </span>p_minus_a = p - vertex_a;
 
-        <span class="comment">// Compute dot products</span>
-        <span class="kw">let</span> <span class="ident">e2e2</span> <span class="op">=</span> <span class="ident">e2</span> <span class="op">*</span> <span class="ident">e2</span>;
-        <span class="kw">let</span> <span class="ident">e1e2</span> <span class="op">=</span> <span class="ident">e2</span> <span class="op">*</span> <span class="ident">e1</span>;
-        <span class="kw">let</span> <span class="ident">e1e1</span> <span class="op">=</span> <span class="ident">e1</span> <span class="op">*</span> <span class="ident">e1</span>;
+        <span class="comment">// Compute dot products
+        </span><span class="kw">let </span>e2e2 = e2 * e2;
+        <span class="kw">let </span>e1e2 = e2 * e1;
+        <span class="kw">let </span>e1e1 = e1 * e1;
 
-        <span class="kw">let</span> <span class="ident">left1</span> <span class="op">=</span> <span class="ident">e1</span> <span class="op">*</span> <span class="ident">p_minus_a</span>;
-        <span class="kw">let</span> <span class="ident">left2</span> <span class="op">=</span> <span class="ident">e2</span> <span class="op">*</span> <span class="ident">p_minus_a</span>;
+        <span class="kw">let </span>left1 = e1 * p_minus_a;
+        <span class="kw">let </span>left2 = e2 * p_minus_a;
 
-        <span class="comment">// Compute barycentric coordinates</span>
-        <span class="kw">let</span> <span class="ident">det</span> <span class="op">=</span> <span class="ident">e1e1</span> <span class="op">*</span> <span class="ident">e2e2</span> <span class="op">-</span> <span class="ident">e1e2</span> <span class="op">*</span> <span class="ident">e1e2</span>;
-        <span class="kw">let</span> <span class="ident">alpha</span> <span class="op">=</span> (<span class="ident">e2e2</span> <span class="op">*</span> <span class="ident">left1</span> <span class="op">-</span> <span class="ident">e1e2</span> <span class="op">*</span> <span class="ident">left2</span>) <span class="op">/</span> <span class="ident">det</span>;
-        <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> (<span class="op">-</span><span class="ident">e1e2</span> <span class="op">*</span> <span class="ident">left1</span> <span class="op">+</span> <span class="ident">e1e1</span> <span class="op">*</span> <span class="ident">left2</span>) <span class="op">/</span> <span class="ident">det</span>;
-        <span class="kw">let</span> <span class="ident">w</span> <span class="op">=</span> <span class="number">1.</span> <span class="op">-</span> <span class="ident">alpha</span> <span class="op">-</span> <span class="ident">beta</span>;
+        <span class="comment">// Compute barycentric coordinates
+        </span><span class="kw">let </span>det = e1e1 * e2e2 - e1e2 * e1e2;
+        <span class="kw">let </span>alpha = (e2e2 * left1 - e1e2 * left2) / det;
+        <span class="kw">let </span>beta = (-e1e2 * left1 + e1e1 * left2) / det;
+        <span class="kw">let </span>w = <span class="number">1. </span>- alpha - beta;
 
-        <span class="comment">// Check if point is in triangle</span>
-        <span class="kw">const</span> <span class="ident">TINY</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">100.</span> <span class="op">*</span> <span class="ident">Float::EPSILON</span>;
-        <span class="kw">if</span> <span class="ident">alpha</span> <span class="op">&gt;</span><span class="op">=</span> <span class="op">-</span><span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="ident">beta</span> <span class="op">&gt;</span><span class="op">=</span> <span class="op">-</span><span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="ident">w</span> <span class="op">&gt;</span><span class="op">=</span> <span class="op">-</span><span class="ident">TINY</span> {
-            <span class="comment">// Somewhere in the triangle</span>
-            <span class="kw">if</span> <span class="ident">alpha</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="ident">beta</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">TINY</span> {
-                <span class="comment">// w is 1... Vertex A</span>
-                <span class="ident">PointInTriangle::VertexA</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">alpha</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="ident">w</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">TINY</span> {
-                <span class="comment">// beta is 1; Vertex C</span>
-                <span class="ident">PointInTriangle::VertexC</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">beta</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">TINY</span> <span class="op">&amp;&amp;</span> <span class="ident">w</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">TINY</span> {
-                <span class="comment">// Alpha is 1; Vertex B</span>
-                <span class="ident">PointInTriangle::VertexB</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">alpha</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">TINY</span> {
-                <span class="ident">PointInTriangle::EdgeAC</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">w</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">TINY</span> {
-                <span class="ident">PointInTriangle::EdgeBC</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">beta</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">TINY</span> {
-                <span class="ident">PointInTriangle::EdgeAB</span>
-            } <span class="kw">else</span> {
-                <span class="ident">PointInTriangle::Inside</span>
+        <span class="comment">// Check if point is in triangle
+        </span><span class="kw">const </span>TINY: Float = <span class="number">100. </span>* Float::EPSILON;
+        <span class="kw">if </span>alpha &gt;= -TINY &amp;&amp; beta &gt;= -TINY &amp;&amp; w &gt;= -TINY {
+            <span class="comment">// Somewhere in the triangle
+            </span><span class="kw">if </span>alpha &lt;= TINY &amp;&amp; beta &lt;= TINY {
+                <span class="comment">// w is 1... Vertex A
+                </span>PointInTriangle::VertexA
+            } <span class="kw">else if </span>alpha &lt;= TINY &amp;&amp; w &lt;= TINY {
+                <span class="comment">// beta is 1; Vertex C
+                </span>PointInTriangle::VertexC
+            } <span class="kw">else if </span>beta &lt;= TINY &amp;&amp; w &lt;= TINY {
+                <span class="comment">// Alpha is 1; Vertex B
+                </span>PointInTriangle::VertexB
+            } <span class="kw">else if </span>alpha &lt;= TINY {
+                PointInTriangle::EdgeAC
+            } <span class="kw">else if </span>w &lt;= TINY {
+                PointInTriangle::EdgeBC
+            } <span class="kw">else if </span>beta &lt;= TINY {
+                PointInTriangle::EdgeAB
+            } <span class="kw">else </span>{
+                PointInTriangle::Inside
             }
-        } <span class="kw">else</span> {
-            <span class="ident">PointInTriangle::Outside</span>
+        } <span class="kw">else </span>{
+            PointInTriangle::Outside
         }
     }
 
-    <span class="doccomment">/// Gets the edge number corresponding to a [`Segment3D`] in the</span>
-    <span class="doccomment">/// Triangle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">Segment3D</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ab</span>()) {
+    <span class="doccomment">/// Gets the edge number corresponding to a [`Segment3D`] in the
+    /// Triangle.
+    </span><span class="kw">pub fn </span>get_edge_index_from_segment(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>Segment3D) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="kw">if </span>s.compare(<span class="kw-2">&amp;</span><span class="self">self</span>.ab()) {
             <span class="prelude-val">Some</span>(<span class="number">0</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bc</span>()) {
+        } <span class="kw">else if </span>s.compare(<span class="kw-2">&amp;</span><span class="self">self</span>.bc()) {
             <span class="prelude-val">Some</span>(<span class="number">1</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ca</span>()) {
+        } <span class="kw">else if </span>s.compare(<span class="kw-2">&amp;</span><span class="self">self</span>.ca()) {
             <span class="prelude-val">Some</span>(<span class="number">2</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="doccomment">/// Retreives a certain edge based on two vertices</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_edge_index_from_points</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">Point3D</span>, <span class="ident">b</span>: <span class="ident">Point3D</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">segment</span> <span class="op">=</span> <span class="ident">Segment3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>);
-        <span class="self">self</span>.<span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">segment</span>)
+    <span class="doccomment">/// Retreives a certain edge based on two vertices
+    </span><span class="kw">pub fn </span>get_edge_index_from_points(<span class="kw-2">&amp;</span><span class="self">self</span>, a: Point3D, b: Point3D) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="kw">let </span>segment = Segment3D::new(a, b);
+        <span class="self">self</span>.get_edge_index_from_segment(<span class="kw-2">&amp;</span>segment)
     }
 
-    <span class="doccomment">/// Checks if a [`Triangle3D`] contains a certain Vertex in</span>
-    <span class="doccomment">/// the same position as a [`Point3D`] `p`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Point3D</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">compare</span>(<span class="ident">p</span>) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">compare</span>(<span class="ident">p</span>) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">c</span>.<span class="ident">compare</span>(<span class="ident">p</span>)
+    <span class="doccomment">/// Checks if a [`Triangle3D`] contains a certain Vertex in
+    /// the same position as a [`Point3D`] `p`
+    </span><span class="kw">pub fn </span>has_vertex(<span class="kw-2">&amp;</span><span class="self">self</span>, p: Point3D) -&gt; bool {
+        <span class="self">self</span>.a.compare(p) || <span class="self">self</span>.b.compare(p) || <span class="self">self</span>.c.compare(p)
     }
 
-    <span class="doccomment">/// Checks whether three [`Triangle3D`] objects are made</span>
-    <span class="doccomment">/// of he same vertices.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Vertices do not need to be in the same order,</span>
-    <span class="doccomment">/// necessarily... So, check if the three vertices</span>
-    <span class="doccomment">/// are in the other triangle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="ident">Triangle3D</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// is this faster than iterate?</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">t</span>.<span class="ident">has_vertex</span>(<span class="self">self</span>.<span class="ident">a</span>) {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="doccomment">/// Checks whether three [`Triangle3D`] objects are made
+    /// of he same vertices.
+    ///
+    /// Vertices do not need to be in the same order,
+    /// necessarily... So, check if the three vertices
+    /// are in the other triangle.
+    </span><span class="kw">pub fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, t: <span class="kw-2">&amp;</span>Triangle3D) -&gt; bool {
+        <span class="comment">// is this faster than iterate?
+        </span><span class="kw">if </span>!t.has_vertex(<span class="self">self</span>.a) {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">t</span>.<span class="ident">has_vertex</span>(<span class="self">self</span>.<span class="ident">b</span>) {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>!t.has_vertex(<span class="self">self</span>.b) {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">t</span>.<span class="ident">has_vertex</span>(<span class="self">self</span>.<span class="ident">c</span>) {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>!t.has_vertex(<span class="self">self</span>.c) {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 
-    <span class="doccomment">/// Intersects a [`Ray3D`] in local coordinates with the [`Triangle3D`]. Returns the</span>
-    <span class="doccomment">/// a [`Point3D`] of intersection and the values `u` and `v`, indicating</span>
-    <span class="doccomment">/// the parametric coordinates of the point of intersection</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">basic_intersection</span>(
+    <span class="doccomment">/// Intersects a [`Ray3D`] in local coordinates with the [`Triangle3D`]. Returns the
+    /// a [`Point3D`] of intersection and the values `u` and `v`, indicating
+    /// the parametric coordinates of the point of intersection
+    </span><span class="kw">pub fn </span>basic_intersection(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
-        <span class="ident">_o_error</span>: <span class="ident">Point3D</span>,
-        <span class="ident">_d_error</span>: <span class="ident">Point3D</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Point3D</span>, <span class="ident">Float</span>, <span class="ident">Float</span>)<span class="op">&gt;</span> {
-        <span class="ident">intersect_triangle</span>(<span class="ident">ray</span>, <span class="self">self</span>.<span class="ident">a</span>(), <span class="self">self</span>.<span class="ident">b</span>(), <span class="self">self</span>.<span class="ident">c</span>())
+        ray: <span class="kw-2">&amp;</span>Ray3D,
+        _o_error: Point3D,
+        _d_error: Point3D,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;(Point3D, Float, Float)&gt; {
+        intersect_triangle(ray, <span class="self">self</span>.a(), <span class="self">self</span>.b(), <span class="self">self</span>.c())
     }
 
-    <span class="doccomment">/// The name of the figure. Useful for debugging.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;triangle&quot;</span>
+    <span class="doccomment">/// The name of the figure. Useful for debugging.
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;triangle&quot;
+    </span>}
+
+    <span class="doccomment">/// Gets a `BBox3D` bounding the object, in local coordinates
+    </span><span class="kw">pub fn </span>bounds(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BBox3D {
+        <span class="kw">let </span>bbox = BBox3D::from_point(<span class="self">self</span>.a);
+        <span class="kw">let </span>bbox = BBox3D::from_union_point(<span class="kw-2">&amp;</span>bbox, <span class="self">self</span>.b);
+        BBox3D::from_union_point(<span class="kw-2">&amp;</span>bbox, <span class="self">self</span>.c)
     }
 
-    <span class="doccomment">/// Gets a `BBox3D` bounding the object, in local coordinates</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bounds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BBox3D</span> {
-        <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::from_point</span>(<span class="self">self</span>.<span class="ident">a</span>);
-        <span class="kw">let</span> <span class="ident">bbox</span> <span class="op">=</span> <span class="ident">BBox3D::from_union_point</span>(<span class="kw-2">&amp;</span><span class="ident">bbox</span>, <span class="self">self</span>.<span class="ident">b</span>);
-        <span class="ident">BBox3D::from_union_point</span>(<span class="kw-2">&amp;</span><span class="ident">bbox</span>, <span class="self">self</span>.<span class="ident">c</span>)
-    }
+    <span class="doccomment">/// Borrows the [`Transform`]
+    </span><span class="kw">pub fn </span>transform(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;RefCount&lt;Transform&gt;&gt; {
+        <span class="kw-2">&amp;</span><span class="prelude-val">None
+    </span>}
 
-    <span class="doccomment">/// Borrows the [`Transform`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="prelude-val">None</span>
-    }
-
-    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance</span>
-    <span class="doccomment">/// `t` and the normal [`Vector3D`] at that point. If the distance</span>
-    <span class="doccomment">/// is negative (i.e., the object is behind the plane), it should return</span>
-    <span class="doccomment">/// [`None`].    </span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///  The steps should be:</span>
-    <span class="doccomment">/// * Calculate the point of intersection</span>
-    <span class="doccomment">/// * Calculate normal and side of intersection</span>
-    <span class="doccomment">/// * Calculate (u,v)</span>
-    <span class="doccomment">/// * Calculate first derivative (i.e., dp_du, dp_dv)</span>
-    <span class="doccomment">/// * Calculate second derivative (i.e., d2p_duu, d2p_dvv, d2p_duv)</span>
-    <span class="doccomment">/// * Call `IntersectionInfo::new(ray,p, u, v, dpdu, dpdv, d2p_duu, d2p_dvv, d2p_duv)`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersect_local_ray</span>(
+    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN LOCAL COORDINATES) traveling forward, returning the distance
+    /// `t` and the normal [`Vector3D`] at that point. If the distance
+    /// is negative (i.e., the object is behind the plane), it should return
+    /// [`None`].    
+    ///
+    ///  The steps should be:
+    /// * Calculate the point of intersection
+    /// * Calculate normal and side of intersection
+    /// * Calculate (u,v)
+    /// * Calculate first derivative (i.e., dp_du, dp_dv)
+    /// * Calculate second derivative (i.e., d2p_duu, d2p_dvv, d2p_duv)
+    /// * Call `IntersectionInfo::new(ray,p, u, v, dpdu, dpdv, d2p_duu, d2p_dvv, d2p_duv)`
+    </span><span class="kw">pub fn </span>intersect_local_ray(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
-        <span class="ident">o_error</span>: <span class="ident">Point3D</span>,
-        <span class="ident">d_error</span>: <span class="ident">Point3D</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntersectionInfo</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">phit</span>, <span class="ident">_u</span>, <span class="ident">_v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">basic_intersection</span>(<span class="ident">ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>)<span class="question-mark">?</span>;
-        <span class="comment">// eprintln!(&quot;Ray is {:?}&quot;, ray);</span>
-        <span class="comment">// eprintln!(&quot;Triangle is {}&quot;, self);</span>
-        <span class="comment">// eprintln!(&quot;phit = {} | u = {} | v = {}&quot;, phit, u, v);</span>
-        <span class="kw">let</span> <span class="ident">dpdu</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">a</span>();
-        <span class="kw">let</span> <span class="ident">dpdv</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">c</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">a</span>();
-        <span class="comment">// eprintln!(&quot;dpdu = {} | dpdv = {}&quot;, dpdu, dpdv);</span>
-        <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="ident">dpdu</span>.<span class="ident">cross</span>(<span class="ident">dpdv</span>).<span class="ident">get_normalized</span>();
-        <span class="comment">// eprintln!(&quot;normal = {}&quot;, normal);</span>
-        <span class="kw">let</span> (<span class="ident">normal</span>, <span class="ident">side</span>) <span class="op">=</span> <span class="ident">SurfaceSide::get_side</span>(<span class="ident">normal</span>, <span class="ident">ray</span>.<span class="ident">direction</span>);
+        ray: <span class="kw-2">&amp;</span>Ray3D,
+        o_error: Point3D,
+        d_error: Point3D,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;IntersectionInfo&gt; {
+        <span class="kw">let </span>(phit, _u, _v) = <span class="self">self</span>.basic_intersection(ray, o_error, d_error)<span class="question-mark">?</span>;
+        <span class="comment">// eprintln!(&quot;Ray is {:?}&quot;, ray);
+        // eprintln!(&quot;Triangle is {}&quot;, self);
+        // eprintln!(&quot;phit = {} | u = {} | v = {}&quot;, phit, u, v);
+        </span><span class="kw">let </span>dpdu = <span class="self">self</span>.b() - <span class="self">self</span>.a();
+        <span class="kw">let </span>dpdv = <span class="self">self</span>.c() - <span class="self">self</span>.a();
+        <span class="comment">// eprintln!(&quot;dpdu = {} | dpdv = {}&quot;, dpdu, dpdv);
+        </span><span class="kw">let </span>normal = dpdu.cross(dpdv).get_normalized();
+        <span class="comment">// eprintln!(&quot;normal = {}&quot;, normal);
+        </span><span class="kw">let </span>(normal, side) = SurfaceSide::get_side(normal, ray.direction);
 
-        <span class="prelude-val">Some</span>(<span class="ident">IntersectionInfo</span> {
-            <span class="ident">p</span>: <span class="ident">phit</span>,
-            <span class="ident">dpdu</span>,
-            <span class="ident">dpdv</span>,
-            <span class="ident">normal</span>,
-            <span class="ident">side</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">u</span>: <span class="ident">_u</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">v</span>: <span class="ident">_u</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">dndu</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;textures&quot;</span>)]</span>
-            <span class="ident">dndv</span>: <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+        <span class="prelude-val">Some</span>(IntersectionInfo {
+            p: phit,
+            dpdu,
+            dpdv,
+            normal,
+            side,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>u: _u,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>v: _u,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>dndu: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;textures&quot;</span>)]
+            </span>dndv: Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>),
         })
     }
 
-    <span class="doccomment">/// Like `intersect_local_ray` but simplified because there is not need</span>
-    <span class="doccomment">/// for calcuating the paramtrisized elements </span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_intersect_local_ray</span>(
+    <span class="doccomment">/// Like `intersect_local_ray` but simplified because there is not need
+    /// for calcuating the paramtrisized elements 
+    </span><span class="kw">pub fn </span>simple_intersect_local_ray(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>,
-        <span class="ident">o_error</span>: <span class="ident">Point3D</span>,
-        <span class="ident">d_error</span>: <span class="ident">Point3D</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">p</span>, <span class="ident">_u</span>, <span class="ident">_v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">basic_intersection</span>(<span class="ident">ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">p</span>)
+        ray: <span class="kw-2">&amp;</span>Ray3D,
+        o_error: Point3D,
+        d_error: Point3D,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;Point3D&gt; {
+        <span class="kw">let </span>(p, _u, _v) = <span class="self">self</span>.basic_intersection(ray, o_error, d_error)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(p)
     }
 
-    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,</span>
-    <span class="doccomment">/// returning a detailed [`IntersectionInfo`] about the intersaction .</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntersectionInfo</span><span class="op">&gt;</span> {
-        <span class="comment">// Transform ray into object space, if needed</span>
-        <span class="kw">let</span> (<span class="ident">local_ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform</span>() {
-            <span class="ident">t</span>.<span class="ident">inv_transform_ray</span>(<span class="ident">ray</span>)
-        } <span class="kw">else</span> {
-            (<span class="kw-2">*</span><span class="ident">ray</span>, <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>), <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>))
+    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
+    /// returning a detailed [`IntersectionInfo`] about the intersaction .
+    </span><span class="kw">pub fn </span>intersect(<span class="kw-2">&amp;</span><span class="self">self</span>, ray: <span class="kw-2">&amp;</span>Ray3D) -&gt; <span class="prelude-ty">Option</span>&lt;IntersectionInfo&gt; {
+        <span class="comment">// Transform ray into object space, if needed
+        </span><span class="kw">let </span>(local_ray, o_error, d_error) = <span class="kw">if let </span><span class="prelude-val">Some</span>(t) = <span class="self">self</span>.transform() {
+            t.inv_transform_ray(ray)
+        } <span class="kw">else </span>{
+            (<span class="kw-2">*</span>ray, Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>), Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>))
         };
 
-        <span class="comment">// Intersect, and return transformed back... if needed</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">intersect_local_ray</span>(<span class="kw-2">&amp;</span><span class="ident">local_ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>) {
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">info</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">info</span>.<span class="ident">transform</span>(<span class="ident">t</span>))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">info</span>)
+        <span class="comment">// Intersect, and return transformed back... if needed
+        </span><span class="kw">match </span><span class="self">self</span>.intersect_local_ray(<span class="kw-2">&amp;</span>local_ray, o_error, d_error) {
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(info) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(t) = <span class="self">self</span>.transform() {
+                    <span class="prelude-val">Some</span>(info.transform(t))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(info)
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,</span>
-    <span class="doccomment">/// returning the point of intersection, if any.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_intersect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ray</span>: <span class="kw-2">&amp;</span><span class="ident">Ray3D</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Point3D</span><span class="op">&gt;</span> {
-        <span class="comment">// Transform ray into object space, if needed</span>
-        <span class="kw">let</span> (<span class="ident">local_ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform</span>() {
-            <span class="ident">t</span>.<span class="ident">inv_transform_ray</span>(<span class="ident">ray</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">Transform::new</span>();
-            <span class="ident">t</span>.<span class="ident">inv_transform_ray</span>(<span class="ident">ray</span>)
+    <span class="doccomment">/// Intersects an object with a [`Ray3D]` (IN WORLD COORDINATES) traveling forward,
+    /// returning the point of intersection, if any.
+    </span><span class="kw">pub fn </span>simple_intersect(<span class="kw-2">&amp;</span><span class="self">self</span>, ray: <span class="kw-2">&amp;</span>Ray3D) -&gt; <span class="prelude-ty">Option</span>&lt;Point3D&gt; {
+        <span class="comment">// Transform ray into object space, if needed
+        </span><span class="kw">let </span>(local_ray, o_error, d_error) = <span class="kw">if let </span><span class="prelude-val">Some</span>(t) = <span class="self">self</span>.transform() {
+            t.inv_transform_ray(ray)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>t = Transform::new();
+            t.inv_transform_ray(ray)
         };
 
-        <span class="comment">// Intersect, and return transformed back... if needed</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">simple_intersect_local_ray</span>(<span class="kw-2">&amp;</span><span class="ident">local_ray</span>, <span class="ident">o_error</span>, <span class="ident">d_error</span>) {
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">phit</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">t</span>.<span class="ident">transform_pt</span>(<span class="ident">phit</span>))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">phit</span>)
+        <span class="comment">// Intersect, and return transformed back... if needed
+        </span><span class="kw">match </span><span class="self">self</span>.simple_intersect_local_ray(<span class="kw-2">&amp;</span>local_ray, o_error, d_error) {
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(phit) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(t) = <span class="self">self</span>.transform() {
+                    <span class="prelude-val">Some</span>(t.transform_pt(phit))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(phit)
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Gets a `BBox3D` bounding the object, in world&#39;s coordinates.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">world_bounds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BBox3D</span> {
-        <span class="kw">let</span> <span class="ident">local_b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bounds</span>();
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">transform</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">transform_bbox</span>(<span class="ident">local_b</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">local_b</span>,
+    <span class="doccomment">/// Gets a `BBox3D` bounding the object, in world&#39;s coordinates.
+    </span><span class="kw">pub fn </span>world_bounds(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BBox3D {
+        <span class="kw">let </span>local_b = <span class="self">self</span>.bounds();
+        <span class="kw">match </span><span class="self">self</span>.transform() {
+            <span class="prelude-val">Some</span>(t) =&gt; t.transform_bbox(local_b),
+            <span class="prelude-val">None </span>=&gt; local_b,
         }
     }
-} <span class="comment">// end of impl Triangle3D</span>
+} <span class="comment">// end of impl Triangle3D
 
-<span class="comment">/***********/</span>
-<span class="comment">/* TESTING */</span>
-<span class="comment">/***********/</span>
+/***********/
+/* TESTING */
+/***********/
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">testing</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</span><span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>testing {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="comment">// Buid triangle</span>
-        <span class="comment">// This is a right triangle, so it fits</span>
-        <span class="comment">// within a circle, and has a circumradius equals</span>
-        <span class="comment">// half of its hypotenuse</span>
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">6.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">8.</span>, <span class="number">0.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="comment">// Buid triangle
+        // This is a right triangle, so it fits
+        // within a circle, and has a circumradius equals
+        // half of its hypotenuse
+        </span><span class="kw">let </span>a = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>b = Point3D::new(<span class="number">6.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>c = Point3D::new(<span class="number">0.</span>, <span class="number">8.</span>, <span class="number">0.</span>);
 
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>t = Triangle3D::new(a, b, c).unwrap();
 
-        <span class="comment">// Test vertices</span>
-        <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">a</span>.<span class="ident">compare</span>(<span class="ident">a</span>));
-        <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">b</span>.<span class="ident">compare</span>(<span class="ident">b</span>));
-        <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">c</span>.<span class="ident">compare</span>(<span class="ident">c</span>));
+        <span class="comment">// Test vertices
+        </span><span class="macro">assert!</span>(t.a.compare(a));
+        <span class="macro">assert!</span>(t.b.compare(b));
+        <span class="macro">assert!</span>(t.c.compare(c));
 
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">vertex</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">a</span>.<span class="ident">compare</span>(<span class="ident">a</span>));
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">vertex</span>(<span class="number">1</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">b</span>.<span class="ident">compare</span>(<span class="ident">b</span>));
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">vertex</span>(<span class="number">2</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">compare</span>(<span class="ident">c</span>));
+        <span class="kw">let </span>a = t.vertex(<span class="number">0</span>).unwrap();
+        <span class="macro">assert!</span>(a.compare(a));
+        <span class="kw">let </span>b = t.vertex(<span class="number">1</span>).unwrap();
+        <span class="macro">assert!</span>(b.compare(b));
+        <span class="kw">let </span>c = t.vertex(<span class="number">2</span>).unwrap();
+        <span class="macro">assert!</span>(c.compare(c));
 
-        <span class="comment">// test segments</span>
-        <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">segment</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">ab_ref</span> <span class="op">=</span> <span class="ident">Segment3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>);
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="ident">ab_ref</span>));
+        <span class="comment">// test segments
+        </span><span class="kw">let </span>ab = t.segment(<span class="number">0</span>).unwrap();
+        <span class="kw">let </span>ab_ref = Segment3D::new(a, b);
+        <span class="macro">assert!</span>(ab.compare(<span class="kw-2">&amp;</span>ab_ref));
 
-        <span class="kw">let</span> <span class="ident">bc</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">segment</span>(<span class="number">1</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">bc_ref</span> <span class="op">=</span> <span class="ident">Segment3D::new</span>(<span class="ident">b</span>, <span class="ident">c</span>);
-        <span class="macro">assert!</span>(<span class="ident">bc</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="ident">bc_ref</span>));
+        <span class="kw">let </span>bc = t.segment(<span class="number">1</span>).unwrap();
+        <span class="kw">let </span>bc_ref = Segment3D::new(b, c);
+        <span class="macro">assert!</span>(bc.compare(<span class="kw-2">&amp;</span>bc_ref));
 
-        <span class="kw">let</span> <span class="ident">ca</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">segment</span>(<span class="number">2</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">ca_ref</span> <span class="op">=</span> <span class="ident">Segment3D::new</span>(<span class="ident">c</span>, <span class="ident">a</span>);
-        <span class="macro">assert!</span>(<span class="ident">ca</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="ident">ca_ref</span>));
+        <span class="kw">let </span>ca = t.segment(<span class="number">2</span>).unwrap();
+        <span class="kw">let </span>ca_ref = Segment3D::new(c, a);
+        <span class="macro">assert!</span>(ca.compare(<span class="kw-2">&amp;</span>ca_ref));
 
-        <span class="comment">// Check that getting out of bounds is error</span>
-        <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">vertex</span>(<span class="number">3</span>).<span class="ident">is_err</span>());
+        <span class="comment">// Check that getting out of bounds is error
+        </span><span class="macro">assert!</span>(t.vertex(<span class="number">3</span>).is_err());
 
-        <span class="comment">// Check that the area is OK</span>
-        <span class="macro">assert!</span>((<span class="ident">t</span>.<span class="ident">area</span>() <span class="op">-</span> <span class="number">6.</span> <span class="op">*</span> <span class="number">8.</span> <span class="op">/</span> <span class="number">2.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1E-10</span>);
+        <span class="comment">// Check that the area is OK
+        </span><span class="macro">assert!</span>((t.area() - <span class="number">6. </span>* <span class="number">8. </span>/ <span class="number">2.</span>).abs() &lt; <span class="number">1E-10</span>);
 
-        <span class="comment">// Check circumradius</span>
-        <span class="macro">assert!</span>((<span class="ident">t</span>.<span class="ident">circumradius</span>() <span class="op">-</span> <span class="number">5.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">0.001</span>);
+        <span class="comment">// Check circumradius
+        </span><span class="macro">assert!</span>((t.circumradius() - <span class="number">5.</span>).abs() &lt; <span class="number">0.001</span>);
 
-        <span class="comment">// Check aspect ratio; circumradius/smallest side</span>
-        <span class="macro">assert!</span>((<span class="ident">t</span>.<span class="ident">aspect_ratio</span>() <span class="op">-</span> <span class="number">5.</span> <span class="op">/</span> <span class="number">6.</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">0.001</span>);
+        <span class="comment">// Check aspect ratio; circumradius/smallest side
+        </span><span class="macro">assert!</span>((t.aspect_ratio() - <span class="number">5. </span>/ <span class="number">6.</span>).abs() &lt; <span class="number">0.001</span>);
 
-        <span class="comment">// Check circumcenter</span>
-        <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">circumcenter</span>().<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">3.</span>, <span class="number">4.</span>, <span class="number">0.</span>)));
+        <span class="comment">// Check circumcenter
+        </span><span class="macro">assert!</span>(t.circumcenter().compare(Point3D::new(<span class="number">3.</span>, <span class="number">4.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// check centroid</span>
-        <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">centroid</span>().<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">6.</span> <span class="op">/</span> <span class="number">3.</span>, <span class="number">8.</span> <span class="op">/</span> <span class="number">3.</span>, <span class="number">0.</span>)));
+        <span class="comment">// check centroid
+        </span><span class="macro">assert!</span>(t.centroid().compare(Point3D::new(<span class="number">6. </span>/ <span class="number">3.</span>, <span class="number">8. </span>/ <span class="number">3.</span>, <span class="number">0.</span>)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_triangle_intersect</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_triangle_intersect() {
+        <span class="kw">let </span>a = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>b = Point3D::new(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>c = Point3D::new(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>);
 
-        <span class="kw">let</span> <span class="ident">triangle</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>triangle = Triangle3D::new(a, b, c).unwrap();
 
-        <span class="kw">let</span> <span class="ident">test_hit</span> <span class="op">=</span> <span class="op">|</span><span class="ident">pt</span>: <span class="ident">Point3D</span>, <span class="ident">offset</span>: <span class="ident">Vector3D</span>, <span class="ident">expect_hit</span>: <span class="ident">bool</span><span class="op">|</span> -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">offset</span>.<span class="ident">get_normalized</span>();
-            <span class="kw">let</span> <span class="ident">ray</span> <span class="op">=</span> <span class="ident">Ray3D</span> {
-                <span class="ident">origin</span>: <span class="ident">pt</span> <span class="op">+</span> <span class="ident">offset</span>,
-                <span class="ident">direction</span>: <span class="ident">offset</span> <span class="op">*</span> <span class="op">-</span><span class="number">1.</span>,
+        <span class="kw">let </span>test_hit = |pt: Point3D, offset: Vector3D, expect_hit: bool| -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+            <span class="kw">let </span>offset = offset.get_normalized();
+            <span class="kw">let </span>ray = Ray3D {
+                origin: pt + offset,
+                direction: offset * -<span class="number">1.</span>,
             };
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">phit</span>) <span class="op">=</span> <span class="ident">triangle</span>.<span class="ident">simple_intersect</span>(<span class="kw-2">&amp;</span><span class="ident">ray</span>) {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">expect_hit</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(phit) = triangle.simple_intersect(<span class="kw-2">&amp;</span>ray) {
+                <span class="kw">if </span>!expect_hit {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                         <span class="string">&quot;Was NOT expecting hit: pt = {}, offset = {}&quot;</span>,
-                        <span class="ident">pt</span>, <span class="ident">offset</span>
+                        pt, offset
                     ));
                 }
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">phit</span>.<span class="ident">compare</span>(<span class="ident">pt</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
+                <span class="kw">if </span>!phit.compare(pt) {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                         <span class="string">&quot;Hit in incorrect point...: pt = {}, offset = {}, phit = {}&quot;</span>,
-                        <span class="ident">pt</span>, <span class="ident">offset</span>, <span class="ident">phit</span>
+                        pt, offset, phit
                     ));
                 }
-            } <span class="kw">else</span> {
-                <span class="kw">if</span> <span class="ident">expect_hit</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
+            } <span class="kw">else </span>{
+                <span class="kw">if </span>expect_hit {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                         <span class="string">&quot;WAS expecting hit: pt = {}, offset = {}&quot;</span>,
-                        <span class="ident">pt</span>, <span class="ident">offset</span>
+                        pt, offset
                     ));
                 }
             }
 
             <span class="prelude-val">Ok</span>(())
-        }; <span class="comment">// end of closure</span>
+        }; <span class="comment">// end of closure
 
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">Vector3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>);
-        <span class="comment">// Vertex A.</span>
-        <span class="ident">test_hit</span>(<span class="ident">triangle</span>.<span class="ident">a</span>(), <span class="ident">offset</span>, <span class="bool-val">true</span>).<span class="ident">unwrap</span>();
+        </span><span class="kw">let </span>offset = Vector3D::new(<span class="number">0.</span>, <span class="number">0.</span>, -<span class="number">1.</span>);
+        <span class="comment">// Vertex A.
+        </span>test_hit(triangle.a(), offset, <span class="bool-val">true</span>).unwrap();
 
-        <span class="comment">// Vertex B.</span>
-        <span class="ident">test_hit</span>(<span class="ident">triangle</span>.<span class="ident">b</span>(), <span class="ident">offset</span>, <span class="bool-val">true</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// Vertex B.
+        </span>test_hit(triangle.b(), offset, <span class="bool-val">true</span>).unwrap();
 
-        <span class="comment">// Vertex C.</span>
-        <span class="ident">test_hit</span>(<span class="ident">triangle</span>.<span class="ident">c</span>(), <span class="ident">offset</span>, <span class="bool-val">true</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// Vertex C.
+        </span>test_hit(triangle.c(), offset, <span class="bool-val">true</span>).unwrap();
 
-        <span class="comment">// Segment AB.</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="ident">test_hit</span>(<span class="ident">p</span>, <span class="ident">offset</span>, <span class="bool-val">true</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// Segment AB.
+        </span><span class="kw">let </span>p = Point3D::new(<span class="number">0.5</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        test_hit(p, offset, <span class="bool-val">true</span>).unwrap();
 
-        <span class="comment">// Segment AC.</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.5</span>, <span class="number">0.</span>);
-        <span class="ident">test_hit</span>(<span class="ident">p</span>, <span class="ident">offset</span>, <span class="bool-val">true</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// Segment AC.
+        </span><span class="kw">let </span>p = Point3D::new(<span class="number">0.</span>, <span class="number">0.5</span>, <span class="number">0.</span>);
+        test_hit(p, offset, <span class="bool-val">true</span>).unwrap();
 
-        <span class="comment">// Segment BC.</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.</span>);
-        <span class="ident">test_hit</span>(<span class="ident">p</span>, <span class="ident">offset</span>, <span class="bool-val">true</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// Segment BC.
+        </span><span class="kw">let </span>p = Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.</span>);
+        test_hit(p, offset, <span class="bool-val">true</span>).unwrap();
 
-        <span class="comment">// Point outside</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>);
-        <span class="ident">test_hit</span>(<span class="ident">p</span>, <span class="ident">offset</span>, <span class="bool-val">false</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// Point outside
+        </span><span class="kw">let </span>p = Point3D::new(<span class="number">0.</span>, -<span class="number">1.</span>, <span class="number">0.</span>);
+        test_hit(p, offset, <span class="bool-val">false</span>).unwrap();
 
-        <span class="comment">// Point inside</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.</span>);
-        <span class="ident">test_hit</span>(<span class="ident">p</span>, <span class="ident">offset</span>, <span class="bool-val">true</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// Point inside
+        </span><span class="kw">let </span>p = Point3D::new(<span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.</span>);
+        test_hit(p, offset, <span class="bool-val">true</span>).unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_test_point</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_test_point() {
+        <span class="kw">let </span>a = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>b = Point3D::new(<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>c = Point3D::new(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>);
 
-        <span class="kw">let</span> <span class="ident">triangle</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>triangle = Triangle3D::new(a, b, c).unwrap();
 
-        <span class="comment">// Vertex A.</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">PointInTriangle::VertexA</span>, <span class="ident">triangle</span>.<span class="ident">test_point</span>(<span class="ident">a</span>));
+        <span class="comment">// Vertex A.
+        </span><span class="macro">assert_eq!</span>(PointInTriangle::VertexA, triangle.test_point(a));
 
-        <span class="comment">// Vertex B.</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">PointInTriangle::VertexB</span>, <span class="ident">triangle</span>.<span class="ident">test_point</span>(<span class="ident">b</span>));
+        <span class="comment">// Vertex B.
+        </span><span class="macro">assert_eq!</span>(PointInTriangle::VertexB, triangle.test_point(b));
 
-        <span class="comment">// Vertex C.</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">PointInTriangle::VertexC</span>, <span class="ident">triangle</span>.<span class="ident">test_point</span>(<span class="ident">c</span>));
+        <span class="comment">// Vertex C.
+        </span><span class="macro">assert_eq!</span>(PointInTriangle::VertexC, triangle.test_point(c));
 
-        <span class="comment">// Segment AB.</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">PointInTriangle::EdgeAB</span>, <span class="ident">triangle</span>.<span class="ident">test_point</span>(<span class="ident">p</span>));
+        <span class="comment">// Segment AB.
+        </span><span class="kw">let </span>p = Point3D::new(<span class="number">0.5</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="macro">assert_eq!</span>(PointInTriangle::EdgeAB, triangle.test_point(p));
 
-        <span class="comment">// Segment AC.</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.5</span>, <span class="number">0.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">PointInTriangle::EdgeAC</span>, <span class="ident">triangle</span>.<span class="ident">test_point</span>(<span class="ident">p</span>));
+        <span class="comment">// Segment AC.
+        </span><span class="kw">let </span>p = Point3D::new(<span class="number">0.</span>, <span class="number">0.5</span>, <span class="number">0.</span>);
+        <span class="macro">assert_eq!</span>(PointInTriangle::EdgeAC, triangle.test_point(p));
 
-        <span class="comment">// Segment BC.</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">PointInTriangle::EdgeBC</span>, <span class="ident">triangle</span>.<span class="ident">test_point</span>(<span class="ident">p</span>));
+        <span class="comment">// Segment BC.
+        </span><span class="kw">let </span>p = Point3D::new(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.</span>);
+        <span class="macro">assert_eq!</span>(PointInTriangle::EdgeBC, triangle.test_point(p));
 
-        <span class="comment">// Point outside</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="op">-</span><span class="number">1.</span>, <span class="number">0.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">PointInTriangle::Outside</span>, <span class="ident">triangle</span>.<span class="ident">test_point</span>(<span class="ident">p</span>));
+        <span class="comment">// Point outside
+        </span><span class="kw">let </span>p = Point3D::new(<span class="number">0.</span>, -<span class="number">1.</span>, <span class="number">0.</span>);
+        <span class="macro">assert_eq!</span>(PointInTriangle::Outside, triangle.test_point(p));
 
-        <span class="comment">// Point inside</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">PointInTriangle::Inside</span>, <span class="ident">triangle</span>.<span class="ident">test_point</span>(<span class="ident">p</span>));
+        <span class="comment">// Point inside
+        </span><span class="kw">let </span>p = Point3D::new(<span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.</span>);
+        <span class="macro">assert_eq!</span>(PointInTriangle::Inside, triangle.test_point(p));
 
-        <span class="comment">// CASE 2</span>
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">4.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">triangle</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">2.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="comment">// CASE 2
+        </span><span class="kw">let </span>a = Point3D::new(<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>b = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>c = Point3D::new(<span class="number">4.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>triangle = Triangle3D::new(a, b, c).unwrap();
+        <span class="kw">let </span>p = Point3D::new(<span class="number">2.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">PointInTriangle::EdgeBC</span>, <span class="ident">triangle</span>.<span class="ident">test_point</span>(<span class="ident">p</span>));
+        <span class="macro">assert_eq!</span>(PointInTriangle::EdgeBC, triangle.test_point(p));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_circumcenter</span>() {
-        <span class="comment">// TEST 1... centerd in origin</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">l</span> <span class="op">=</span> <span class="number">3.</span>;
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">l</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="ident">l</span>, <span class="number">0.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_circumcenter() {
+        <span class="comment">// TEST 1... centerd in origin
+        </span><span class="kw">let </span><span class="kw-2">mut </span>l = <span class="number">3.</span>;
+        <span class="kw">let </span>a = Point3D::new(-l, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>b = Point3D::new(l, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>c = Point3D::new(<span class="number">0.</span>, l, <span class="number">0.</span>);
 
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>t = Triangle3D::new(a, b, c).unwrap();
 
-        <span class="kw">let</span> <span class="ident">center1</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">circumcenter</span>();
-        <span class="macro">assert!</span>(<span class="ident">center1</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>)));
+        <span class="kw">let </span>center1 = t.circumcenter();
+        <span class="macro">assert!</span>(center1.compare(Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>)));
 
-        <span class="comment">// Test 2: Centered somewhere else</span>
-        <span class="ident">l</span> <span class="op">=</span> <span class="number">3.</span>;
-        <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="number">23.</span>;
-        <span class="kw">let</span> <span class="ident">cy</span> <span class="op">=</span> <span class="number">21.</span>;
-        <span class="kw">let</span> <span class="ident">cz</span> <span class="op">=</span> <span class="number">3.12314</span>;
-        <span class="kw">let</span> <span class="ident">a2</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="op">-</span><span class="ident">l</span> <span class="op">+</span> <span class="ident">cx</span>, <span class="number">0.</span> <span class="op">+</span> <span class="ident">cy</span>, <span class="ident">cz</span>);
-        <span class="kw">let</span> <span class="ident">b2</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="ident">l</span> <span class="op">+</span> <span class="ident">cx</span>, <span class="number">0.</span> <span class="op">+</span> <span class="ident">cy</span>, <span class="ident">cz</span>);
-        <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span> <span class="op">+</span> <span class="ident">cx</span>, <span class="ident">l</span> <span class="op">+</span> <span class="ident">cy</span>, <span class="ident">cz</span>);
+        <span class="comment">// Test 2: Centered somewhere else
+        </span>l = <span class="number">3.</span>;
+        <span class="kw">let </span>cx = <span class="number">23.</span>;
+        <span class="kw">let </span>cy = <span class="number">21.</span>;
+        <span class="kw">let </span>cz = <span class="number">3.12314</span>;
+        <span class="kw">let </span>a2 = Point3D::new(-l + cx, <span class="number">0. </span>+ cy, cz);
+        <span class="kw">let </span>b2 = Point3D::new(l + cx, <span class="number">0. </span>+ cy, cz);
+        <span class="kw">let </span>c2 = Point3D::new(<span class="number">0. </span>+ cx, l + cy, cz);
 
-        <span class="kw">let</span> <span class="ident">t2</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">a2</span>, <span class="ident">b2</span>, <span class="ident">c2</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>t2 = Triangle3D::new(a2, b2, c2).unwrap();
 
-        <span class="kw">let</span> <span class="ident">center2</span> <span class="op">=</span> <span class="ident">t2</span>.<span class="ident">circumcenter</span>();
+        <span class="kw">let </span>center2 = t2.circumcenter();
 
-        <span class="macro">assert!</span>(<span class="ident">center2</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="ident">cx</span>, <span class="ident">cy</span>, <span class="ident">cz</span>)));
+        <span class="macro">assert!</span>(center2.compare(Point3D::new(cx, cy, cz)));
 
-        <span class="comment">// Test 3: From internet solved problem</span>
-        <span class="kw">let</span> <span class="ident">a3</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">3.</span>, <span class="number">2.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">b3</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">1.</span>, <span class="number">4.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">c3</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">5.</span>, <span class="number">4.</span>, <span class="number">0.</span>);
+        <span class="comment">// Test 3: From internet solved problem
+        </span><span class="kw">let </span>a3 = Point3D::new(<span class="number">3.</span>, <span class="number">2.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>b3 = Point3D::new(<span class="number">1.</span>, <span class="number">4.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>c3 = Point3D::new(<span class="number">5.</span>, <span class="number">4.</span>, <span class="number">0.</span>);
 
-        <span class="kw">let</span> <span class="ident">t3</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">a3</span>, <span class="ident">b3</span>, <span class="ident">c3</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">center3</span> <span class="op">=</span> <span class="ident">t3</span>.<span class="ident">circumcenter</span>();
-        <span class="macro">assert!</span>(<span class="ident">center3</span>.<span class="ident">compare</span>(<span class="ident">Point3D::new</span>(<span class="number">3.</span>, <span class="number">4.</span>, <span class="number">0.</span>)));
+        <span class="kw">let </span>t3 = Triangle3D::new(a3, b3, c3).unwrap();
+        <span class="kw">let </span>center3 = t3.circumcenter();
+        <span class="macro">assert!</span>(center3.compare(Point3D::new(<span class="number">3.</span>, <span class="number">4.</span>, <span class="number">0.</span>)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_get_edge_index_from_points</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">6.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">8.</span>, <span class="number">0.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_get_edge_index_from_points() {
+        <span class="kw">let </span>a = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>b = Point3D::new(<span class="number">6.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>c = Point3D::new(<span class="number">0.</span>, <span class="number">8.</span>, <span class="number">0.</span>);
 
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>t = Triangle3D::new(a, b, c).unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">t</span>.<span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>)),
+            t.get_edge_index_from_segment(<span class="kw-2">&amp;</span>Segment3D::new(a, b)),
             <span class="prelude-val">Some</span>(<span class="number">0</span>)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">t</span>.<span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">b</span>, <span class="ident">a</span>)),
+            t.get_edge_index_from_segment(<span class="kw-2">&amp;</span>Segment3D::new(b, a)),
             <span class="prelude-val">Some</span>(<span class="number">0</span>)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">t</span>.<span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">b</span>, <span class="ident">c</span>)),
+            t.get_edge_index_from_segment(<span class="kw-2">&amp;</span>Segment3D::new(b, c)),
             <span class="prelude-val">Some</span>(<span class="number">1</span>)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">t</span>.<span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">c</span>, <span class="ident">b</span>)),
+            t.get_edge_index_from_segment(<span class="kw-2">&amp;</span>Segment3D::new(c, b)),
             <span class="prelude-val">Some</span>(<span class="number">1</span>)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">t</span>.<span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">c</span>, <span class="ident">a</span>)),
+            t.get_edge_index_from_segment(<span class="kw-2">&amp;</span>Segment3D::new(c, a)),
             <span class="prelude-val">Some</span>(<span class="number">2</span>)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">t</span>.<span class="ident">get_edge_index_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">Segment3D::new</span>(<span class="ident">a</span>, <span class="ident">c</span>)),
+            t.get_edge_index_from_segment(<span class="kw-2">&amp;</span>Segment3D::new(a, c)),
             <span class="prelude-val">Some</span>(<span class="number">2</span>)
         );
 
-        <span class="comment">// test segments</span>
-        <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">segment</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">ab_ref</span> <span class="op">=</span> <span class="ident">Segment3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>);
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="ident">ab_ref</span>));
+        <span class="comment">// test segments
+        </span><span class="kw">let </span>ab = t.segment(<span class="number">0</span>).unwrap();
+        <span class="kw">let </span>ab_ref = Segment3D::new(a, b);
+        <span class="macro">assert!</span>(ab.compare(<span class="kw-2">&amp;</span>ab_ref));
 
-        <span class="kw">let</span> <span class="ident">bc</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">segment</span>(<span class="number">1</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">bc_ref</span> <span class="op">=</span> <span class="ident">Segment3D::new</span>(<span class="ident">b</span>, <span class="ident">c</span>);
-        <span class="macro">assert!</span>(<span class="ident">bc</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="ident">bc_ref</span>));
+        <span class="kw">let </span>bc = t.segment(<span class="number">1</span>).unwrap();
+        <span class="kw">let </span>bc_ref = Segment3D::new(b, c);
+        <span class="macro">assert!</span>(bc.compare(<span class="kw-2">&amp;</span>bc_ref));
 
-        <span class="kw">let</span> <span class="ident">ca</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">segment</span>(<span class="number">2</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">ca_ref</span> <span class="op">=</span> <span class="ident">Segment3D::new</span>(<span class="ident">c</span>, <span class="ident">a</span>);
-        <span class="macro">assert!</span>(<span class="ident">ca</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="ident">ca_ref</span>));
+        <span class="kw">let </span>ca = t.segment(<span class="number">2</span>).unwrap();
+        <span class="kw">let </span>ca_ref = Segment3D::new(c, a);
+        <span class="macro">assert!</span>(ca.compare(<span class="kw-2">&amp;</span>ca_ref));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_has_vertex</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">6.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">0.</span>, <span class="number">8.</span>, <span class="number">0.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_has_vertex() {
+        <span class="kw">let </span>a = Point3D::new(<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>b = Point3D::new(<span class="number">6.</span>, <span class="number">0.</span>, <span class="number">0.</span>);
+        <span class="kw">let </span>c = Point3D::new(<span class="number">0.</span>, <span class="number">8.</span>, <span class="number">0.</span>);
 
-        <span class="kw">let</span> <span class="ident">not_there</span> <span class="op">=</span> <span class="ident">Point3D::new</span>(<span class="number">12.</span>, <span class="number">1.</span>, <span class="number">99.</span>);
+        <span class="kw">let </span>not_there = Point3D::new(<span class="number">12.</span>, <span class="number">1.</span>, <span class="number">99.</span>);
 
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>t = Triangle3D::new(a, b, c).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">has_vertex</span>(<span class="ident">a</span>));
-        <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">has_vertex</span>(<span class="ident">b</span>));
-        <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">has_vertex</span>(<span class="ident">c</span>));
+        <span class="macro">assert!</span>(t.has_vertex(a));
+        <span class="macro">assert!</span>(t.has_vertex(b));
+        <span class="macro">assert!</span>(t.has_vertex(c));
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">t</span>.<span class="ident">has_vertex</span>(<span class="ident">not_there</span>));
+        <span class="macro">assert!</span>(!t.has_vertex(not_there));
 
-        <span class="kw">let</span> <span class="ident">t2</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">a</span>, <span class="ident">c</span>, <span class="ident">b</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="ident">t2</span>));
+        <span class="kw">let </span>t2 = Triangle3D::new(a, c, b).unwrap();
+        <span class="macro">assert!</span>(t.compare(<span class="kw-2">&amp;</span>t2));
 
-        <span class="kw">let</span> <span class="ident">t3</span> <span class="op">=</span> <span class="ident">Triangle3D::new</span>(<span class="ident">a</span>, <span class="ident">c</span>, <span class="ident">not_there</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">t</span>.<span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="ident">t3</span>));
+        <span class="kw">let </span>t3 = Triangle3D::new(a, c, not_there).unwrap();
+        <span class="macro">assert!</span>(!t.compare(<span class="kw-2">&amp;</span>t3));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
