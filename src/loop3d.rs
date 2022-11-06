@@ -430,7 +430,7 @@ impl Loop3D {
         }
 
         // Ray cast
-        let d = (point - self.vertices[0]) * 1000.; // Should be enough...?
+        let d = (point - (self.vertices[0] + self.vertices[1])*0.5) * 1000.; // Should be enough...?
         let ray = Segment3D::new(point, point + d);
 
         let mut n_cross = 0;
@@ -606,6 +606,8 @@ impl Loop3D {
 
 #[cfg(test)]
 mod testing {
+
+    use crate::{Triangulation3D, Polygon3D};
 
     use super::*;
 
@@ -1209,5 +1211,23 @@ mod testing {
         assert!(c.x.abs() < 1e-8);
         assert!(c.y.abs() < 1e-8);
         assert!(c.z.abs() < 1e-8);
+    }
+
+    #[test]
+    fn test_weird_loop(){
+        let mut l = Loop3D::new();
+        l.push(Point3D{x:0., y:1.3500000000000001, z:0.0}).unwrap();        
+        l.push(Point3D{x:0., y:2.0899999999999999, z:0.82999999999999996}).unwrap();
+        l.push(Point3D{x:0., y:2.9900000000000002, z:0.82999999999999996}).unwrap();
+        l.push(Point3D{x:0., y:2.9900000000000002, z:2.29}).unwrap();
+        l.push(Point3D{x:0., y:2.0899999999999999, z:2.29}).unwrap();
+        l.push(Point3D{x:0., y:1.3500000000000001, z:2.7000000000000002}).unwrap();
+        l.push(Point3D{x:0., y:3.7400000000000002, z:2.7000000000000002}).unwrap();
+        l.push(Point3D{x:0., y:3.7400000000000002, z:0.0}).unwrap();
+        
+        l.close().unwrap();
+        
+        let poly = Polygon3D::new(l).unwrap();
+        Triangulation3D::from_polygon(&poly).unwrap();
     }
 }
