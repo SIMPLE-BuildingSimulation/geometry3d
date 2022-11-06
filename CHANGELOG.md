@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/SIMPLE-BuildingSimulation/geometry3d/compare/v0.2.0...v0.2.1) (2022-11-06)
+
+
+### Bug Fixes
+
+* fixed test_point in Loop ([43aa62b](https://github.com/SIMPLE-BuildingSimulation/geometry3d/commit/43aa62b91a2b152c32b2889eb7f8c8eaee30c18e))
+
 ## [0.2.0](https://github.com/SIMPLE-BuildingSimulation/geometry3d/compare/v0.1.0...v0.2.0) (2022-10-12)
 
 
