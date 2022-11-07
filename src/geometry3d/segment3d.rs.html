@@ -562,6 +562,8 @@
 <span id="528">528</span>
 <span id="529">529</span>
 <span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -780,11 +782,13 @@ SOFTWARE.
     <span class="doccomment">/// Checks if two [`Segment3D`] intersect each other. This returns `false` if
     /// one of the [`Segment3D`] barely touches the other one.
     </span><span class="kw">pub fn </span>intersect(<span class="kw-2">&amp;</span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>Segment3D, output: <span class="kw-2">&amp;mut </span>Point3D) -&gt; bool {
+        <span class="kw">const </span>TINY: Float = <span class="number">1e-8</span>;
+        <span class="kw">const </span>INTERSECT_RANGE : core::ops::Range&lt;Float&gt; = TINY..(<span class="number">1.</span>-TINY);
         <span class="kw">match </span><span class="self">self</span>.get_intersection_pt(input) {
             <span class="prelude-val">Some</span>((t_a, t_b)) =&gt; {
                 <span class="kw">let </span>a = <span class="self">self</span>.end - <span class="self">self</span>.start;
 
-                <span class="kw">if </span>(Float::EPSILON..<span class="number">1.</span>).contains(<span class="kw-2">&amp;</span>t_a) &amp;&amp; (Float::EPSILON..<span class="number">1.</span>).contains(<span class="kw-2">&amp;</span>t_b) {
+                <span class="kw">if </span>(<span class="number">0. </span>..<span class="number">1.</span>).contains(<span class="kw-2">&amp;</span>t_a) &amp;&amp; INTERSECT_RANGE.contains(<span class="kw-2">&amp;</span>t_b) {
                     <span class="kw-2">*</span>output = <span class="self">self</span>.start + a * t_a;
                     <span class="bool-val">true
                 </span>} <span class="kw">else </span>{
