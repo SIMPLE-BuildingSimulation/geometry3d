@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/SIMPLE-BuildingSimulation/geometry3d/compare/v0.2.1...v0.2.2) (2022-11-07)
+
+
+### Bug Fixes
+
+* fixed triangulation issues ([336515c](https://github.com/SIMPLE-BuildingSimulation/geometry3d/commit/336515cf59763957021ffad61539fb6d83d13c2d))
+
 ## [0.2.1](https://github.com/SIMPLE-BuildingSimulation/geometry3d/compare/v0.2.0...v0.2.1) (2022-11-06)
 
 
