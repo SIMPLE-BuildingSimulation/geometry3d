@@ -560,10 +560,6 @@
 <span id="526">526</span>
 <span id="527">527</span>
 <span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -674,10 +670,8 @@ SOFTWARE.
     <span class="doccomment">/// Checks if a [`Segment3D`] contains another [`Segment3D`].
     </span><span class="kw">pub fn </span>contains(<span class="kw-2">&amp;</span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>Segment3D) -&gt; <span class="prelude-ty">Result</span>&lt;bool, String&gt; {
         <span class="kw">const </span>TINY: Float = <span class="number">1e-6</span>;
-        <span class="kw">if </span><span class="self">self</span>.length() &lt; TINY {
-            <span class="kw">let </span>msg = <span class="string">&quot;Trying to check whether a segment is contained in a zero-length segment&quot;
-                </span>.to_string();
-            <span class="kw">return </span><span class="prelude-val">Err</span>(msg);
+        <span class="kw">if </span><span class="self">self</span>.length() &lt; TINY {            
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Trying to check whether a segment is contained in a zero-length segment&quot;</span>.into());
         }
 
         <span class="kw">let </span>a1 = <span class="self">self</span>.start();
@@ -706,13 +700,11 @@ SOFTWARE.
             alpha = (a2.z - a1.z) / a1b1.z;
             beta = (b2.z - a1.z) / a1b1.z;
         } <span class="kw">else </span>{
-            <span class="comment">// We should never get here.
-            </span><span class="kw">let </span>msg = <span class="string">&quot;Trying to check whether a segment is contained in a zero-length segment&quot;
-                </span>.to_string();
-            <span class="kw">return </span><span class="prelude-val">Err</span>(msg);
+            <span class="comment">// We should never get here.                        
+            </span><span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Trying to check whether a segment is contained in a zero-length segment&quot;</span>.into());
         }
-
-        <span class="prelude-val">Ok</span>((<span class="number">0. </span>..=<span class="number">1.</span>).contains(<span class="kw-2">&amp;</span>alpha) &amp;&amp; (<span class="number">0. </span>..=<span class="number">1.</span>).contains(<span class="kw-2">&amp;</span>beta))
+        <span class="kw">const </span>INTERSECT_RANGE : core::ops::RangeInclusive&lt;Float&gt; = <span class="number">0. </span>..=<span class="number">1.</span>;<span class="comment">// TINY..(1.-TINY);
+        </span><span class="prelude-val">Ok</span>(INTERSECT_RANGE.contains(<span class="kw-2">&amp;</span>alpha) &amp;&amp; INTERSECT_RANGE.contains(<span class="kw-2">&amp;</span>beta))
     }
 
     <span class="doccomment">/// Checks where is it that two [`Segment3D`] intersect, returning the

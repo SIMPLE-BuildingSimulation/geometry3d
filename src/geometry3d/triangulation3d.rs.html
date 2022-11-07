@@ -2604,6 +2604,12 @@
 <span id="2570">2570</span>
 <span id="2571">2571</span>
 <span id="2572">2572</span>
+<span id="2573">2573</span>
+<span id="2574">2574</span>
+<span id="2575">2575</span>
+<span id="2576">2576</span>
+<span id="2577">2577</span>
+<span id="2578">2578</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -2873,17 +2879,23 @@ SOFTWARE.
         <span class="kw">let </span><span class="kw-2">mut </span>anchor = <span class="number">0</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>count = <span class="number">0</span>;
         <span class="kw">loop </span>{
-            <span class="macro">assert!</span>(
-                count &lt; <span class="number">1000</span>,
-                <span class="string">&quot;Excessive number of iteration when triangulating polygon&quot;
-            </span>);
+            <span class="kw">if </span>count &gt; <span class="number">1000 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Excessive number of iteration when triangulating polygon&quot;</span>.into());
+            }
+            
             count += <span class="number">1</span>;
-            <span class="kw">let </span>n = the_loop.len();
+            <span class="kw">let </span><span class="kw-2">mut </span>n = the_loop.len();
             <span class="kw">let </span>last_added = t.n_triangles();
+            
             <span class="kw">if </span>n == <span class="number">2 </span>{
                 <span class="comment">// return
                 </span>t.mark_neighbourhouds()<span class="question-mark">?</span>;
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(t);
+            }
+
+            <span class="kw">if </span>count % <span class="number">10 </span>== <span class="number">0</span>{
+                the_loop = the_loop.sanitize()<span class="question-mark">?</span>;
+                n = the_loop.len();
             }
 
             <span class="kw">let </span>v0 = the_loop[anchor % n];
@@ -2891,8 +2903,8 @@ SOFTWARE.
             <span class="kw">let </span>v2 = the_loop[(anchor + <span class="number">2</span>) % n];
 
             <span class="kw">let </span>potential_diag = Segment3D::new(v0, v2);
-            <span class="kw">let </span>is_line = v0.is_collinear(v1, v2).unwrap();
-            <span class="kw">let </span>is_diagonal = the_loop.is_diagonal(potential_diag);
+            <span class="kw">let </span>is_line = v0.is_collinear(v1, v2)<span class="question-mark">?</span>;
+            <span class="kw">let </span>is_diagonal = the_loop.is_diagonal(potential_diag)<span class="question-mark">?</span>;
             <span class="kw">if </span>!is_line &amp;&amp; is_diagonal {
                 <span class="comment">// Do not add (i.e., just drop) ears that are too small.
                 </span><span class="kw">if </span>potential_diag.length() &gt; <span class="number">0.0001 </span>{
