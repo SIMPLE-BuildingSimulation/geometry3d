@@ -267,17 +267,23 @@ impl Triangulation3D {
         let mut anchor = 0;
         let mut count = 0;
         loop {
-            assert!(
-                count < 1000,
-                "Excessive number of iteration when triangulating polygon"
-            );
+            if count > 1000 {
+                return Err("Excessive number of iteration when triangulating polygon".into());
+            }
+            
             count += 1;
-            let n = the_loop.len();
+            let mut n = the_loop.len();
             let last_added = t.n_triangles();
+            
             if n == 2 {
                 // return
                 t.mark_neighbourhouds()?;
                 return Ok(t);
+            }
+
+            if count % 10 == 0{
+                the_loop = the_loop.sanitize()?;
+                n = the_loop.len();
             }
 
             let v0 = the_loop[anchor % n];
@@ -285,8 +291,8 @@ impl Triangulation3D {
             let v2 = the_loop[(anchor + 2) % n];
 
             let potential_diag = Segment3D::new(v0, v2);
-            let is_line = v0.is_collinear(v1, v2).unwrap();
-            let is_diagonal = the_loop.is_diagonal(potential_diag);
+            let is_line = v0.is_collinear(v1, v2)?;
+            let is_diagonal = the_loop.is_diagonal(potential_diag)?;
             if !is_line && is_diagonal {
                 // Do not add (i.e., just drop) ears that are too small.
                 if potential_diag.length() > 0.0001 {

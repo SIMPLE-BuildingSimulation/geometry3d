@@ -108,10 +108,8 @@ impl Segment3D {
     /// Checks if a [`Segment3D`] contains another [`Segment3D`].
     pub fn contains(&self, input: &Segment3D) -> Result<bool, String> {
         const TINY: Float = 1e-6;
-        if self.length() < TINY {
-            let msg = "Trying to check whether a segment is contained in a zero-length segment"
-                .to_string();
-            return Err(msg);
+        if self.length() < TINY {            
+            return Err("Trying to check whether a segment is contained in a zero-length segment".into());
         }
 
         let a1 = self.start();
@@ -140,13 +138,11 @@ impl Segment3D {
             alpha = (a2.z - a1.z) / a1b1.z;
             beta = (b2.z - a1.z) / a1b1.z;
         } else {
-            // We should never get here.
-            let msg = "Trying to check whether a segment is contained in a zero-length segment"
-                .to_string();
-            return Err(msg);
+            // We should never get here.                        
+            return Err("Trying to check whether a segment is contained in a zero-length segment".into());
         }
-
-        Ok((0. ..=1.).contains(&alpha) && (0. ..=1.).contains(&beta))
+        const INTERSECT_RANGE : core::ops::RangeInclusive<Float> = 0. ..=1.;// TINY..(1.-TINY);
+        Ok(INTERSECT_RANGE.contains(&alpha) && INTERSECT_RANGE.contains(&beta))
     }
 
     /// Checks where is it that two [`Segment3D`] intersect, returning the

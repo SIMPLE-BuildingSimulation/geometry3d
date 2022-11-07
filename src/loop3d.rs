@@ -183,6 +183,55 @@ impl Loop3D {
         }
     }
 
+    /// Creates a new and empty [`Loop3D`] with a specific `capacity`. It has a Zero Normal and an
+    /// area of -1. These attributes are filled automatically when pushing
+    /// vertices into the Loop.
+    pub fn with_capacity(capacity: usize) -> Loop3D {
+        Loop3D {
+            vertices: Vec::with_capacity(capacity),
+            normal: Vector3D::new(0., 0., 0.),
+            closed: false,
+            area: -1.0,
+            perimeter: -1.0,
+        }
+    }
+
+    /// is closed?
+    pub fn closed(&self) -> bool {
+        self.closed
+    }
+
+    /// Creates a clone of `self`, removing the
+    /// collinear points.
+    ///
+    /// The returned [`Loop3D`] will be closed if `self`
+    /// is closed.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use geometry3d::{Loop3D, Point3D};
+    ///
+    /// let mut l = Loop3D::with_capacity(4);
+    /// // Add a triangle
+    /// l.push(Point3D::new(0., 0., 0.)).unwrap();
+    /// l.push(Point3D::new(1., 1., 0.)).unwrap();
+    /// l.push(Point3D::new(0., 1., 0.)).unwrap();
+    /// l.push(Point3D::new(0., 0.5, 0.)).unwrap();
+    ///
+    /// l = l.sanitize().unwrap();    
+    /// ```
+    pub fn sanitize(self) -> Result<Self, String> {
+        let mut new = Self::with_capacity(self.len());
+        for v in self.vertices.iter() {
+            new.push(*v).unwrap();
+        }
+        if self.closed {
+            new.close()?
+        }
+        Ok(new)
+    }
+
     /// Checks if the [`Loop3D`] has Zero vertices
     pub fn is_empty(&self) -> bool {
         self.vertices.is_empty()
@@ -298,25 +347,32 @@ impl Loop3D {
     /// one vertex to another. I mean, this function takes *any* segment,
     /// meaning that a small [`Segment3D`] "floating" inside of a big [`Loop3D`]
     /// will be considered a diagonal... be careful with this
-    pub fn is_diagonal(&self, s: Segment3D) -> bool {
+    pub fn is_diagonal(&self, s: Segment3D) -> Result<bool, String> {
         let mut inter = Point3D::new(0., 0., 0.);
         let n = self.len();
-        // It cannot intercept any
+        // It cannot intercect any
         for i in 0..=n {
             let a = self.vertices[i % n];
             let b = self.vertices[(i + 1) % n];
 
             let poly_s = Segment3D::new(a, b);
-            if s.intersect(&poly_s, &mut inter) {
-                return false;
+            let intersects = s.intersect(&poly_s, &mut inter);
+            // If they are contained and are the same length, then they are the same segment
+            
+            const TINY : Float = 1e-7;
+            
+            let different_length = (s.length() - poly_s.length()).abs() > TINY;
+            let contains = s.contains(&poly_s)? && different_length ;
+            if intersects || contains {
+                return Ok(false);
             }
         }
         // And the midpoint must be in the loop.
         if !self.test_point(s.midpoint()).unwrap() {
-            return false;
+            return Ok(false);
         }
 
-        true // return
+        Ok(true)
     }
 
     /// Opens a [`Loop3D`]
@@ -430,7 +486,7 @@ impl Loop3D {
         }
 
         // Ray cast
-        let d = (point - (self.vertices[0] + self.vertices[1])*0.5) * 1000.; // Should be enough...?
+        let d = (point - (self.vertices[0] + self.vertices[1]) * 0.5) * 1000.; // Should be enough...?
         let ray = Segment3D::new(point, point + d);
 
         let mut n_cross = 0;
@@ -607,7 +663,7 @@ impl Loop3D {
 #[cfg(test)]
 mod testing {
 
-    use crate::{Triangulation3D, Polygon3D};
+    use crate::{Polygon3D, Triangulation3D};
 
     use super::*;
 
@@ -1099,22 +1155,28 @@ mod testing {
         l.close().unwrap();
 
         // Intersects a segment
-        assert!(!l.is_diagonal(Segment3D::new(
-            Point3D::new(-4., 0., 0.),
-            Point3D::new(4., 0., 0.),
-        )));
+        assert!(!l
+            .is_diagonal(Segment3D::new(
+                Point3D::new(-4., 0., 0.),
+                Point3D::new(4., 0., 0.),
+            ))
+            .unwrap());
 
         // Doesn't intersect, but is outside
-        assert!(!l.is_diagonal(Segment3D::new(
-            Point3D::new(4., 0., 0.),
-            Point3D::new(5., 0., 0.),
-        )));
+        assert!(!l
+            .is_diagonal(Segment3D::new(
+                Point3D::new(4., 0., 0.),
+                Point3D::new(5., 0., 0.),
+            ))
+            .unwrap());
 
         // Doesn't intersect, is inside == is_diagonal
-        assert!(l.is_diagonal(Segment3D::new(
-            Point3D::new(-2., -2., 0.),
-            Point3D::new(2., 2., 0.),
-        )));
+        assert!(l
+            .is_diagonal(Segment3D::new(
+                Point3D::new(-2., -2., 0.),
+                Point3D::new(2., 2., 0.),
+            ))
+            .unwrap());
     }
 
     #[test]
@@ -1214,45 +1276,230 @@ mod testing {
     }
 
     #[test]
-    fn test_weird_loop(){
-        let mut l = Loop3D::new();
-        l.push(Point3D{x:0., y:1.3500000000000001, z:0.0}).unwrap();        
-        l.push(Point3D{x:0., y:2.0899999999999999, z:0.82999999999999996}).unwrap();
-        l.push(Point3D{x:0., y:2.9900000000000002, z:0.82999999999999996}).unwrap();
-        l.push(Point3D{x:0., y:2.9900000000000002, z:2.29}).unwrap();
-        l.push(Point3D{x:0., y:2.0899999999999999, z:2.29}).unwrap();
-        l.push(Point3D{x:0., y:1.3500000000000001, z:2.7000000000000002}).unwrap();
-        l.push(Point3D{x:0., y:3.7400000000000002, z:2.7000000000000002}).unwrap();
-        l.push(Point3D{x:0., y:3.7400000000000002, z:0.0}).unwrap();
-        
+    fn test_sanitize() {
+        let mut l = Loop3D::with_capacity(4);
+        // Add a triangle
+        l.vertices.push(Point3D::new(0., 0., 0.));
+        l.vertices.push(Point3D::new(1., 1., 0.));
+        l.vertices.push(Point3D::new(0., 1., 0.)); 
+        // And then two aligned points       
+        l.vertices.push(Point3D::new(0., 0.5, 0.)); // <- Collinear point
+        l.vertices.push(Point3D::new(0., 0.2, 0.));
+
+        // start with 5 points
+        assert_eq!(l.len(), 5); 
+
+        // Sanitizing removes the collinear point, 
+        // withouth closing.
+        l = l.sanitize().unwrap();
+        assert_eq!(l.len(), 4); 
+        assert!(!l.closed()); 
+
+        // We close it, (last point we
+        // added is collinear, so it will be removed).
         l.close().unwrap();
-        
+        assert_eq!(l.len(), 3);
+
+        // Sanitizing now should return a closed polygon.
+        l = l.sanitize().unwrap();
+        assert!(l.closed());
+    }
+
+    #[test]
+    fn test_weird_loop() {
+        let mut l = Loop3D::new();
+        l.push(Point3D {
+            x: 0.,
+            y: 1.3500000000000001,
+            z: 0.0,
+        })
+        .unwrap();
+        l.push(Point3D {
+            x: 0.,
+            y: 2.0899999999999999,
+            z: 0.82999999999999996,
+        })
+        .unwrap();
+        l.push(Point3D {
+            x: 0.,
+            y: 2.9900000000000002,
+            z: 0.82999999999999996,
+        })
+        .unwrap();
+        l.push(Point3D {
+            x: 0.,
+            y: 2.9900000000000002,
+            z: 2.29,
+        })
+        .unwrap();
+        l.push(Point3D {
+            x: 0.,
+            y: 2.0899999999999999,
+            z: 2.29,
+        })
+        .unwrap();
+        l.push(Point3D {
+            x: 0.,
+            y: 1.3500000000000001,
+            z: 2.7000000000000002,
+        })
+        .unwrap();
+        l.push(Point3D {
+            x: 0.,
+            y: 3.7400000000000002,
+            z: 2.7000000000000002,
+        })
+        .unwrap();
+        l.push(Point3D {
+            x: 0.,
+            y: 3.7400000000000002,
+            z: 0.0,
+        })
+        .unwrap();
+
+        l.close().unwrap();
+
         let poly = Polygon3D::new(l).unwrap();
         Triangulation3D::from_polygon(&poly).unwrap();
     }
 
     #[test]
-    fn test_weird_loop_2(){
+    fn test_weird_loop_2() {
         let mut outer = Loop3D::new();
-        outer.push(Point3D{x:8.7699999999999996, y:3.7400000000000002, z: 0.0}).unwrap(); // 0
-        outer.push(Point3D{x:8.7699999999999996, y:3.7400000000000002, z: 2.7000000000000002}).unwrap(); // 1
-        outer.push(Point3D{x:8.7699999999999996, y:0.0, z: 2.7000000000000002}).unwrap(); // 1
-        outer.push(Point3D{x:8.7699999999999996, y:0.0, z: 0.0}).unwrap(); // 1
+        outer
+            .push(Point3D {
+                x: 8.7699999999999996,
+                y: 3.7400000000000002,
+                z: 0.0,
+            })
+            .unwrap(); // 0
+        outer
+            .push(Point3D {
+                x: 8.7699999999999996,
+                y: 3.7400000000000002,
+                z: 2.7000000000000002,
+            })
+            .unwrap(); // 1
+        outer
+            .push(Point3D {
+                x: 8.7699999999999996,
+                y: 0.0,
+                z: 2.7000000000000002,
+            })
+            .unwrap(); // 1
+        outer
+            .push(Point3D {
+                x: 8.7699999999999996,
+                y: 0.0,
+                z: 0.0,
+            })
+            .unwrap(); // 1
         outer.close().unwrap();
 
         let mut inner = Loop3D::new();
 
+        inner
+            .push(Point3D {
+                x: 8.7699999999999996,
+                y: 1.2649999999999999,
+                z: 0.69999999999999996,
+            })
+            .unwrap(); // 2
+        inner
+            .push(Point3D {
+                x: 8.7699999999999996,
+                y: 1.2649999999999999,
+                z: 2.29,
+            })
+            .unwrap(); // 3
+        inner
+            .push(Point3D {
+                x: 8.7699999999999996,
+                y: 2.4750000000000001,
+                z: 2.29,
+            })
+            .unwrap(); // 4
+        inner
+            .push(Point3D {
+                x: 8.7699999999999996,
+                y: 2.4740000000000002,
+                z: 0.69999999999999996,
+            })
+            .unwrap(); // 5
 
-
-        inner.push(Point3D{x:8.7699999999999996, y:1.2649999999999999, z: 0.69999999999999996}).unwrap(); // 2
-        inner.push(Point3D{x:8.7699999999999996, y:1.2649999999999999, z: 2.29}).unwrap(); // 3
-        inner.push(Point3D{x:8.7699999999999996, y:2.4750000000000001, z: 2.29}).unwrap(); // 4
-        inner.push(Point3D{x:8.7699999999999996, y:2.4740000000000002, z: 0.69999999999999996}).unwrap(); // 5        
-        
         inner.close().unwrap();
-        
+
         let mut poly = Polygon3D::new(outer).unwrap();
         poly.cut_hole(inner).unwrap();
+        Triangulation3D::from_polygon(&poly).unwrap();
+    }
+
+   
+
+    #[test]
+    fn test_weird_loop_3() {
+        let mut outer = Loop3D::new();
+        outer
+            .push(Point3D {
+                x: 2.98,
+                y: 1.3500000000000001,
+                z: 2.7000000000000002,
+            })
+            .unwrap(); // 0
+        outer
+            .push(Point3D {
+                x: 4.0199999999999996,
+                y: 1.3500000000000001,
+                z: 2.7000000000000002,
+            })
+            .unwrap(); // 1
+        outer
+            .push(Point3D {
+                x: 4.0199999999999996,
+                y: 6.0300000000000002,
+                z: 2.7000000000000002,
+            })
+            .unwrap(); // 1
+        outer
+            .push(Point3D {
+                x: 2.98,
+                y: 6.0300000000000002,
+                z: 2.7000000000000002,
+            })
+            .unwrap(); // 1
+
+        outer
+            .push(Point3D {
+                x: 2.98,
+                y: 5.7599999999999998,
+                z: 2.7000000000000002,
+            })
+            .unwrap(); // 2
+        outer
+            .push(Point3D {
+                x: 1.9199999999999999,
+                y: 5.7599999999999998,
+                z: 2.7000000000000002,
+            })
+            .unwrap(); // 3
+        outer
+            .push(Point3D {
+                x: 1.9199999999999999,
+                y: 4.7999999999999998,
+                z: 2.7000000000000002,
+            })
+            .unwrap(); // 4
+        outer
+            .push(Point3D {
+                x: 2.98,
+                y: 4.7999999999999998,
+                z: 2.7000000000000002,
+            })
+            .unwrap(); // 5
+
+        outer.close().unwrap();
+
+        let poly = Polygon3D::new(outer).unwrap();
         Triangulation3D::from_polygon(&poly).unwrap();
     }
 }
