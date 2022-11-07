@@ -1230,4 +1230,29 @@ mod testing {
         let poly = Polygon3D::new(l).unwrap();
         Triangulation3D::from_polygon(&poly).unwrap();
     }
+
+    #[test]
+    fn test_weird_loop_2(){
+        let mut outer = Loop3D::new();
+        outer.push(Point3D{x:8.7699999999999996, y:3.7400000000000002, z: 0.0}).unwrap(); // 0
+        outer.push(Point3D{x:8.7699999999999996, y:3.7400000000000002, z: 2.7000000000000002}).unwrap(); // 1
+        outer.push(Point3D{x:8.7699999999999996, y:0.0, z: 2.7000000000000002}).unwrap(); // 1
+        outer.push(Point3D{x:8.7699999999999996, y:0.0, z: 0.0}).unwrap(); // 1
+        outer.close().unwrap();
+
+        let mut inner = Loop3D::new();
+
+
+
+        inner.push(Point3D{x:8.7699999999999996, y:1.2649999999999999, z: 0.69999999999999996}).unwrap(); // 2
+        inner.push(Point3D{x:8.7699999999999996, y:1.2649999999999999, z: 2.29}).unwrap(); // 3
+        inner.push(Point3D{x:8.7699999999999996, y:2.4750000000000001, z: 2.29}).unwrap(); // 4
+        inner.push(Point3D{x:8.7699999999999996, y:2.4740000000000002, z: 0.69999999999999996}).unwrap(); // 5        
+        
+        inner.close().unwrap();
+        
+        let mut poly = Polygon3D::new(outer).unwrap();
+        poly.cut_hole(inner).unwrap();
+        Triangulation3D::from_polygon(&poly).unwrap();
+    }
 }

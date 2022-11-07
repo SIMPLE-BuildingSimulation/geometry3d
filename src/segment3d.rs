@@ -216,11 +216,13 @@ impl Segment3D {
     /// Checks if two [`Segment3D`] intersect each other. This returns `false` if
     /// one of the [`Segment3D`] barely touches the other one.
     pub fn intersect(&self, input: &Segment3D, output: &mut Point3D) -> bool {
+        const TINY: Float = 1e-8;
+        const INTERSECT_RANGE : core::ops::Range<Float> = TINY..(1.-TINY);
         match self.get_intersection_pt(input) {
             Some((t_a, t_b)) => {
                 let a = self.end - self.start;
 
-                if (Float::EPSILON..1.).contains(&t_a) && (Float::EPSILON..1.).contains(&t_b) {
+                if (0. ..1.).contains(&t_a) && INTERSECT_RANGE.contains(&t_b) {
                     *output = self.start + a * t_a;
                     true
                 } else {
