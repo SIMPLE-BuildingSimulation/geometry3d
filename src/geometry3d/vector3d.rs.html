@@ -660,7 +660,6 @@
 <span id="626">626</span>
 <span id="627">627</span>
 <span id="628">628</span>
-<span id="629">629</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -882,8 +881,7 @@ SOFTWARE.
 
         <span class="kw">let </span>ab_squared = <span class="self">self</span>.length_squared() * v.length_squared();
         <span class="kw">let </span>dot : Float  = <span class="kw-2">*</span><span class="self">self </span>* v;
-        <span class="kw">let </span>r = ((dot * dot) - ab_squared).abs();
-        <span class="macro">println!</span>(<span class="string">&quot;r = {}&quot;</span>, <span class="kw-2">&amp;</span>r);
+        <span class="kw">let </span>r = ((dot * dot) - ab_squared).abs();        
         r &lt; <span class="number">1e-5
     </span>} <span class="comment">// end of is_parallel
 
