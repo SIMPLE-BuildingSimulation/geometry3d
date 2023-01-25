@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/SIMPLE-BuildingSimulation/geometry3d/compare/v0.2.2...v0.2.3) (2023-01-25)
+
+
+### Bug Fixes
+
+* Bug in is_parallel; remove println!() ([fea1deb](https://github.com/SIMPLE-BuildingSimulation/geometry3d/commit/fea1deb35848111ca2912457c90c3b79661ab9d7))
+
 ## [0.2.2](https://github.com/SIMPLE-BuildingSimulation/geometry3d/compare/v0.2.1...v0.2.2) (2022-11-07)
 
 
