@@ -32,7 +32,7 @@
   });
 </script>
 
-</head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../geometry3d/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../geometry3d/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../geometry3d/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+</head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../geometry3d/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -661,40 +661,6 @@
 <span id="627">627</span>
 <span id="628">628</span>
 <span id="629">629</span>
-<span id="630">630</span>
-<span id="631">631</span>
-<span id="632">632</span>
-<span id="633">633</span>
-<span id="634">634</span>
-<span id="635">635</span>
-<span id="636">636</span>
-<span id="637">637</span>
-<span id="638">638</span>
-<span id="639">639</span>
-<span id="640">640</span>
-<span id="641">641</span>
-<span id="642">642</span>
-<span id="643">643</span>
-<span id="644">644</span>
-<span id="645">645</span>
-<span id="646">646</span>
-<span id="647">647</span>
-<span id="648">648</span>
-<span id="649">649</span>
-<span id="650">650</span>
-<span id="651">651</span>
-<span id="652">652</span>
-<span id="653">653</span>
-<span id="654">654</span>
-<span id="655">655</span>
-<span id="656">656</span>
-<span id="657">657</span>
-<span id="658">658</span>
-<span id="659">659</span>
-<span id="660">660</span>
-<span id="661">661</span>
-<span id="662">662</span>
-<span id="663">663</span>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -914,46 +880,12 @@ SOFTWARE.
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="comment">// This closure will be useful later.
-        </span><span class="kw">let </span>check_other = |k_in: Float, v1: Float, v2: Float| {
-            <span class="kw">if </span>v2.abs() &gt; <span class="number">1e-8 </span>{
-                <span class="comment">// Can be divided. Check if division
-                // results in K (or close to it).
-                </span>(v1 / v2 - k_in).abs() &lt; <span class="number">1e-8
-            </span>} <span class="kw">else </span>{
-                <span class="comment">// Cannot be divided... check if v1 is
-                // also tiny
-                </span>v1.abs() &lt; <span class="number">1e-8
-            </span>}
-        };
-
-        <span class="comment">// If they point in the same direction, K should be the same in all cases.
-        // This value (1.0) is never really used I think, but I need to
-        // initialize the variable... otherwise I get  warming.
-        </span><span class="kw">let </span>k; <span class="comment">// = 1.0 as Float;
-        </span><span class="kw">if </span>v.x.abs() &gt; <span class="number">1e-8 </span>{
-            <span class="comment">// Let&#39;s try anchoring at X
-            </span>k = <span class="self">self</span>.x / v.x;
-
-            <span class="comment">// Check if Y and Z have the same K.
-            </span>check_other(k, <span class="self">self</span>.y, v.y) &amp;&amp; check_other(k, <span class="self">self</span>.z, v.z)
-        } <span class="kw">else if </span>v.y.abs() &gt; <span class="number">1e-8 </span>{
-            <span class="comment">// Let&#39;s try anchoring at Y
-            </span>k = <span class="self">self</span>.y / v.y;
-
-            <span class="comment">// return
-            </span>check_other(k, <span class="self">self</span>.x, v.x) &amp;&amp; check_other(k, <span class="self">self</span>.z, v.z)
-        } <span class="kw">else </span>{
-            <span class="comment">// Since v is not zero, then
-            // v.z.abs() must be larget than tiny
-            // Let&#39;s anchor at Z
-
-            //if v.z.abs() &gt; tiny {
-            </span>k = <span class="self">self</span>.z / v.z;
-            <span class="comment">//}
-            </span>check_other(k, <span class="self">self</span>.x, v.x) &amp;&amp; check_other(k, <span class="self">self</span>.y, v.y)
-        }
-    } <span class="comment">// end of is_parallel
+        <span class="kw">let </span>ab_squared = <span class="self">self</span>.length_squared() * v.length_squared();
+        <span class="kw">let </span>dot : Float  = <span class="kw-2">*</span><span class="self">self </span>* v;
+        <span class="kw">let </span>r = ((dot * dot) - ab_squared).abs();
+        <span class="macro">println!</span>(<span class="string">&quot;r = {}&quot;</span>, <span class="kw-2">&amp;</span>r);
+        r &lt; <span class="number">1e-5
+    </span>} <span class="comment">// end of is_parallel
 
     </span><span class="doccomment">/// Checks if two vectors are parallel and follow the same direction.
     </span><span class="kw">pub fn </span>is_same_direction(<span class="kw-2">&amp;</span><span class="self">self</span>, v: Vector3D) -&gt; bool {
@@ -1359,4 +1291,4 @@ SOFTWARE.
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geometry3d" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.1 (90743e729 2023-01-10)" ></div></body></html>
