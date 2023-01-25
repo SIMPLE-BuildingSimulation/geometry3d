@@ -219,8 +219,7 @@ impl Vector3D {
 
         let ab_squared = self.length_squared() * v.length_squared();
         let dot : Float  = *self * v;
-        let r = ((dot * dot) - ab_squared).abs();
-        println!("r = {}", &r);
+        let r = ((dot * dot) - ab_squared).abs();        
         r < 1e-5
     } // end of is_parallel
 
