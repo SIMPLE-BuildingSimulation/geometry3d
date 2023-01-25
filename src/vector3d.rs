@@ -217,45 +217,11 @@ impl Vector3D {
             return false;
         }
 
-        // This closure will be useful later.
-        let check_other = |k_in: Float, v1: Float, v2: Float| {
-            if v2.abs() > 1e-8 {
-                // Can be divided. Check if division
-                // results in K (or close to it).
-                (v1 / v2 - k_in).abs() < 1e-8
-            } else {
-                // Cannot be divided... check if v1 is
-                // also tiny
-                v1.abs() < 1e-8
-            }
-        };
-
-        // If they point in the same direction, K should be the same in all cases.
-        // This value (1.0) is never really used I think, but I need to
-        // initialize the variable... otherwise I get  warming.
-        let k; // = 1.0 as Float;
-        if v.x.abs() > 1e-8 {
-            // Let's try anchoring at X
-            k = self.x / v.x;
-
-            // Check if Y and Z have the same K.
-            check_other(k, self.y, v.y) && check_other(k, self.z, v.z)
-        } else if v.y.abs() > 1e-8 {
-            // Let's try anchoring at Y
-            k = self.y / v.y;
-
-            // return
-            check_other(k, self.x, v.x) && check_other(k, self.z, v.z)
-        } else {
-            // Since v is not zero, then
-            // v.z.abs() must be larget than tiny
-            // Let's anchor at Z
-
-            //if v.z.abs() > tiny {
-            k = self.z / v.z;
-            //}
-            check_other(k, self.x, v.x) && check_other(k, self.y, v.y)
-        }
+        let ab_squared = self.length_squared() * v.length_squared();
+        let dot : Float  = *self * v;
+        let r = ((dot * dot) - ab_squared).abs();
+        println!("r = {}", &r);
+        r < 1e-5
     } // end of is_parallel
 
     /// Checks if two vectors are parallel and follow the same direction.
