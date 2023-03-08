@@ -348,6 +348,10 @@ impl Loop3D {
     /// meaning that a small [`Segment3D`] "floating" inside of a big [`Loop3D`]
     /// will be considered a diagonal... be careful with this
     pub fn is_diagonal(&self, s: Segment3D) -> Result<bool, String> {
+        if s.length < 1e-5 {
+            // Very small segment cannot be diagonal
+            return Ok(false);
+        }
         let mut inter = Point3D::new(0., 0., 0.);
         let n = self.len();
         // It cannot intercect any
@@ -358,11 +362,11 @@ impl Loop3D {
             let poly_s = Segment3D::new(a, b);
             let intersects = s.intersect(&poly_s, &mut inter);
             // If they are contained and are the same length, then they are the same segment
-            
-            const TINY : Float = 1e-7;
-            
+
+            const TINY: Float = 1e-7;
+
             let different_length = (s.length() - poly_s.length()).abs() > TINY;
-            let contains = s.contains(&poly_s)? && different_length ;
+            let contains = s.contains(&poly_s)? && different_length;
             if intersects || contains {
                 return Ok(false);
             }
@@ -1281,19 +1285,19 @@ mod testing {
         // Add a triangle
         l.vertices.push(Point3D::new(0., 0., 0.));
         l.vertices.push(Point3D::new(1., 1., 0.));
-        l.vertices.push(Point3D::new(0., 1., 0.)); 
-        // And then two aligned points       
+        l.vertices.push(Point3D::new(0., 1., 0.));
+        // And then two aligned points
         l.vertices.push(Point3D::new(0., 0.5, 0.)); // <- Collinear point
         l.vertices.push(Point3D::new(0., 0.2, 0.));
 
         // start with 5 points
-        assert_eq!(l.len(), 5); 
+        assert_eq!(l.len(), 5);
 
-        // Sanitizing removes the collinear point, 
+        // Sanitizing removes the collinear point,
         // withouth closing.
         l = l.sanitize().unwrap();
-        assert_eq!(l.len(), 4); 
-        assert!(!l.closed()); 
+        assert_eq!(l.len(), 4);
+        assert!(!l.closed());
 
         // We close it, (last point we
         // added is collinear, so it will be removed).
@@ -1433,8 +1437,6 @@ mod testing {
         poly.cut_hole(inner).unwrap();
         Triangulation3D::from_polygon(&poly).unwrap();
     }
-
-   
 
     #[test]
     fn test_weird_loop_3() {

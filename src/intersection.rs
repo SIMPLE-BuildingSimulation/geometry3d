@@ -100,12 +100,11 @@ pub struct IntersectionInfo {
     pub v: Float,
 }
 
-
 impl std::default::Default for IntersectionInfo {
-    fn default()->Self{
-        Self{            
+    fn default() -> Self {
+        Self {
             p: Point3D::new(0., 0., 0.),
-            normal: Vector3D::new(0., 0., 0.),            
+            normal: Vector3D::new(0., 0., 0.),
             side: SurfaceSide::default(),
             dpdu: Vector3D::new(0., 0., 0.),
             dpdv: Vector3D::new(0., 0., 0.),

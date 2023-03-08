@@ -270,18 +270,18 @@ impl Triangulation3D {
             if count > 1000 {
                 return Err("Excessive number of iteration when triangulating polygon".into());
             }
-            
+
             count += 1;
             let mut n = the_loop.len();
             let last_added = t.n_triangles();
-            
+
             if n == 2 {
                 // return
                 t.mark_neighbourhouds()?;
                 return Ok(t);
             }
 
-            if count % 10 == 0{
+            if count % 10 == 0 {
                 the_loop = the_loop.sanitize()?;
                 n = the_loop.len();
             }
