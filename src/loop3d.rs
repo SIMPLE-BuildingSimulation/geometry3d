@@ -228,7 +228,7 @@ impl Loop3D {
         for v in self.vertices.iter() {
             new.push(*v).unwrap();
         }
-        if self.closed && self.vertices.len() >= 3 {
+        if self.closed && new.vertices.len() >= 3 {
             new.close()?
         }
         Ok(new)
