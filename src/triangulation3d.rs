@@ -292,27 +292,28 @@ impl Triangulation3D {
 
             let potential_diag = Segment3D::new(v0, v2);
             let is_line = v0.is_collinear(v1, v2)?;
+            
+            // this will be false if potential_diag is very small.
             let is_diagonal = the_loop.is_diagonal(potential_diag)?;
             if !is_line && is_diagonal {
-                // Do not add (i.e., just drop) ears that are too small.
-                if potential_diag.length() > 0.0001 {
-                    // Add triangle
-                    t.push(v0, v1, v2, last_added).unwrap();
+                
+                // Add triangle
+                t.push(v0, v1, v2, last_added).unwrap();
 
-                    // Set contrain... there must be a smarter way of doing this
-                    let s01 = Segment3D::new(v0, v1);
-                    if poly.contains_segment(&s01) {
-                        t.triangles[last_added].constrain(Edge::from_i(0));
-                    }
-                    let s12 = Segment3D::new(v1, v2);
-                    if poly.contains_segment(&s12) {
-                        t.triangles[last_added].constrain(Edge::from_i(1));
-                    }
-                    let s20 = Segment3D::new(v2, v0);
-                    if poly.contains_segment(&s20) {
-                        t.triangles[last_added].constrain(Edge::from_i(2));
-                    }
+                // Set contrain... there must be a smarter way of doing this
+                let s01 = Segment3D::new(v0, v1);
+                if poly.contains_segment(&s01) {
+                    t.triangles[last_added].constrain(Edge::from_i(0));
                 }
+                let s12 = Segment3D::new(v1, v2);
+                if poly.contains_segment(&s12) {
+                    t.triangles[last_added].constrain(Edge::from_i(1));
+                }
+                let s20 = Segment3D::new(v2, v0);
+                if poly.contains_segment(&s20) {
+                    t.triangles[last_added].constrain(Edge::from_i(2));
+                }
+            
 
                 //remove v1
                 the_loop.remove((anchor + 1) % n);
