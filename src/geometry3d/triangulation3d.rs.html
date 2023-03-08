@@ -2611,6 +2611,7 @@
 <a href="#2577" id="2577">2577</a>
 <a href="#2578" id="2578">2578</a>
 <a href="#2579" id="2579">2579</a>
+<a href="#2580" id="2580">2580</a>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -2853,7 +2854,7 @@ SOFTWARE.
         <span class="kw">for </span>this_i <span class="kw">in </span><span class="number">0</span>..n {
             <span class="kw">for </span>other_i <span class="kw">in </span>this_i + <span class="number">1</span>..n {
                 <span class="kw">for </span>edge_i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                    <span class="kw">let </span>edge = <span class="self">self</span>.triangles[this_i].triangle.segment(edge_i).unwrap();
+                    <span class="kw">let </span>edge = <span class="self">self</span>.triangles[this_i].triangle.segment(edge_i)<span class="question-mark">?</span>;
 
                     <span class="kw">if </span><span class="self">self</span>.triangles[other_i]
                         .triangle
@@ -2873,7 +2874,7 @@ SOFTWARE.
     /// clipping algorithm.
     </span><span class="kw">pub fn </span>from_polygon(poly: <span class="kw-2">&amp;</span>Polygon3D) -&gt; <span class="prelude-ty">Result</span>&lt;Triangulation3D, String&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>the_loop = poly.get_closed_loop();
-        the_loop.close().unwrap();
+        the_loop.close()<span class="question-mark">?</span>;
         <span class="comment">// This is a theorem, apparently.
         </span><span class="kw">let </span><span class="kw-2">mut </span>t = Triangulation3D::with_capacity(the_loop.len() - <span class="number">2</span>);
 
@@ -2905,13 +2906,12 @@ SOFTWARE.
 
             <span class="kw">let </span>potential_diag = Segment3D::new(v0, v2);
             <span class="kw">let </span>is_line = v0.is_collinear(v1, v2)<span class="question-mark">?</span>;
-            
+
             <span class="comment">// this will be false if potential_diag is very small.
             </span><span class="kw">let </span>is_diagonal = the_loop.is_diagonal(potential_diag)<span class="question-mark">?</span>;
             <span class="kw">if </span>!is_line &amp;&amp; is_diagonal {
-                
                 <span class="comment">// Add triangle
-                </span>t.push(v0, v1, v2, last_added).unwrap();
+                </span>t.push(v0, v1, v2, last_added)<span class="question-mark">?</span>;
 
                 <span class="comment">// Set contrain... there must be a smarter way of doing this
                 </span><span class="kw">let </span>s01 = Segment3D::new(v0, v1);
@@ -2926,7 +2926,6 @@ SOFTWARE.
                 <span class="kw">if </span>poly.contains_segment(<span class="kw-2">&amp;</span>s20) {
                     t.triangles[last_added].constrain(Edge::from_i(<span class="number">2</span>));
                 }
-            
 
                 <span class="comment">//remove v1
                 </span>the_loop.remove((anchor + <span class="number">1</span>) % n);
@@ -2985,7 +2984,7 @@ SOFTWARE.
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Accessing invalid triangle within mark_as_neighbours()&quot;</span>.to_string());
         }
         <span class="comment">// Get segment... we should panic here, as this is not a user error
-        </span><span class="kw">let </span>seg1 = <span class="kw-2">&amp;</span><span class="self">self</span>.triangles[i1].triangle.segment(edge_1.as_i()).unwrap();
+        </span><span class="kw">let </span>seg1 = <span class="kw-2">&amp;</span><span class="self">self</span>.triangles[i1].triangle.segment(edge_1.as_i())<span class="question-mark">?</span>;
 
         <span class="comment">// Check neighbour
         </span><span class="kw">if </span>!<span class="self">self</span>.triangles[i2].valid {
@@ -3049,9 +3048,9 @@ SOFTWARE.
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Point3D, String&gt; {
         <span class="kw">match </span>triangle.get_edge_index_from_segment(<span class="kw-2">&amp;</span>segment) {
             <span class="prelude-val">Some</span>(i) =&gt; <span class="kw">match </span>i {
-                <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(triangle.vertex(<span class="number">2</span>).unwrap()),
-                <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(triangle.vertex(<span class="number">0</span>).unwrap()),
-                <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(triangle.vertex(<span class="number">1</span>).unwrap()),
+                <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(triangle.vertex(<span class="number">2</span>)<span class="question-mark">?</span>),
+                <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(triangle.vertex(<span class="number">0</span>)<span class="question-mark">?</span>),
+                <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(triangle.vertex(<span class="number">1</span>)<span class="question-mark">?</span>),
                 <span class="kw">_ </span>=&gt; {
                     <span class="prelude-val">Err</span>(<span class="string">&quot;Something really strange happened when get_opposite_vertex()&quot;</span>.to_string())
                 }
@@ -3067,7 +3066,7 @@ SOFTWARE.
 
     <span class="doccomment">/// Returns the aspect ration that would result after flipping the diagonal of [`Triangle3D`]
     /// (located at `index`)
-    </span><span class="kw">fn </span>get_flipped_aspect_ratio(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize, edge: Edge) -&gt; <span class="prelude-ty">Option</span>&lt;Float&gt; {
+    </span><span class="kw">fn </span>get_flipped_aspect_ratio(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize, edge: Edge) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Float&gt;, String&gt; {
         <span class="comment">// do not modify constraints
         </span><span class="kw">let </span>tripiece = <span class="kw-2">&amp;</span><span class="self">self</span>.triangles[index];
         <span class="kw">if </span>!tripiece.valid {
@@ -3075,12 +3074,12 @@ SOFTWARE.
         }
 
         <span class="kw">if </span>tripiece.is_constrained(edge) {
-            <span class="kw">return </span><span class="prelude-val">None</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
         <span class="comment">// get neighbor
         </span><span class="kw">let </span>neighbour_i = <span class="kw">match </span>tripiece.neighbour(edge) {
-            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             <span class="prelude-val">Some</span>(i) =&gt; i,
         };
 
@@ -3094,34 +3093,34 @@ SOFTWARE.
         }
 
         <span class="comment">// get vertices
-        </span><span class="kw">let </span>vertex_a = tripiece.triangle.vertex(edge.as_i() % <span class="number">3</span>).unwrap();
-        <span class="kw">let </span>vertex_b = tripiece.triangle.vertex((edge.as_i() + <span class="number">1</span>) % <span class="number">3</span>).unwrap();
-        <span class="kw">let </span>vertex_c = tripiece.triangle.vertex((edge.as_i() + <span class="number">2</span>) % <span class="number">3</span>).unwrap();
+        </span><span class="kw">let </span>vertex_a = tripiece.triangle.vertex(edge.as_i() % <span class="number">3</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>vertex_b = tripiece.triangle.vertex((edge.as_i() + <span class="number">1</span>) % <span class="number">3</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>vertex_c = tripiece.triangle.vertex((edge.as_i() + <span class="number">2</span>) % <span class="number">3</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// Get the oposite side
         </span><span class="kw">let </span>s = Segment3D::new(vertex_a, vertex_b);
-        <span class="kw">let </span>opposite = <span class="self">self</span>.get_opposite_vertex(<span class="kw-2">&amp;</span>neighbour.triangle, s).unwrap();
+        <span class="kw">let </span>opposite = <span class="self">self</span>.get_opposite_vertex(<span class="kw-2">&amp;</span>neighbour.triangle, s)<span class="question-mark">?</span>;
 
         <span class="kw">if </span>!is_convex(vertex_a, opposite, vertex_b, vertex_c) {
-            <span class="kw">return </span><span class="prelude-val">None</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
         <span class="comment">// get the other situation
-        </span><span class="kw">let </span>flipped1 = TriPiece::new(vertex_a, opposite, vertex_c, <span class="number">0</span>).unwrap();
-        <span class="kw">let </span>flipped2 = TriPiece::new(opposite, vertex_b, vertex_c, <span class="number">0</span>).unwrap();
+        </span><span class="kw">let </span>flipped1 = TriPiece::new(vertex_a, opposite, vertex_c, <span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>flipped2 = TriPiece::new(opposite, vertex_b, vertex_c, <span class="number">0</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>f1_aspect = flipped1.aspect_ratio;
         <span class="kw">let </span>f2_aspect = flipped2.aspect_ratio;
 
         <span class="comment">// Return the maximum
         </span><span class="kw">if </span>f1_aspect &gt; f2_aspect {
-            <span class="prelude-val">Some</span>(f1_aspect)
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(f1_aspect))
         } <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(f2_aspect)
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(f2_aspect))
         }
     }
 
-    <span class="kw">fn </span>flip_diagonal(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize, edge: Edge) {
+    <span class="kw">fn </span>flip_diagonal(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize, edge: Edge) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
         <span class="comment">// The transformation is as follows:
         //         C                C
         //        /\               /|\
@@ -3148,24 +3147,17 @@ SOFTWARE.
         }
 
         <span class="comment">// get vertices
-        </span><span class="kw">let </span>vertex_a = <span class="self">self</span>.triangles[index]
-            .triangle
-            .vertex(edge.as_i() % <span class="number">3</span>)
-            .unwrap();
+        </span><span class="kw">let </span>vertex_a = <span class="self">self</span>.triangles[index].triangle.vertex(edge.as_i() % <span class="number">3</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>vertex_b = <span class="self">self</span>.triangles[index]
             .triangle
-            .vertex((edge.as_i() + <span class="number">1</span>) % <span class="number">3</span>)
-            .unwrap();
+            .vertex((edge.as_i() + <span class="number">1</span>) % <span class="number">3</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>vertex_c = <span class="self">self</span>.triangles[index]
             .triangle
-            .vertex((edge.as_i() + <span class="number">2</span>) % <span class="number">3</span>)
-            .unwrap();
+            .vertex((edge.as_i() + <span class="number">2</span>) % <span class="number">3</span>)<span class="question-mark">?</span>;
         <span class="comment">// ... including the oposite side
         </span><span class="kw">let </span>s = Segment3D::new(vertex_a, vertex_b);
 
-        <span class="kw">let </span>opposite = <span class="self">self
-            </span>.get_opposite_vertex(<span class="kw-2">&amp;</span><span class="self">self</span>.triangles[neighbour_index].triangle, s)
-            .unwrap();
+        <span class="kw">let </span>opposite = <span class="self">self</span>.get_opposite_vertex(<span class="kw-2">&amp;</span><span class="self">self</span>.triangles[neighbour_index].triangle, s)<span class="question-mark">?</span>;
 
         <span class="comment">/* CHECK SURROUNDINGS */
         // AC segment
@@ -3225,28 +3217,26 @@ SOFTWARE.
         <span class="kw">let </span>constrain_aopp = <span class="self">self</span>.triangles[neighbour_index].is_constrained(aopp_edge);
 
         <span class="comment">/* THE ORIGINAL TRIANGLES, AND PUSH THE NEW ONES */
-        </span><span class="self">self</span>.invalidate(index).unwrap();
-        <span class="self">self</span>.invalidate(neighbour_index).unwrap();
-        <span class="kw">let </span>aoc_i = <span class="self">self</span>.push(vertex_a, opposite, vertex_c, index).unwrap();
-        <span class="kw">let </span>cob_i = <span class="self">self
-            </span>.push(vertex_c, opposite, vertex_b, neighbour_index)
-            .unwrap();
+        </span><span class="self">self</span>.invalidate(index)<span class="question-mark">?</span>;
+        <span class="self">self</span>.invalidate(neighbour_index)<span class="question-mark">?</span>;
+        <span class="kw">let </span>aoc_i = <span class="self">self</span>.push(vertex_a, opposite, vertex_c, index)<span class="question-mark">?</span>;
+        <span class="kw">let </span>cob_i = <span class="self">self</span>.push(vertex_c, opposite, vertex_b, neighbour_index)<span class="question-mark">?</span>;
 
         <span class="comment">/* REORGANIZE NEIGHBOURHOOD */
         // Segment A-Opposite
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(ni) = neighbour_aopp_i {
-            <span class="self">self</span>.mark_as_neighbours(index, Edge::Ab, ni).unwrap();
+            <span class="self">self</span>.mark_as_neighbours(index, Edge::Ab, ni)<span class="question-mark">?</span>;
         }
         <span class="kw">if </span>constrain_aopp {
             <span class="self">self</span>.triangles[aoc_i].constrain(Edge::Ab);
         }
 
         <span class="comment">// Segment C-Opposite
-        </span><span class="self">self</span>.mark_as_neighbours(aoc_i, Edge::Bc, cob_i).unwrap(); <span class="comment">// this one cannot be constrained
+        </span><span class="self">self</span>.mark_as_neighbours(aoc_i, Edge::Bc, cob_i)<span class="question-mark">?</span>; <span class="comment">// this one cannot be constrained
 
         // Segment AC
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(ni) = neighbour_ac_index {
-            <span class="self">self</span>.mark_as_neighbours(index, Edge::Ca, ni).unwrap();
+            <span class="self">self</span>.mark_as_neighbours(index, Edge::Ca, ni)<span class="question-mark">?</span>;
         }
         <span class="kw">if </span>constrain_ac {
             <span class="self">self</span>.triangles[aoc_i].constrain(Edge::Ca);
@@ -3258,7 +3248,7 @@ SOFTWARE.
 
         // Segment B-Opposite
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(ni) = neighbour_bopp_i {
-            <span class="self">self</span>.mark_as_neighbours(cob_i, Edge::Bc, ni).unwrap();
+            <span class="self">self</span>.mark_as_neighbours(cob_i, Edge::Bc, ni)<span class="question-mark">?</span>;
         }
         <span class="kw">if </span>constrain_bopp {
             <span class="self">self</span>.triangles[cob_i].constrain(Edge::Bc);
@@ -3266,14 +3256,15 @@ SOFTWARE.
 
         <span class="comment">// Segment BC
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(ni) = neighbour_bc_i {
-            <span class="self">self</span>.mark_as_neighbours(cob_i, Edge::Ca, ni).unwrap();
+            <span class="self">self</span>.mark_as_neighbours(cob_i, Edge::Ca, ni)<span class="question-mark">?</span>;
         }
         <span class="kw">if </span>constrain_bc {
             <span class="self">self</span>.triangles[cob_i].constrain(Edge::Ca);
         }
-    } <span class="comment">// end of flip_diagonal()
+        <span class="prelude-val">Ok</span>(())
+    }
 
-    </span><span class="doccomment">/// Adds a point to an edge of a [`Triangle3D`], splitting
+    <span class="doccomment">/// Adds a point to an edge of a [`Triangle3D`], splitting
     /// it and its neighbour
     </span><span class="kw">fn </span>split_edge(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -3300,37 +3291,34 @@ SOFTWARE.
 
         <span class="kw">let </span>segment_to_split = <span class="self">self</span>.triangles[triangle_index]
             .triangle
-            .segment(edge_to_split.as_i())
-            .unwrap();
+            .segment(edge_to_split.as_i())<span class="question-mark">?</span>;
 
         <span class="comment">// Neighbour... this is not necessarily there
         </span><span class="kw">let </span>nei_i = <span class="self">self</span>.triangles[triangle_index].neighbour(edge_to_split);
 
         <span class="comment">// get points
-        </span><span class="kw">let </span><span class="kw-2">mut </span>process_hemisphere = |index: usize| -&gt; (usize, usize) {
+        </span><span class="kw">let </span><span class="kw-2">mut </span>process_hemisphere = |index: usize| -&gt; <span class="prelude-ty">Result</span>&lt;(usize, usize), String&gt; {
             <span class="kw">let </span>ab_index = <span class="self">self</span>.triangles[index]
                 .triangle
                 .get_edge_index_from_segment(<span class="kw-2">&amp;</span>segment_to_split)
-                .unwrap();
-            <span class="kw">let </span>ab = <span class="self">self</span>.triangles[index].triangle.segment(ab_index).unwrap();
+                .ok_or_else(|| <span class="string">&quot;Could not get index from segment&quot;</span>.to_string())<span class="question-mark">?</span>;
+            <span class="kw">let </span>ab = <span class="self">self</span>.triangles[index].triangle.segment(ab_index)<span class="question-mark">?</span>;
             <span class="kw">let </span>vertex_a = ab.start();
             <span class="kw">let </span>vertex_b = ab.end();
 
             <span class="kw">let </span>edge = <span class="self">self</span>.triangles[index]
                 .triangle
                 .get_edge_index_from_segment(<span class="kw-2">&amp;</span>ab)
-                .unwrap();
+                .ok_or_else(|| <span class="string">&quot;Could not get index from segment&quot;</span>.to_string())<span class="question-mark">?</span>;
             <span class="kw">let </span>edge = Edge::from_i(edge);
 
-            <span class="comment">// let s = self.triangles[index].segment(edge).unwrap();
+            <span class="comment">// let s = self.triangles[index].segment(edge)?;
 
             // Get points
-            </span><span class="kw">let </span>vertex_c = <span class="self">self
-                </span>.get_opposite_vertex(<span class="kw-2">&amp;</span><span class="self">self</span>.triangles[index].triangle, ab)
-                .unwrap();
+            </span><span class="kw">let </span>vertex_c = <span class="self">self</span>.get_opposite_vertex(<span class="kw-2">&amp;</span><span class="self">self</span>.triangles[index].triangle, ab)<span class="question-mark">?</span>;
 
             <span class="comment">// invalidate base triangle.
-            </span><span class="self">self</span>.invalidate(index).unwrap();
+            </span><span class="self">self</span>.invalidate(index)<span class="question-mark">?</span>;
 
             <span class="comment">// Get neighbours in AC and BC and Constrains
             </span><span class="kw">let </span>bc_n = <span class="self">self</span>.triangles[index].neighbour(edge + <span class="number">1</span>);
@@ -3342,8 +3330,8 @@ SOFTWARE.
 
             <span class="comment">// Replace base triangle with two new triangles.
             // Create and add the new triangles.
-            </span><span class="kw">let </span>apc_i = <span class="self">self</span>.push(vertex_a, p, vertex_c, index).unwrap(); <span class="comment">// replace the original with this one.
-            </span><span class="kw">let </span>pbc_i = <span class="self">self</span>.push(p, vertex_b, vertex_c, <span class="number">0</span>).unwrap(); <span class="comment">// check from the start.
+            </span><span class="kw">let </span>apc_i = <span class="self">self</span>.push(vertex_a, p, vertex_c, index)<span class="question-mark">?</span>; <span class="comment">// replace the original with this one.
+            </span><span class="kw">let </span>pbc_i = <span class="self">self</span>.push(p, vertex_b, vertex_c, <span class="number">0</span>)<span class="question-mark">?</span>; <span class="comment">// check from the start.
 
             // Set neighbours and constraints
 
@@ -3358,11 +3346,11 @@ SOFTWARE.
             }
 
             <span class="comment">// Segment 1: PC
-            </span><span class="self">self</span>.mark_as_neighbours(apc_i, Edge::Bc, pbc_i).unwrap();
+            </span><span class="self">self</span>.mark_as_neighbours(apc_i, Edge::Bc, pbc_i)<span class="question-mark">?</span>;
 
             <span class="comment">// Segment 2: CA
             </span><span class="kw">if let </span><span class="prelude-val">Some</span>(ni) = ac_n {
-                <span class="self">self</span>.mark_as_neighbours(apc_i, Edge::Ca, ni).unwrap();
+                <span class="self">self</span>.mark_as_neighbours(apc_i, Edge::Ca, ni)<span class="question-mark">?</span>;
             }
             <span class="kw">if </span>ac_c {
                 <span class="self">self</span>.triangles[apc_i].constrain(Edge::Ca);
@@ -3380,7 +3368,7 @@ SOFTWARE.
 
             <span class="comment">// Segment 1: BC
             </span><span class="kw">if let </span><span class="prelude-val">Some</span>(ni) = bc_n {
-                <span class="self">self</span>.mark_as_neighbours(pbc_i, Edge::Bc, ni).unwrap();
+                <span class="self">self</span>.mark_as_neighbours(pbc_i, Edge::Bc, ni)<span class="question-mark">?</span>;
             }
             <span class="kw">if </span>bc_c {
                 <span class="self">self</span>.triangles[pbc_i].constrain(Edge::Bc);
@@ -3389,26 +3377,24 @@ SOFTWARE.
             <span class="comment">// Segment 2: CP... matches the other triangle. Reciprocity
 
             // Return positions of new triangles.
-            </span>(apc_i, pbc_i)
+            </span><span class="prelude-val">Ok</span>((apc_i, pbc_i))
         }; <span class="comment">// end of process_hemisphere
 
         // PROCESS BASE TRIANGLE
         // ==============================
 
-        </span><span class="kw">let </span>(top_left_i, top_right_i) = process_hemisphere(triangle_index);
+        </span><span class="kw">let </span>(top_left_i, top_right_i) = process_hemisphere(triangle_index)<span class="question-mark">?</span>;
 
         <span class="comment">// PROCESS NEIGHBOUR
         // =================
 
         // If there is any neighbour, process as well.
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(nei_i) = nei_i {
-            <span class="kw">let </span>(bottom_right_i, bottom_left_i) = process_hemisphere(nei_i);
+            <span class="kw">let </span>(bottom_right_i, bottom_left_i) = process_hemisphere(nei_i)<span class="question-mark">?</span>;
 
             <span class="comment">// Mark the upper and lower hemispheres as neighbours.
-            </span><span class="self">self</span>.mark_as_neighbours(top_left_i, Edge::Ab, bottom_left_i)
-                .unwrap();
-            <span class="self">self</span>.mark_as_neighbours(top_right_i, Edge::Ab, bottom_right_i)
-                .unwrap();
+            </span><span class="self">self</span>.mark_as_neighbours(top_left_i, Edge::Ab, bottom_left_i)<span class="question-mark">?</span>;
+            <span class="self">self</span>.mark_as_neighbours(top_right_i, Edge::Ab, bottom_right_i)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -3442,7 +3428,7 @@ SOFTWARE.
         </span><span class="kw">let </span>edge = <span class="self">self</span>.triangles[i]
             .triangle
             .get_edge_index_from_points(vertex_a, vertex_b)
-            .unwrap();
+            .ok_or_else(|| <span class="string">&quot;Could not get index from segment&quot;</span>.to_string())<span class="question-mark">?</span>;
         <span class="kw">let </span>edge = Edge::from_i(edge);
         <span class="kw">let </span>neighbour_ab_i = <span class="self">self</span>.triangles[i].neighbour(edge);
         <span class="kw">let </span>constrain_ab = <span class="self">self</span>.triangles[i].is_constrained(edge);
@@ -3450,7 +3436,8 @@ SOFTWARE.
         <span class="kw">let </span>edge = <span class="self">self</span>.triangles[i]
             .triangle
             .get_edge_index_from_points(vertex_b, vertex_c)
-            .unwrap();
+            .ok_or_else(|| <span class="string">&quot;Could not get index from segment&quot;</span>.to_string())<span class="question-mark">?</span>;
+
         <span class="kw">let </span>edge = Edge::from_i(edge);
         <span class="kw">let </span>neighbour_bc_i = <span class="self">self</span>.triangles[i].neighbour(edge);
         <span class="kw">let </span>constrain_bc = <span class="self">self</span>.triangles[i].is_constrained(edge);
@@ -3458,45 +3445,46 @@ SOFTWARE.
         <span class="kw">let </span>edge = <span class="self">self</span>.triangles[i]
             .triangle
             .get_edge_index_from_points(vertex_c, vertex_a)
-            .unwrap();
+            .ok_or_else(|| <span class="string">&quot;Could not get index from segment&quot;</span>.to_string())<span class="question-mark">?</span>;
+
         <span class="kw">let </span>edge = Edge::from_i(edge);
         <span class="kw">let </span>neighbour_ca_i = <span class="self">self</span>.triangles[i].neighbour(edge);
         <span class="kw">let </span>constrain_ca = <span class="self">self</span>.triangles[i].is_constrained(edge);
 
         <span class="comment">// Invalidate this triangle.
-        </span><span class="self">self</span>.invalidate(i).unwrap();
+        </span><span class="self">self</span>.invalidate(i)<span class="question-mark">?</span>;
 
         <span class="comment">// Add new triangles, noting their indices
         // Indices of the new triangles
-        </span><span class="kw">let </span>cap_i = <span class="self">self</span>.push(vertex_c, vertex_a, point, <span class="number">0</span>).unwrap();
-        <span class="kw">let </span>abp_i = <span class="self">self</span>.push(vertex_a, vertex_b, point, <span class="number">0</span>).unwrap();
-        <span class="kw">let </span>bcp_i = <span class="self">self</span>.push(vertex_b, vertex_c, point, <span class="number">0</span>).unwrap();
+        </span><span class="kw">let </span>cap_i = <span class="self">self</span>.push(vertex_c, vertex_a, point, <span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>abp_i = <span class="self">self</span>.push(vertex_a, vertex_b, point, <span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>bcp_i = <span class="self">self</span>.push(vertex_b, vertex_c, point, <span class="number">0</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// Connect them to each other
-        </span><span class="self">self</span>.mark_as_neighbours(cap_i, Edge::Bc, abp_i).unwrap();
-        <span class="self">self</span>.mark_as_neighbours(abp_i, Edge::Bc, bcp_i).unwrap();
-        <span class="self">self</span>.mark_as_neighbours(bcp_i, Edge::Bc, cap_i).unwrap();
+        </span><span class="self">self</span>.mark_as_neighbours(cap_i, Edge::Bc, abp_i)<span class="question-mark">?</span>;
+        <span class="self">self</span>.mark_as_neighbours(abp_i, Edge::Bc, bcp_i)<span class="question-mark">?</span>;
+        <span class="self">self</span>.mark_as_neighbours(bcp_i, Edge::Bc, cap_i)<span class="question-mark">?</span>;
 
         <span class="comment">// Connect to outside
         </span><span class="kw">if </span>constrain_ca {
             <span class="self">self</span>.triangles[cap_i].constrain(Edge::Ab);
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(ni) = neighbour_ca_i {
-            <span class="self">self</span>.mark_as_neighbours(cap_i, Edge::Ab, ni).unwrap();
+            <span class="self">self</span>.mark_as_neighbours(cap_i, Edge::Ab, ni)<span class="question-mark">?</span>;
         }
 
         <span class="kw">if </span>constrain_ab {
             <span class="self">self</span>.triangles[abp_i].constrain(Edge::Ab);
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(ni) = neighbour_ab_i {
-            <span class="self">self</span>.mark_as_neighbours(abp_i, Edge::Ab, ni).unwrap();
+            <span class="self">self</span>.mark_as_neighbours(abp_i, Edge::Ab, ni)<span class="question-mark">?</span>;
         }
 
         <span class="kw">if </span>constrain_bc {
             <span class="self">self</span>.triangles[bcp_i].constrain(Edge::Ab);
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(ni) = neighbour_bc_i {
-            <span class="self">self</span>.mark_as_neighbours(bcp_i, Edge::Ab, ni).unwrap();
+            <span class="self">self</span>.mark_as_neighbours(bcp_i, Edge::Ab, ni)<span class="question-mark">?</span>;
         }
 
         <span class="comment">// return
@@ -3506,7 +3494,7 @@ SOFTWARE.
     <span class="doccomment">/// Runs through the [`Triangulation3D`] checking if it is worth
     /// flipping diagonals. I.e., if flipping the diagonal would make
     /// the aspect ratios become better
-    </span><span class="kw">fn </span>restore_delaunay(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max_aspect_ratio: Float) {
+    </span><span class="kw">fn </span>restore_delaunay(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max_aspect_ratio: Float) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
         <span class="comment">// Flipping diagonals does not change the number of triangles.
         </span><span class="kw">let </span>n = <span class="self">self</span>.triangles.len();
 
@@ -3544,7 +3532,7 @@ SOFTWARE.
                 </span><span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                     <span class="kw">let </span>this_edge = Edge::from_i(j);
                     <span class="comment">// calculate possible aspect ratio...
-                    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(ar) = <span class="self">self</span>.get_flipped_aspect_ratio(i, this_edge) {
+                    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(ar) = <span class="self">self</span>.get_flipped_aspect_ratio(i, this_edge)<span class="question-mark">? </span>{
                         <span class="kw">if </span>current_ar &gt; ar &amp;&amp; best_aspect_ratio &gt; ar {
                             best_edge = <span class="prelude-val">Some</span>(this_edge);
                             best_aspect_ratio = ar;
@@ -3556,12 +3544,14 @@ SOFTWARE.
                 // the current situation (i.e. &gt;= 0)
                 </span><span class="kw">if let </span><span class="prelude-val">Some</span>(best) = best_edge {
                     <span class="comment">// if at least one of them is better than the current
-                    </span><span class="self">self</span>.flip_diagonal(i, best);
+                    </span><span class="self">self</span>.flip_diagonal(i, best)<span class="question-mark">?</span>;
                     any_changes = <span class="bool-val">true</span>;
                 } <span class="comment">// else... do nothing
             </span>}
         } <span class="comment">// End of while any_changes
-    </span>} <span class="comment">// end of fn restore_delaunay
+
+        </span><span class="prelude-val">Ok</span>(())
+    } <span class="comment">// end of fn restore_delaunay
 
     </span><span class="doccomment">/// Adds a point on a specific [`Triangle3D`]. Returns a `bool`, indicating
     /// whether any change was carried out
@@ -3570,15 +3560,15 @@ SOFTWARE.
         index: usize,
         point: Point3D,
         p_location: PointInTriangle,
-    ) -&gt; bool {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;bool, String&gt; {
         <span class="kw">if </span>!<span class="self">self</span>.triangles[index].valid {
             <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Trying to add point into an obsolete triangle&quot;</span>);
         }
 
         <span class="kw">if </span>p_location.is_vertex() {
             <span class="comment">// Point is a vertex... ignore, but pretend we did something
-            </span><span class="bool-val">false
-        </span>} <span class="kw">else if </span>p_location.is_edge() {
+            </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
+        } <span class="kw">else if </span>p_location.is_edge() {
             <span class="kw">let </span>edge = <span class="kw">match </span>p_location {
                 PointInTriangle::EdgeAB =&gt; Edge::Ab,
                 PointInTriangle::EdgeBC =&gt; Edge::Bc,
@@ -3587,12 +3577,12 @@ SOFTWARE.
                     <span class="macro">panic!</span>(<span class="string">&quot;Trying to split edge with a point that does not fall on an edge&quot;</span>)
                 }
             };
-            <span class="self">self</span>.split_edge(index, edge, point).unwrap();
-            <span class="bool-val">true
-        </span>} <span class="kw">else if </span>p_location == PointInTriangle::Inside {
-            <span class="self">self</span>.split_triangle(index, point).unwrap();
-            <span class="bool-val">true
-        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.split_edge(index, edge, point)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
+        } <span class="kw">else if </span>p_location == PointInTriangle::Inside {
+            <span class="self">self</span>.split_triangle(index, point)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
+        } <span class="kw">else </span>{
             <span class="macro">unreachable!</span>();
         }
     }
@@ -3611,7 +3601,7 @@ SOFTWARE.
 
             <span class="kw">let </span>p_location = tripiece.triangle.test_point(point);
             <span class="kw">if </span>p_location != PointInTriangle::Outside {
-                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">self</span>.add_point_to_triangle(i, point, p_location));
+                <span class="kw">return </span><span class="self">self</span>.add_point_to_triangle(i, point, p_location);
             }
         }
 
@@ -3648,17 +3638,17 @@ SOFTWARE.
                 <span class="kw">let </span><span class="kw-2">mut </span>s_i = <span class="number">0</span>;
                 <span class="comment">// but check the other two.
                 </span><span class="kw">for </span>j <span class="kw">in </span><span class="number">1</span>..<span class="number">3 </span>{
-                    <span class="kw">if </span>s.length() &lt; <span class="self">self</span>.triangles[i].triangle.segment(j).unwrap().length() {
+                    <span class="kw">if </span>s.length() &lt; <span class="self">self</span>.triangles[i].triangle.segment(j)<span class="question-mark">?</span>.length() {
                         s_i = j;
-                        s = <span class="self">self</span>.triangles[i].triangle.segment(j).unwrap();
+                        s = <span class="self">self</span>.triangles[i].triangle.segment(j)<span class="question-mark">?</span>;
                     }
                 }
                 <span class="kw">let </span>edge_to_split = Edge::from_i(s_i);
 
                 <span class="comment">// add midpoint
                 </span><span class="kw">let </span>mid_s = s.midpoint();
-                <span class="self">self</span>.split_edge(i, edge_to_split, mid_s).unwrap();
-                <span class="self">self</span>.restore_delaunay(max_aspect_ratio);
+                <span class="self">self</span>.split_edge(i, edge_to_split, mid_s)<span class="question-mark">?</span>;
+                <span class="self">self</span>.restore_delaunay(max_aspect_ratio)<span class="question-mark">?</span>;
                 any_changes = <span class="bool-val">true</span>;
             } <span class="kw">else if </span>area &gt; max_area {
                 <span class="comment">// try to add the circumcenter
@@ -3670,7 +3660,7 @@ SOFTWARE.
                     <span class="prelude-val">Ok</span>(did_something) =&gt; {
                         <span class="kw">if </span>did_something {
                             any_changes = <span class="bool-val">true</span>;
-                            <span class="self">self</span>.restore_delaunay(max_aspect_ratio);
+                            <span class="self">self</span>.restore_delaunay(max_aspect_ratio)<span class="question-mark">?</span>;
                         }
                     }
                     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
@@ -3679,9 +3669,9 @@ SOFTWARE.
                         </span><span class="kw">let </span>centroid = <span class="self">self</span>.triangles[i].centroid;
 
                         <span class="comment">// The Centroid of a triangle is always inside of it... right?
-                        </span><span class="kw">if </span><span class="self">self</span>.add_point_to_triangle(i, centroid, PointInTriangle::Inside) {
+                        </span><span class="kw">if </span><span class="self">self</span>.add_point_to_triangle(i, centroid, PointInTriangle::Inside)<span class="question-mark">? </span>{
                             any_changes = <span class="bool-val">true</span>;
-                            <span class="self">self</span>.restore_delaunay(max_aspect_ratio);
+                            <span class="self">self</span>.restore_delaunay(max_aspect_ratio)<span class="question-mark">?</span>;
                         }
                     }
                 }
@@ -3801,9 +3791,12 @@ SOFTWARE.
                     <span class="kw">let </span>neigh_edge = neigh
                         .triangle
                         .get_edge_index_from_points(edge.start, edge.end)
+                        .ok_or(<span class="string">&quot;Could not find edge index from points&quot;</span>)
                         .unwrap();
-                    <span class="kw">let </span>neighbours_neighbour =
-                        neigh.neighbour(Edge::from_i(neigh_edge)).unwrap() <span class="kw">as </span>usize;
+                    <span class="kw">let </span>neighbours_neighbour = neigh
+                        .neighbour(Edge::from_i(neigh_edge))
+                        .ok_or(<span class="string">&quot;Could not find neighbour&quot;</span>)
+                        .unwrap() <span class="kw">as </span>usize;
                     <span class="kw">if </span>neighbours_neighbour != i {
                         <span class="macro">panic!</span>(
                             <span class="string">&quot; ... This({}).neighbour({})={} != Neighbour({}).neighbour({})={}&quot;</span>,
@@ -4110,19 +4103,22 @@ SOFTWARE.
         <span class="comment">// Point inside (calls split_triangle())
         </span><span class="kw">let </span><span class="kw-2">mut </span>t = Triangulation3D::new();
         <span class="kw">let </span>i = t.push(a, b, c, <span class="number">0</span>).unwrap();
-        t.add_point_to_triangle(i, Point3D::new(<span class="number">0.0</span>, <span class="number">0.1</span>, <span class="number">0.</span>), PointInTriangle::Inside);
+        t.add_point_to_triangle(i, Point3D::new(<span class="number">0.0</span>, <span class="number">0.1</span>, <span class="number">0.</span>), PointInTriangle::Inside)
+            .unwrap();
         <span class="macro">assert_eq!</span>(<span class="number">3</span>, t.triangles.len());
 
         <span class="comment">// Point on AB edge (calls split_edge())
         </span><span class="kw">let </span><span class="kw-2">mut </span>t = Triangulation3D::new();
         <span class="kw">let </span>i = t.push(a, b, c, <span class="number">0</span>).unwrap();
-        t.add_point_to_triangle(i, Point3D::new(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.</span>), PointInTriangle::EdgeAB);
+        t.add_point_to_triangle(i, Point3D::new(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.</span>), PointInTriangle::EdgeAB)
+            .unwrap();
         <span class="macro">assert_eq!</span>(<span class="number">2</span>, t.triangles.len());
 
         <span class="comment">// Point on Vertex (does nothing)
         </span><span class="kw">let </span><span class="kw-2">mut </span>t = Triangulation3D::new();
         <span class="kw">let </span>i = t.push(a, b, c, <span class="number">0</span>).unwrap();
-        t.add_point_to_triangle(i, a, PointInTriangle::VertexA);
+        t.add_point_to_triangle(i, a, PointInTriangle::VertexA)
+            .unwrap();
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, t.triangles.len());
     }
 
@@ -4385,7 +4381,7 @@ SOFTWARE.
 
         // Expected to fail... they are not
         // neighbours yet
-        </span>t.flip_diagonal(<span class="number">0</span>, Edge::Ab);
+        </span>t.flip_diagonal(<span class="number">0</span>, Edge::Ab).unwrap();
     }
 
     <span class="attr">#[test]
@@ -4428,7 +4424,7 @@ SOFTWARE.
         </span><span class="macro">assert_eq!</span>(t.n_valid_triangles(), <span class="number">6</span>);
 
         <span class="comment">// Should work now.
-        </span>t.flip_diagonal(<span class="number">0</span>, Edge::Ab);
+        </span>t.flip_diagonal(<span class="number">0</span>, Edge::Ab).unwrap();
 
         <span class="kw">let </span>first_flip = get_triangulation_svg(<span class="kw-2">&amp;</span>t, -l, l, -l, l);
 
@@ -4480,19 +4476,25 @@ SOFTWARE.
         <span class="macro">assert_eq!</span>(t.triangles[<span class="number">1</span>].neighbour(Edge::Ab).unwrap(), <span class="number">0</span>);
 
         <span class="comment">// These should return -1... no neighbours there.
-        </span><span class="macro">assert!</span>(t.get_flipped_aspect_ratio(<span class="number">0</span>, Edge::Ab).is_none());
-        <span class="macro">assert!</span>(t.get_flipped_aspect_ratio(<span class="number">0</span>, Edge::Bc).is_none());
+        </span><span class="macro">assert!</span>(t.get_flipped_aspect_ratio(<span class="number">0</span>, Edge::Ab).unwrap().is_none());
+        <span class="macro">assert!</span>(t.get_flipped_aspect_ratio(<span class="number">0</span>, Edge::Bc).unwrap().is_none());
 
         <span class="comment">// constrain side 0 of triangle 0
         </span>t.triangles[<span class="number">0</span>].constrain(Edge::Ab);
-        <span class="macro">assert!</span>(t.get_flipped_aspect_ratio(<span class="number">0</span>, Edge::Ab).is_none());
+        <span class="macro">assert!</span>(t.get_flipped_aspect_ratio(<span class="number">0</span>, Edge::Ab).unwrap().is_none());
 
         <span class="comment">// This should work.
         </span><span class="kw">let </span>tri0_ar = tri0.aspect_ratio();
         <span class="kw">let </span>tri1_ar = tri1.aspect_ratio();
         <span class="macro">assert_eq!</span>(tri0_ar, tri1_ar);
-        <span class="macro">assert_eq!</span>(tri0_ar, t.get_flipped_aspect_ratio(<span class="number">0</span>, Edge::Ca).unwrap());
-        <span class="macro">assert_eq!</span>(tri1_ar, t.get_flipped_aspect_ratio(<span class="number">1</span>, Edge::Ab).unwrap());
+        <span class="macro">assert_eq!</span>(
+            tri0_ar,
+            t.get_flipped_aspect_ratio(<span class="number">0</span>, Edge::Ca).unwrap().unwrap()
+        );
+        <span class="macro">assert_eq!</span>(
+            tri1_ar,
+            t.get_flipped_aspect_ratio(<span class="number">1</span>, Edge::Ab).unwrap().unwrap()
+        );
     }
 
     <span class="attr">#[test]
@@ -4618,7 +4620,7 @@ SOFTWARE.
             }
         }
 
-        t.restore_delaunay(<span class="number">1.6</span>);
+        t.restore_delaunay(<span class="number">1.6</span>).unwrap();
         <span class="kw">let </span>after_delaunay = get_triangulation_svg(<span class="kw-2">&amp;</span>t, -l, l, -l, l);
 
         draw_triangulation(

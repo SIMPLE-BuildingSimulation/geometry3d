@@ -1539,6 +1539,8 @@
 <a href="#1505" id="1505">1505</a>
 <a href="#1506" id="1506">1506</a>
 <a href="#1507" id="1507">1507</a>
+<a href="#1508" id="1508">1508</a>
+<a href="#1509" id="1509">1509</a>
 </pre><pre class="rust"><code><span class="comment">/*
 MIT License
 
@@ -1746,7 +1748,9 @@ SOFTWARE.
     /// collinear points.
     ///
     /// The returned [`Loop3D`] will be closed if `self`
-    /// is closed.
+    /// is closed and it has more than 3 vertices (it might not
+    /// happen, as loops can be modified after closed... not very
+    /// safe, but possible)
     ///
     /// # Example
     ///
@@ -1767,7 +1771,7 @@ SOFTWARE.
         <span class="kw">for </span>v <span class="kw">in </span><span class="self">self</span>.vertices.iter() {
             new.push(<span class="kw-2">*</span>v).unwrap();
         }
-        <span class="kw">if </span><span class="self">self</span>.closed {
+        <span class="kw">if </span><span class="self">self</span>.closed &amp;&amp; <span class="self">self</span>.vertices.len() &gt;= <span class="number">3 </span>{
             new.close()<span class="question-mark">?
         </span>}
         <span class="prelude-val">Ok</span>(new)
