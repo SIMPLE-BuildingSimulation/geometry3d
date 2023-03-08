@@ -1771,7 +1771,7 @@ SOFTWARE.
         <span class="kw">for </span>v <span class="kw">in </span><span class="self">self</span>.vertices.iter() {
             new.push(<span class="kw-2">*</span>v).unwrap();
         }
-        <span class="kw">if </span><span class="self">self</span>.closed &amp;&amp; <span class="self">self</span>.vertices.len() &gt;= <span class="number">3 </span>{
+        <span class="kw">if </span><span class="self">self</span>.closed &amp;&amp; new.vertices.len() &gt;= <span class="number">3 </span>{
             new.close()<span class="question-mark">?
         </span>}
         <span class="prelude-val">Ok</span>(new)
