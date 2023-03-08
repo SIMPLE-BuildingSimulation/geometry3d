@@ -205,7 +205,9 @@ impl Loop3D {
     /// collinear points.
     ///
     /// The returned [`Loop3D`] will be closed if `self`
-    /// is closed.
+    /// is closed and it has more than 3 vertices (it might not
+    /// happen, as loops can be modified after closed... not very
+    /// safe, but possible)
     ///
     /// # Example
     ///
@@ -226,7 +228,7 @@ impl Loop3D {
         for v in self.vertices.iter() {
             new.push(*v).unwrap();
         }
-        if self.closed {
+        if self.closed && self.vertices.len() >= 3 {
             new.close()?
         }
         Ok(new)
