@@ -292,11 +292,10 @@ impl Triangulation3D {
 
             let potential_diag = Segment3D::new(v0, v2);
             let is_line = v0.is_collinear(v1, v2)?;
-            
+
             // this will be false if potential_diag is very small.
             let is_diagonal = the_loop.is_diagonal(potential_diag)?;
             if !is_line && is_diagonal {
-                
                 // Add triangle
                 t.push(v0, v1, v2, last_added)?;
 
@@ -313,7 +312,6 @@ impl Triangulation3D {
                 if poly.contains_segment(&s20) {
                     t.triangles[last_added].constrain(Edge::from_i(2));
                 }
-            
 
                 //remove v1
                 the_loop.remove((anchor + 1) % n);
@@ -508,7 +506,7 @@ impl Triangulation3D {
         }
     }
 
-    fn flip_diagonal(&mut self, index: usize, edge: Edge) ->Result<(),String> {
+    fn flip_diagonal(&mut self, index: usize, edge: Edge) -> Result<(), String> {
         // The transformation is as follows:
         //         C                C
         //        /\               /|\
@@ -535,9 +533,7 @@ impl Triangulation3D {
         }
 
         // get vertices
-        let vertex_a = self.triangles[index]
-            .triangle
-            .vertex(edge.as_i() % 3)?;
+        let vertex_a = self.triangles[index].triangle.vertex(edge.as_i() % 3)?;
         let vertex_b = self.triangles[index]
             .triangle
             .vertex((edge.as_i() + 1) % 3)?;
@@ -547,9 +543,7 @@ impl Triangulation3D {
         // ... including the oposite side
         let s = Segment3D::new(vertex_a, vertex_b);
 
-        let opposite = self
-            .get_opposite_vertex(&self.triangles[neighbour_index].triangle, s)
-            ?;
+        let opposite = self.get_opposite_vertex(&self.triangles[neighbour_index].triangle, s)?;
 
         /* CHECK SURROUNDINGS */
         // AC segment
@@ -612,9 +606,7 @@ impl Triangulation3D {
         self.invalidate(index)?;
         self.invalidate(neighbour_index)?;
         let aoc_i = self.push(vertex_a, opposite, vertex_c, index)?;
-        let cob_i = self
-            .push(vertex_c, opposite, vertex_b, neighbour_index)
-            ?;
+        let cob_i = self.push(vertex_c, opposite, vertex_b, neighbour_index)?;
 
         /* REORGANIZE NEIGHBOURHOOD */
         // Segment A-Opposite
@@ -656,7 +648,7 @@ impl Triangulation3D {
             self.triangles[cob_i].constrain(Edge::Ca);
         }
         Ok(())
-    } 
+    }
 
     /// Adds a point to an edge of a [`Triangle3D`], splitting
     /// it and its neighbour
@@ -685,8 +677,7 @@ impl Triangulation3D {
 
         let segment_to_split = self.triangles[triangle_index]
             .triangle
-            .segment(edge_to_split.as_i())
-            ?;
+            .segment(edge_to_split.as_i())?;
 
         // Neighbour... this is not necessarily there
         let nei_i = self.triangles[triangle_index].neighbour(edge_to_split);
@@ -695,22 +686,22 @@ impl Triangulation3D {
         let mut process_hemisphere = |index: usize| -> Result<(usize, usize), String> {
             let ab_index = self.triangles[index]
                 .triangle
-                .get_edge_index_from_segment(&segment_to_split).ok_or( "Could not get index from segment".to_string())?;
+                .get_edge_index_from_segment(&segment_to_split)
+                .ok_or_else(|| "Could not get index from segment".to_string())?;
             let ab = self.triangles[index].triangle.segment(ab_index)?;
             let vertex_a = ab.start();
             let vertex_b = ab.end();
 
             let edge = self.triangles[index]
                 .triangle
-                .get_edge_index_from_segment(&ab).ok_or( "Could not get index from segment".to_string())?;
+                .get_edge_index_from_segment(&ab)
+                .ok_or_else(|| "Could not get index from segment".to_string())?;
             let edge = Edge::from_i(edge);
 
             // let s = self.triangles[index].segment(edge)?;
 
             // Get points
-            let vertex_c = self
-                .get_opposite_vertex(&self.triangles[index].triangle, ab)
-                ?;
+            let vertex_c = self.get_opposite_vertex(&self.triangles[index].triangle, ab)?;
 
             // invalidate base triangle.
             self.invalidate(index)?;
@@ -788,10 +779,8 @@ impl Triangulation3D {
             let (bottom_right_i, bottom_left_i) = process_hemisphere(nei_i)?;
 
             // Mark the upper and lower hemispheres as neighbours.
-            self.mark_as_neighbours(top_left_i, Edge::Ab, bottom_left_i)
-                ?;
-            self.mark_as_neighbours(top_right_i, Edge::Ab, bottom_right_i)
-                ?;
+            self.mark_as_neighbours(top_left_i, Edge::Ab, bottom_left_i)?;
+            self.mark_as_neighbours(top_right_i, Edge::Ab, bottom_right_i)?;
         }
 
         Ok(())
@@ -824,14 +813,16 @@ impl Triangulation3D {
         // Get neighbours and constraints
         let edge = self.triangles[i]
             .triangle
-            .get_edge_index_from_points(vertex_a, vertex_b).ok_or( "Could not get index from segment".to_string())?;            
+            .get_edge_index_from_points(vertex_a, vertex_b)
+            .ok_or_else(|| "Could not get index from segment".to_string())?;
         let edge = Edge::from_i(edge);
         let neighbour_ab_i = self.triangles[i].neighbour(edge);
         let constrain_ab = self.triangles[i].is_constrained(edge);
 
         let edge = self.triangles[i]
             .triangle
-            .get_edge_index_from_points(vertex_b, vertex_c).ok_or( "Could not get index from segment".to_string())?;
+            .get_edge_index_from_points(vertex_b, vertex_c)
+            .ok_or_else(|| "Could not get index from segment".to_string())?;
 
         let edge = Edge::from_i(edge);
         let neighbour_bc_i = self.triangles[i].neighbour(edge);
@@ -839,8 +830,9 @@ impl Triangulation3D {
 
         let edge = self.triangles[i]
             .triangle
-            .get_edge_index_from_points(vertex_c, vertex_a).ok_or( "Could not get index from segment".to_string())?;
-            
+            .get_edge_index_from_points(vertex_c, vertex_a)
+            .ok_or_else(|| "Could not get index from segment".to_string())?;
+
         let edge = Edge::from_i(edge);
         let neighbour_ca_i = self.triangles[i].neighbour(edge);
         let constrain_ca = self.triangles[i].is_constrained(edge);
@@ -888,7 +880,7 @@ impl Triangulation3D {
     /// Runs through the [`Triangulation3D`] checking if it is worth
     /// flipping diagonals. I.e., if flipping the diagonal would make
     /// the aspect ratios become better
-    fn restore_delaunay(&mut self, max_aspect_ratio: Float) -> Result<(),String> {
+    fn restore_delaunay(&mut self, max_aspect_ratio: Float) -> Result<(), String> {
         // Flipping diagonals does not change the number of triangles.
         let n = self.triangles.len();
 
@@ -1184,9 +1176,13 @@ mod testing {
                     let neigh = &t.triangles[neighbour_i];
                     let neigh_edge = neigh
                         .triangle
-                        .get_edge_index_from_points(edge.start, edge.end).ok_or("Could not find edge index from points").unwrap();                        
-                    let neighbours_neighbour =
-                        neigh.neighbour(Edge::from_i(neigh_edge)).ok_or("Could not find neighbour").unwrap() as usize;
+                        .get_edge_index_from_points(edge.start, edge.end)
+                        .ok_or("Could not find edge index from points")
+                        .unwrap();
+                    let neighbours_neighbour = neigh
+                        .neighbour(Edge::from_i(neigh_edge))
+                        .ok_or("Could not find neighbour")
+                        .unwrap() as usize;
                     if neighbours_neighbour != i {
                         panic!(
                             " ... This({}).neighbour({})={} != Neighbour({}).neighbour({})={}",
@@ -1289,7 +1285,7 @@ mod testing {
             file.write(b"<div>").unwrap();
 
             file.write(format!("<h1>{}</h1>", title).as_bytes())
-            .unwrap();
+                .unwrap();
             file.write(svg.as_bytes()).unwrap();
             file.write(b"</div>").unwrap();
         }
@@ -1493,19 +1489,22 @@ mod testing {
         // Point inside (calls split_triangle())
         let mut t = Triangulation3D::new();
         let i = t.push(a, b, c, 0).unwrap();
-        t.add_point_to_triangle(i, Point3D::new(0.0, 0.1, 0.), PointInTriangle::Inside).unwrap();
+        t.add_point_to_triangle(i, Point3D::new(0.0, 0.1, 0.), PointInTriangle::Inside)
+            .unwrap();
         assert_eq!(3, t.triangles.len());
 
         // Point on AB edge (calls split_edge())
         let mut t = Triangulation3D::new();
         let i = t.push(a, b, c, 0).unwrap();
-        t.add_point_to_triangle(i, Point3D::new(0.0, 0.0, 0.), PointInTriangle::EdgeAB).unwrap();
+        t.add_point_to_triangle(i, Point3D::new(0.0, 0.0, 0.), PointInTriangle::EdgeAB)
+            .unwrap();
         assert_eq!(2, t.triangles.len());
 
         // Point on Vertex (does nothing)
         let mut t = Triangulation3D::new();
         let i = t.push(a, b, c, 0).unwrap();
-        t.add_point_to_triangle(i, a, PointInTriangle::VertexA).unwrap();
+        t.add_point_to_triangle(i, a, PointInTriangle::VertexA)
+            .unwrap();
         assert_eq!(1, t.triangles.len());
     }
 
@@ -1874,8 +1873,14 @@ mod testing {
         let tri0_ar = tri0.aspect_ratio();
         let tri1_ar = tri1.aspect_ratio();
         assert_eq!(tri0_ar, tri1_ar);
-        assert_eq!(tri0_ar, t.get_flipped_aspect_ratio(0, Edge::Ca).unwrap().unwrap());
-        assert_eq!(tri1_ar, t.get_flipped_aspect_ratio(1, Edge::Ab).unwrap().unwrap());
+        assert_eq!(
+            tri0_ar,
+            t.get_flipped_aspect_ratio(0, Edge::Ca).unwrap().unwrap()
+        );
+        assert_eq!(
+            tri1_ar,
+            t.get_flipped_aspect_ratio(1, Edge::Ab).unwrap().unwrap()
+        );
     }
 
     #[test]
