@@ -523,7 +523,7 @@ impl Triangle3D {
     }
 
     /// Like `intersect_local_ray` but simplified because there is not need
-    /// for calcuating the paramtrisized elements 
+    /// for calcuating the paramtrisized elements
     pub fn simple_intersect_local_ray(
         &self,
         ray: &Ray3D,

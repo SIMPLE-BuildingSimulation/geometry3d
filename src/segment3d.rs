@@ -108,8 +108,10 @@ impl Segment3D {
     /// Checks if a [`Segment3D`] contains another [`Segment3D`].
     pub fn contains(&self, input: &Segment3D) -> Result<bool, String> {
         const TINY: Float = 1e-6;
-        if self.length() < TINY {            
-            return Err("Trying to check whether a segment is contained in a zero-length segment".into());
+        if self.length() < TINY {
+            return Err(
+                "Trying to check whether a segment is contained in a zero-length segment".into(),
+            );
         }
 
         let a1 = self.start();
@@ -138,10 +140,12 @@ impl Segment3D {
             alpha = (a2.z - a1.z) / a1b1.z;
             beta = (b2.z - a1.z) / a1b1.z;
         } else {
-            // We should never get here.                        
-            return Err("Trying to check whether a segment is contained in a zero-length segment".into());
+            // We should never get here.
+            return Err(
+                "Trying to check whether a segment is contained in a zero-length segment".into(),
+            );
         }
-        const INTERSECT_RANGE : core::ops::RangeInclusive<Float> = 0. ..=1.;// TINY..(1.-TINY);
+        const INTERSECT_RANGE: core::ops::RangeInclusive<Float> = 0. ..=1.; // TINY..(1.-TINY);
         Ok(INTERSECT_RANGE.contains(&alpha) && INTERSECT_RANGE.contains(&beta))
     }
 
@@ -213,7 +217,7 @@ impl Segment3D {
     /// one of the [`Segment3D`] barely touches the other one.
     pub fn intersect(&self, input: &Segment3D, output: &mut Point3D) -> bool {
         const TINY: Float = 1e-8;
-        const INTERSECT_RANGE : core::ops::Range<Float> = TINY..(1.-TINY);
+        const INTERSECT_RANGE: core::ops::Range<Float> = TINY..(1. - TINY);
         match self.get_intersection_pt(input) {
             Some((t_a, t_b)) => {
                 let a = self.end - self.start;
