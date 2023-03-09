@@ -2881,23 +2881,23 @@ SOFTWARE.
         <span class="kw">let </span><span class="kw-2">mut </span>anchor = <span class="number">0</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>count = <span class="number">0</span>;
         <span class="kw">loop </span>{
+            count += <span class="number">1</span>;
             <span class="kw">if </span>count &gt; <span class="number">1000 </span>{
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Excessive number of iteration when triangulating polygon&quot;</span>.into());
             }
 
-            count += <span class="number">1</span>;
             <span class="kw">let </span><span class="kw-2">mut </span>n = the_loop.len();
+            <span class="kw">if </span>count % <span class="number">10 </span>== <span class="number">0 </span>{
+                the_loop = the_loop.sanitize()<span class="question-mark">?</span>;
+                n = the_loop.len();
+            }
+
             <span class="kw">let </span>last_added = t.n_triangles();
 
             <span class="kw">if </span>n == <span class="number">2 </span>{
                 <span class="comment">// return
                 </span>t.mark_neighbourhouds()<span class="question-mark">?</span>;
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(t);
-            }
-
-            <span class="kw">if </span>count % <span class="number">10 </span>== <span class="number">0 </span>{
-                the_loop = the_loop.sanitize()<span class="question-mark">?</span>;
-                n = the_loop.len();
             }
 
             <span class="kw">let </span>v0 = the_loop[anchor % n];
